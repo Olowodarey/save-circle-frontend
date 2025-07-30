@@ -1,10 +1,57 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Users, Shield, Lock, TrendingUp, Coins, Globe } from "lucide-react"
+import { Users, Shield, Lock, TrendingUp, Coins, Globe, LogOut } from "lucide-react"
 import Link from "next/link"
+import WalletConnectModal from "@/components/wallet-connect-modal"
 
 export default function HomePage() {
+  const [showWalletModal, setShowWalletModal] = useState(false)
+  const [walletConnected, setWalletConnected] = useState(false)
+  const [walletType, setWalletType] = useState<string | null>(null)
+  const [address, setAddress] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Check wallet connection on mount
+    if (typeof window !== "undefined") {
+      const savedWallet = localStorage.getItem("connected-wallet")
+      const savedAddress = localStorage.getItem("wallet-address")
+
+      if (savedWallet && savedAddress) {
+        setWalletConnected(true)
+        setWalletType(savedWallet)
+        setAddress(savedAddress)
+      }
+    }
+  }, [])
+
+  const handleWalletConnect = (walletType: string) => {
+    const mockAddress = "0x1234567890abcdef1234567890abcdef12345678"
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("connected-wallet", walletType)
+      localStorage.setItem("wallet-address", mockAddress)
+    }
+
+    setWalletConnected(true)
+    setWalletType(walletType)
+    setAddress(mockAddress)
+    setShowWalletModal(false)
+  }
+
+  const handleDisconnect = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("connected-wallet")
+      localStorage.removeItem("wallet-address")
+    }
+    setWalletConnected(false)
+    setWalletType(null)
+    setAddress(null)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
@@ -31,9 +78,24 @@ export default function HomePage() {
             </Link>
           </nav>
           <div className="flex items-center gap-3">
-            <Button variant="outline" asChild>
-              <Link href="/login">Connect Wallet</Link>
-            </Button>
+            {!walletConnected ? (
+              <Button variant="outline" onClick={() => setShowWalletModal(true)}>
+                Connect Wallet
+              </Button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  {walletType}
+                </Badge>
+                <span className="text-sm text-gray-600 font-mono">
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleDisconnect}>
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
             <Button asChild>
               <Link href="/dashboard">Launch App</Link>
             </Button>
@@ -274,6 +336,11 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+      <WalletConnectModal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
+        onConnect={handleWalletConnect}
+      />
     </div>
   )
 }
