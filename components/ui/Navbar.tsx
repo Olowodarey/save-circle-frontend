@@ -1,0 +1,102 @@
+import {useState, useEffect} from "react";
+import { Badge } from "@/components/ui/badge"
+import {Coins, LogOut} from "lucide-react";
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+
+interface HeaderProps {
+    setShowWalletModal: (show: boolean) => void;
+    setWalletType: (type: string) => void;
+    setWalletConnected: (connected: boolean) => void;
+    setAddress: (address: string) => void;
+    walletConnected: boolean;
+    walletType: string | null;
+    address: string | null;
+  }
+
+const Navbar = ({
+    setShowWalletModal,
+    setWalletType,
+    setWalletConnected,
+    setAddress,
+    walletConnected,
+    walletType,
+    address
+  }: HeaderProps) =>  {
+    
+      useEffect(() => {
+        // Check wallet connection on mount
+        if (typeof window !== "undefined") {
+          const savedWallet = localStorage.getItem("connected-wallet")
+          const savedAddress = localStorage.getItem("wallet-address")
+    
+          if (savedWallet && savedAddress) {
+            setWalletConnected(true)
+            setWalletType(savedWallet)
+            setAddress(savedAddress)
+          }
+        }
+      }, [])
+    
+      
+      const handleDisconnect = () => {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("connected-wallet")
+          localStorage.removeItem("wallet-address")
+        }
+        setWalletConnected(false)
+        setWalletType("")
+        setAddress("")
+      }
+
+    return  <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <Coins className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-900">Save Circle</span>
+            </Link>
+            <nav className="hidden md:flex items-center gap-6">
+            <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
+                Dashboard
+            </Link>
+            <Link href="/groups" className="text-gray-600 hover:text-gray-900">
+                Groups
+            </Link>
+            <Link href="/profile" className="text-gray-600 hover:text-gray-900">
+                Profile
+            </Link>
+            <Link href="/reputation" className="text-gray-600 hover:text-gray-900">
+                Reputation
+            </Link>
+            </nav>
+            <div className="flex items-center gap-3">
+            {!walletConnected ? (
+                <Button variant="outline" onClick={() => setShowWalletModal(true)}>
+                Connect Wallet
+                </Button>
+            ) : (
+                <div className="flex items-center gap-2">
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    {walletType}
+                </Badge>
+                <span className="text-sm text-gray-600 font-mono">
+                    {address?.slice(0, 6)}...{address?.slice(-4)}
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleDisconnect}>
+                    <LogOut className="w-4 h-4" />
+                </Button>
+                </div>
+            )}
+            <Button asChild>
+                <Link href="/dashboard">Launch App</Link>
+            </Button>
+            </div>
+        </div>
+    </header>
+    
+}
+
+export default Navbar;
