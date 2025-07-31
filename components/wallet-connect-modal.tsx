@@ -1,10 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { X, Wallet, AlertCircle } from "lucide-react"
+import { useConnect, type Connector } from "@starknet-react/core";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { X, Wallet, AlertCircle } from "lucide-react";
 
 interface WalletConnectModalProps {
   isOpen: boolean
@@ -13,54 +14,20 @@ interface WalletConnectModalProps {
 }
 
 export default function WalletConnectModal({ isOpen, onClose, onConnect }: WalletConnectModalProps) {
-  const [connecting, setConnecting] = useState<string | null>(null)
-
-  const allWallets = [
-    {
-      id: "argentx",
-      name: "ArgentX",
-      description: "The most popular Starknet wallet",
-      icon: "/placeholder.svg?height=48&width=48",
-      installed: typeof window !== "undefined" && window.starknet_argentX,
-      popular: true,
-    },
-    {
-      id: "braavos",
-      name: "Braavos",
-      description: "Smart wallet for Starknet",
-      icon: "/placeholder.svg?height=48&width=48",
-      installed: typeof window !== "undefined" && window.starknet_braavos,
-      popular: false,
-    },
-    {
-      id: "okx",
-      name: "OKX Wallet",
-      description: "Multi-chain wallet with Starknet support",
-      icon: "/placeholder.svg?height=48&width=48",
-      installed: typeof window !== "undefined" && window.okxwallet?.starknet,
-      popular: false,
-    },
-  ]
-
+  const { connectors, connectAsync, isPending, isSuccess, isError, error, reset } = useConnect();
   // Only show installed wallets
-  const availableWallets = allWallets.filter((wallet) => wallet.installed)
+  const availableWallets = connectors
 
-  const handleConnect = async (walletId: string) => {
-    setConnecting(walletId)
-
+  const handleConnect = async (connector: Connector) => {
     try {
-      // Simulate connection delay
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // Here you would implement actual wallet connection logic
-      // For now, we'll just simulate a successful connection
-      onConnect(walletId)
-    } catch (error) {
-      console.error("Failed to connect wallet:", error)
-    } finally {
-      setConnecting(null)
+      await connectAsync({ connector });
+      if (isSuccess) {
+        onClose();
+      }
+    } catch (err) {
+      console.error("Failed to connect wallet:", err);
     }
-  }
+  };
 
   if (!isOpen) return null
 
@@ -91,23 +58,21 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect }: Walle
         <CardContent className="space-y-4">
           {availableWallets.length > 0 ? (
             <>
-              {availableWallets.map((wallet) => (
+              {availableWallets.map((connector) => (
                 <div
-                  key={wallet.id}
-                  className={`relative border rounded-lg p-4 transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer ${
-                    connecting === wallet.id ? "border-blue-300 bg-blue-50" : ""
-                  }`}
-                  onClick={() => handleConnect(wallet.id)}
+                  key={connector.id}
+                  className={`relative border rounded-lg p-4 transition-all hover:border-blue-300 hover:bg-blue-50 cursor-pointer`}
+                  onClick={() => handleConnect(connector)}
                 >
-                  {wallet.popular && (
+                  {/* {connector.popular && (
                     <Badge className="absolute -top-2 -right-2 bg-blue-600 hover:bg-blue-600">Popular</Badge>
-                  )}
+                  )} */}
 
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-white rounded-lg border flex items-center justify-center">
                       <img
-                        src={wallet.icon || "/placeholder.svg"}
-                        alt={wallet.name}
+                        src={connector.icon || "/placeholder.svg"}
+                        alt={connector.name}
                         className="w-8 h-8"
                         onError={(e) => {
                           e.currentTarget.style.display = "none"
@@ -115,20 +80,32 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect }: Walle
                         }}
                       />
                       <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded flex items-center justify-center text-white font-bold text-sm hidden">
-                        {wallet.name.charAt(0)}
+                        {connector.name.charAt(0)}
                       </div>
                     </div>
 
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{wallet.name}</h3>
-                      <p className="text-sm text-gray-600">{wallet.description}</p>
+                      <h3 className="font-semibold text-gray-900">{connector.name}</h3>
+                      {/* <p className="text-sm text-gray-600">{connector.description}</p> */}
 
-                      {connecting === wallet.id && (
+                      {isPending && ( 
                         <div className="flex items-center gap-1 mt-1">
                           <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                           <span className="text-xs text-blue-600">Connecting...</span>
                         </div>
                       )}
+                      
+                      {isError && (
+                        <div className="flex items-center gap-1 mt-1">
+                          <span className="text-xs text-red-600">Connection failed</span>
+                          <button 
+                            onClick={reset}
+                            className="text-xs text-blue-600 hover:underline ml-1"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      )} 
                     </div>
                   </div>
                 </div>
