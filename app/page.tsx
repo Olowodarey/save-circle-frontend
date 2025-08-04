@@ -9,24 +9,16 @@ import Link from "next/link"
 import WalletConnectModal from "@/components/wallet-connect-modal"
 import  Navbar  from "@/components/ui/Navbar"
 import  Footer  from "@/components/ui/Footer"
+import { useAccount } from "@starknet-react/core";
 
 export default function HomePage() {
+  const { address, isConnected } = useAccount();
   const [showWalletModal, setShowWalletModal] = useState(false)
-  const [walletConnected, setWalletConnected] = useState(false)
-  const [walletType, setWalletType] = useState<string | null>(null)
-  const [address, setAddress] = useState<string | null>(null)
-
   const handleWalletConnect = (walletType: string) => {
-    const mockAddress = "0x1234567890abcdef1234567890abcdef12345678"
 
     if (typeof window !== "undefined") {
       localStorage.setItem("connected-wallet", walletType)
-      localStorage.setItem("wallet-address", mockAddress)
     }
-
-    setWalletConnected(true)
-    setWalletType(walletType)
-    setAddress(mockAddress)
     setShowWalletModal(false)
   }
 
@@ -36,12 +28,6 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <Navbar setShowWalletModal={setShowWalletModal}
-              setWalletType={setWalletType}
-              setWalletConnected={setWalletConnected}
-              setAddress={setAddress}
-              walletConnected={walletConnected}
-              walletType={walletType}
-              address={address}
       />
 
       {/* Hero Section */}
