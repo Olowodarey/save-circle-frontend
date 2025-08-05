@@ -8,10 +8,11 @@ interface ProtectedLinkProps {
   href: string
   children: ReactNode
   className?: string
-  [key: string]: any // for other props like asChild, etc.
+  [key: string]: any // for other props like asChild, etc.,
+  setShowWalletModal: (show: boolean) => void;
 }
 
-export function ProtectedLink({ href, children, className, ...props }: ProtectedLinkProps) {
+export function ProtectedLink({ href, children, className, setShowWalletModal, ...props }: ProtectedLinkProps) {
   const { address, isConnected } = useAccount()
 
   const handleClick = (e: React.MouseEvent) => {
@@ -23,7 +24,7 @@ export function ProtectedLink({ href, children, className, ...props }: Protected
           label: "Connect Wallet",
           onClick: () => {
             // You can trigger wallet modal here if needed
-            // setShowWalletModal(true)
+            setShowWalletModal(true)
           }
         }
       })

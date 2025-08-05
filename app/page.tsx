@@ -54,10 +54,10 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="text-lg px-8" asChild>
-              <ProtectedLink href="/dashboard">Start Saving</ProtectedLink>
+              <ProtectedLink setShowWalletModal={setShowWalletModal} href="/dashboard">Start Saving</ProtectedLink>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8 bg-transparent" asChild>
-              <ProtectedLink href="/groups">Explore Groups</ProtectedLink>
+              <ProtectedLink setShowWalletModal={setShowWalletModal} href="/groups">Explore Groups</ProtectedLink>
             </Button>
           </div>
         </div>
