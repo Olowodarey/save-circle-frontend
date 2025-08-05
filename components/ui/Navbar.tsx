@@ -4,6 +4,7 @@ import { Coins, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
+import {ProtectedLink} from "@/components/ProtectedLinks"
 
 interface HeaderProps {
     setShowWalletModal: (show: boolean) => void;
@@ -41,18 +42,18 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
                 </Link>
                 
                 <nav className="hidden md:flex items-center gap-6">
-                    <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
+                    <ProtectedLink href="/dashboard" className="text-gray-600 hover:text-gray-900">
                         Dashboard
-                    </Link>
-                    <Link href="/groups" className="text-gray-600 hover:text-gray-900">
+                    </ProtectedLink>
+                    <ProtectedLink href="/groups" className="text-gray-600 hover:text-gray-900">
                         Groups
-                    </Link>
-                    <Link href="/profile" className="text-gray-600 hover:text-gray-900">
+                    </ProtectedLink>
+                    <ProtectedLink href="/profile" className="text-gray-600 hover:text-gray-900">
                         Profile
-                    </Link>
-                    <Link href="/reputation" className="text-gray-600 hover:text-gray-900">
+                    </ProtectedLink>
+                    <ProtectedLink href="/reputation" className="text-gray-600 hover:text-gray-900">
                         Reputation
-                    </Link>
+                    </ProtectedLink>
                 </nav>
                 
                 <div className="flex items-center gap-3">

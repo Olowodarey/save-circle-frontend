@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { X, Wallet, AlertCircle, CheckCircle } from "lucide-react";
 import { ready, braavos, useInjectedConnectors, useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 
+
 interface WalletConnectModalProps {
   isOpen: boolean;
   onClose: () => void;

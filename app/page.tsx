@@ -5,24 +5,37 @@ import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Users, Shield, Lock, TrendingUp, Coins, Globe } from "lucide-react"
+import {ProtectedLink} from "@/components/ProtectedLinks"
 import Link from "next/link"
 import WalletConnectModal from "@/components/wallet-connect-modal"
 import  Navbar  from "@/components/ui/Navbar"
 import  Footer  from "@/components/ui/Footer"
 import { useAccount } from "@starknet-react/core";
+// import {toast} from "sonner"
 
 export default function HomePage() {
   const { address, isConnected } = useAccount();
-  const [showWalletModal, setShowWalletModal] = useState(false)
-  const handleWalletConnect = (walletType: string) => {
+  const [showWalletModal, setShowWalletModal] = useState(false);
 
+  const handleWalletConnect = (walletType: string) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("connected-wallet", walletType)
     }
     setShowWalletModal(false)
   }
 
-
+  // const handleProtectedAction = () => {
+  //   if (!isConnected || !address) {
+  //     toast.error("Wallet Connection Required", {
+  //       description: "Please connect your wallet to continue",
+  //       action: {
+  //         label: "Connect Wallet",
+  //         onClick: () => setShowWalletModal(true)
+  //       }
+  //     })
+  //     return
+  //   }
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -41,10 +54,10 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="text-lg px-8" asChild>
-              <Link href="/dashboard">Start Saving</Link>
+              <ProtectedLink href="/dashboard">Start Saving</ProtectedLink>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8 bg-transparent" asChild>
-              <Link href="/groups">Explore Groups</Link>
+              <ProtectedLink href="/groups">Explore Groups</ProtectedLink>
             </Button>
           </div>
         </div>
