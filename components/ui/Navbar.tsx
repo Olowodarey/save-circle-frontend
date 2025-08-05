@@ -58,7 +58,7 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
                 
                 <div className="flex items-center gap-3">
                     {!isConnected ? (
-                        <Button variant="outline" onClick={() => setShowWalletModal(true)}>
+                        <Button onClick={() => setShowWalletModal(true)}>
                             Connect Wallet
                         </Button>
                     ) : (
@@ -75,9 +75,9 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
                             </Button>
                         </div>
                     )}
-                    <Button asChild>
+                    {/* <Button asChild>
                         <Link href="/dashboard">Launch App</Link>
-                    </Button>
+                    </Button> */}
                 </div>
             </div>
         </header>
