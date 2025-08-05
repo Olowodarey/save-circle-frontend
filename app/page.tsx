@@ -1,45 +1,47 @@
+"use client"
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Users, Shield, Lock, TrendingUp, Coins, Globe } from "lucide-react"
+import {ProtectedLink} from "@/components/ProtectedLinks"
 import Link from "next/link"
+import WalletConnectModal from "@/components/wallet-connect-modal"
+import  Navbar  from "@/components/ui/Navbar"
+import  Footer  from "@/components/ui/Footer"
+import { useAccount } from "@starknet-react/core";
+// import {toast} from "sonner"
 
 export default function HomePage() {
+  const { address, isConnected } = useAccount();
+  const [showWalletModal, setShowWalletModal] = useState(false);
+
+  const handleWalletConnect = (walletType: string) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("connected-wallet", walletType)
+    }
+    setShowWalletModal(false)
+  }
+
+  // const handleProtectedAction = () => {
+  //   if (!isConnected || !address) {
+  //     toast.error("Wallet Connection Required", {
+  //       description: "Please connect your wallet to continue",
+  //       action: {
+  //         label: "Connect Wallet",
+  //         onClick: () => setShowWalletModal(true)
+  //       }
+  //     })
+  //     return
+  //   }
+  // }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-              <Coins className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">Save Circle</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
-              Dashboard
-            </Link>
-            <Link href="/groups" className="text-gray-600 hover:text-gray-900">
-              Groups
-            </Link>
-            <Link href="/profile" className="text-gray-600 hover:text-gray-900">
-              Profile
-            </Link>
-            <Link href="/reputation" className="text-gray-600 hover:text-gray-900">
-              Reputation
-            </Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" asChild>
-              <Link href="/login">Connect Wallet</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/dashboard">Launch App</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Navbar setShowWalletModal={setShowWalletModal}
+      />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 text-center">
@@ -52,10 +54,10 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="text-lg px-8" asChild>
-              <Link href="/dashboard">Start Saving</Link>
+              <ProtectedLink setShowWalletModal={setShowWalletModal} href="/dashboard">Start Saving</ProtectedLink>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8 bg-transparent" asChild>
-              <Link href="/groups">Explore Groups</Link>
+              <ProtectedLink setShowWalletModal={setShowWalletModal} href="/groups">Explore Groups</ProtectedLink>
             </Button>
           </div>
         </div>
@@ -190,90 +192,12 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                  <Coins className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold">Save Circle</span>
-              </div>
-              <p className="text-gray-400">
-                Decentralized savings circles built on Starknet for global financial inclusion.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Platform</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/dashboard" className="hover:text-white">
-                    Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/groups" className="hover:text-white">
-                    Groups
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/reputation" className="hover:text-white">
-                    Reputation
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Resources</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Documentation
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Smart Contracts
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Security
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Community</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Discord
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Twitter
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    GitHub
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Save Circle. Built on Starknet.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
+      <WalletConnectModal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
+        onConnect={handleWalletConnect}
+      />
     </div>
   )
 }

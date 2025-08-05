@@ -167,9 +167,18 @@ export default function GroupDetailsPage() {
   const [showJoinModal, setShowJoinModal] = useState(false)
 
   const handleJoinGroup = () => {
-    // Handle join group logic
+    // Here you would call the smart contract to join the group
     console.log("Joining group:", groupId)
-    setShowJoinModal(false)
+
+    // Simulate joining process
+    setTimeout(() => {
+      // Update the group data to reflect that user has joined
+      // In a real app, this would refetch data from the blockchain
+      alert("Successfully joined the group!")
+      setShowJoinModal(false)
+      // Optionally redirect to dashboard or refresh the page
+      window.location.reload()
+    }, 1000)
   }
 
   return (

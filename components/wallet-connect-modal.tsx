@@ -1,81 +1,106 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { X, Wallet, ExternalLink, AlertCircle } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { X, Wallet, AlertCircle, CheckCircle } from "lucide-react";
+import { ready, braavos, useInjectedConnectors, useAccount, useConnect, useDisconnect } from "@starknet-react/core";
+
 
 interface WalletConnectModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onConnect: (walletType: string) => void
+  isOpen: boolean;
+  onClose: () => void;
+  onConnect: (walletType: string) => void;
 }
 
 export default function WalletConnectModal({ isOpen, onClose, onConnect }: WalletConnectModalProps) {
-  const [connecting, setConnecting] = useState<string | null>(null)
+  const { address, isConnected, connector: activeConnector } = useAccount();
+  const { connect, isPending: isConnecting, error } = useConnect();
+  const { disconnect } = useDisconnect();
+  const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
 
-  const wallets = [
-    {
-      id: "argentx",
-      name: "ArgentX",
-      description: "The most popular Starknet wallet",
-      icon: "/placeholder.svg?height=48&width=48",
-      installed: typeof window !== "undefined" && window.starknet_argentX,
-      downloadUrl: "https://chrome.google.com/webstore/detail/argent-x/dlcobpjiigpikoobohmabehhmhfoodbb",
-      popular: true,
-    },
-    {
-      id: "braavos",
-      name: "Braavos",
-      description: "Smart wallet for Starknet",
-      icon: "/placeholder.svg?height=48&width=48",
-      installed: typeof window !== "undefined" && window.starknet_braavos,
-      downloadUrl: "https://chrome.google.com/webstore/detail/braavos-smart-wallet/jnlgamecbpmbajjfhmmmlhejkemejdma",
-      popular: false,
-    },
-    {
-      id: "okx",
-      name: "OKX Wallet",
-      description: "Multi-chain wallet with Starknet support",
-      icon: "/placeholder.svg?height=48&width=48",
-      installed: typeof window !== "undefined" && window.okxwallet?.starknet,
-      downloadUrl: "https://chrome.google.com/webstore/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge",
-      popular: false,
-    },
-  ]
+  const { connectors } = useInjectedConnectors({
+    recommended: [ready(), braavos()],
+    // Hide recommended connectors if the user has any connector installed.
+    includeRecommended: "always",
+    // Randomize the order of the connectors.
+    order: "random",
+  });
 
-  const handleConnect = async (walletId: string) => {
-    setConnecting(walletId)
-
-    try {
-      // Simulate connection delay
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // Here you would implement actual wallet connection logic
-      // For now, we'll just simulate a successful connection
-      onConnect(walletId)
-      onClose()
-    } catch (error) {
-      console.error("Failed to connect wallet:", error)
-    } finally {
-      setConnecting(null)
+  // Close modal when connection is successful
+  useEffect(() => {
+    if (isConnected && address) {
+      onConnect(activeConnector?.name || "unknown");
+      onClose();
+      setConnectingWallet(null);
     }
-  }
+  }, [isConnected, address, activeConnector, onConnect, onClose]);
 
-  if (!isOpen) return null
+  // Clear connecting state if error occurs
+  useEffect(() => {
+    if (error) {
+      setConnectingWallet(null);
+    }
+  }, [error]);
+
+  const handleConnect = async (connector: any) => {
+    try {
+      setConnectingWallet(connector.id);
+      await connect({ connector });
+    } catch (err) {
+      console.error("Failed to connect wallet:", err);
+      setConnectingWallet(null);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    try {
+      await disconnect();
+      setConnectingWallet(null);
+    } catch (err) {
+      console.error("Failed to disconnect wallet:", err);
+    }
+  };
+
+  const getWalletStatus = (connector: any) => {
+    if (isConnected && activeConnector?.id === connector.id) {
+      return "connected";
+    }
+    if (connectingWallet === connector.id && isConnecting) {
+      return "connecting";
+    }
+    if (error && connectingWallet === connector.id) {
+      return "error";
+    }
+    return "disconnected";
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Wallet className="w-5 h-5" />
-                Connect Wallet
+                {isConnected ? "Wallet Connected" : "Connect Wallet"}
               </CardTitle>
-              <CardDescription>Choose a wallet to connect to Save Circle</CardDescription>
+              <CardDescription>
+                {isConnected 
+                  ? `Connected to ${activeConnector?.name || "wallet"}`
+                  : "Choose a wallet to connect to Save Circle"
+                }
+              </CardDescription>
             </div>
             <Button variant="ghost" size="sm" onClick={onClose}>
               <X className="w-4 h-4" />
@@ -83,85 +108,165 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect }: Walle
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {wallets.map((wallet) => (
-            <div
-              key={wallet.id}
-              className={`relative border rounded-lg p-4 transition-all ${
-                wallet.installed
-                  ? "hover:border-blue-300 hover:bg-blue-50 cursor-pointer"
-                  : "border-gray-200 bg-gray-50"
-              }`}
-              onClick={() => wallet.installed && handleConnect(wallet.id)}
-            >
-              {wallet.popular && (
-                <Badge className="absolute -top-2 -right-2 bg-blue-600 hover:bg-blue-600">Popular</Badge>
-              )}
-
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white rounded-lg border flex items-center justify-center">
-                  <img
-                    src={wallet.icon || "/placeholder.svg"}
-                    alt={wallet.name}
-                    className="w-8 h-8"
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none"
-                      e.currentTarget.nextElementSibling!.style.display = "flex"
-                    }}
-                  />
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded flex items-center justify-center text-white font-bold text-sm hidden">
-                    {wallet.name.charAt(0)}
+          {/* Connected Wallet Info */}
+          {isConnected && address && (
+            <div className="border rounded-lg p-4 bg-green-50 border-green-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <div>
+                    <p className="font-medium text-green-900">{activeConnector?.name}</p>
+                    <p className="text-sm text-green-700">
+                      {`${address.slice(0, 6)}...${address.slice(-4)}`}
+                    </p>
                   </div>
                 </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleDisconnect}
+                  className="border-green-300 text-green-700 hover:bg-green-100"
+                >
+                  Disconnect
+                </Button>
+              </div>
+            </div>
+          )}
 
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{wallet.name}</h3>
-                  <p className="text-sm text-gray-600">{wallet.description}</p>
+          {/* Wallet List */}
+          {connectors.length > 0 ? (
+            <>
+              {connectors.map((connector: any) => {
+                const status = getWalletStatus(connector);
+                const isCurrentlyConnected = status === "connected";
+                
+                return (
+                  <div
+                    key={connector.id}
+                    className={`relative border rounded-lg p-4 transition-all cursor-pointer ${
+                      isCurrentlyConnected
+                        ? "border-green-300 bg-green-50"
+                        : status === "connecting"
+                        ? "border-blue-300 bg-blue-50"
+                        : status === "error"
+                        ? "border-red-300 bg-red-50"
+                        : "hover:border-blue-300 hover:bg-blue-50"
+                    }`}
+                    onClick={() => !isCurrentlyConnected && handleConnect(connector)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white rounded-lg border flex items-center justify-center relative">
+                        {connector.icon ? (
+                          <img 
+                            src={typeof connector.icon === "string" ? connector.icon : connector.icon.light} 
+                            alt={connector.name}
+                            className="h-8 w-8 rounded"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              // e.currentTarget.nextElementSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded flex items-center justify-center text-white font-bold text-xs absolute"
+                          style={{ display: connector.icon ? 'none' : 'flex' }}
+                        >
+                          {connector.name?.charAt(0) || 'W'}
+                        </div>
+                      </div>
 
-                  {!wallet.installed && (
-                    <div className="flex items-center gap-1 mt-1">
-                      <AlertCircle className="w-3 h-3 text-orange-500" />
-                      <span className="text-xs text-orange-600">Not installed</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-gray-900">{connector.name}</h3>
+                          {isCurrentlyConnected && (
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                              Connected
+                            </Badge>
+                          )}
+                        </div>
+
+                        {status === "connecting" && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                            <span className="text-xs text-blue-600">Connecting...</span>
+                          </div>
+                        )}
+                        
+                        {status === "error" && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <AlertCircle className="w-3 h-3 text-red-600" />
+                            <span className="text-xs text-red-600">Connection failed</span>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleConnect(connector);
+                              }}
+                              className="text-xs text-blue-600 hover:underline ml-1"
+                            >
+                              Retry
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                );
+              })}
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <Wallet className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Wallets Found</h3>
+              <p className="text-gray-600 mb-4">Please install a Starknet wallet to connect to Save Circle.</p>
+              <div className="space-y-2 text-sm text-gray-500">
+                <p>Supported wallets:</p>
+                <ul className="space-y-1">
+                  <li>• ArgentX (Recommended)</li>
+                  <li>• Braavos</li>
+                  <li>• OKX Wallet</li>
+                </ul>
+              </div>
+              <div className="mt-4">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.open("https://www.argent.xyz/argent-x/", "_blank")}
+                >
+                  Install ArgentX
+                </Button>
+              </div>
+            </div>
+          )}
 
-                <div className="flex flex-col items-end gap-2">
-                  {wallet.installed ? (
-                    <Button size="sm" disabled={connecting === wallet.id} className="min-w-[80px]">
-                      {connecting === wallet.id ? "Connecting..." : "Connect"}
-                    </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        window.open(wallet.downloadUrl, "_blank")
-                      }}
-                      className="min-w-[80px]"
-                    >
-                      <ExternalLink className="w-3 h-3 mr-1" />
-                      Install
-                    </Button>
-                  )}
+          {/* Info Section */}
+          {connectors.length > 0 && !isConnected && (
+            <div className="pt-4 border-t">
+              <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg">
+                <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="font-medium text-blue-900">New to Starknet?</p>
+                  <p className="text-blue-700">
+                    We recommend starting with ArgentX - it's the most popular and user-friendly Starknet wallet.
+                  </p>
                 </div>
               </div>
             </div>
-          ))}
+          )}
 
-          <div className="pt-4 border-t">
-            <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg">
-              <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+          {/* Error Display */}
+          {error && (
+            <div className="flex items-start gap-2 p-3 bg-red-50 rounded-lg border border-red-200">
+              <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
               <div className="text-sm">
-                <p className="font-medium text-blue-900">New to Starknet?</p>
-                <p className="text-blue-700">
-                  We recommend starting with ArgentX - it's the most popular and user-friendly Starknet wallet.
+                <p className="font-medium text-red-900">Connection Error</p>
+                <p className="text-red-700">
+                  {error.message || "Failed to connect to wallet. Please try again."}
                 </p>
               </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

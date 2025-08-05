@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Plus, Users, TrendingUp, Wallet, Clock, Star, Lock, LogOut } from "lucide-react"
 import Link from "next/link"
+import WalletConnectModal from "@/components/wallet-connect-modal"
 
 export default function Dashboard() {
   const [walletConnected, setWalletConnected] = useState(false)
@@ -15,6 +16,7 @@ export default function Dashboard() {
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [address, setAddress] = useState<string | null>(null)
   const [walletType, setWalletType] = useState<string | null>(null)
+  const [showWalletModal, setShowWalletModal] = useState(false)
 
   useEffect(() => {
     // Check wallet connection on mount
@@ -65,17 +67,21 @@ export default function Dashboard() {
   }
 
   const handleConnect = () => {
+    setShowWalletModal(true)
+  }
+
+  const handleWalletConnect = (walletType: string) => {
     const mockAddress = "0x1234567890abcdef1234567890abcdef12345678"
-    const mockWalletType = "ArgentX"
 
     if (typeof window !== "undefined") {
-      localStorage.setItem("connected-wallet", mockWalletType)
+      localStorage.setItem("connected-wallet", walletType)
       localStorage.setItem("wallet-address", mockAddress)
     }
 
     setWalletConnected(true)
-    setWalletType(mockWalletType)
+    setWalletType(walletType)
     setAddress(mockAddress)
+    setShowWalletModal(false)
   }
 
   const handleDisconnect = () => {
@@ -341,6 +347,11 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
+      <WalletConnectModal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
+        onConnect={handleWalletConnect}
+      />
     </div>
   )
 }

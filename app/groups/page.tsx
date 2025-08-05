@@ -1,18 +1,37 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Users, Search, Filter, Globe, Lock, Star, Clock, Plus } from "lucide-react"
+import { Users, Search, Filter, Globe, Lock, Star, Clock, Plus, LogOut } from "lucide-react"
 import Link from "next/link"
+import WalletConnectModal from "@/components/wallet-connect-modal"
 
 export default function GroupsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState("all")
+  const [showWalletModal, setShowWalletModal] = useState(false)
+  const [walletConnected, setWalletConnected] = useState(false)
+  const [walletType, setWalletType] = useState<string | null>(null)
+  const [address, setAddress] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Check wallet connection on mount
+    if (typeof window !== "undefined") {
+      const savedWallet = localStorage.getItem("connected-wallet")
+      const savedAddress = localStorage.getItem("wallet-address")
+
+      if (savedWallet && savedAddress) {
+        setWalletConnected(true)
+        setWalletType(savedWallet)
+        setAddress(savedAddress)
+      }
+    }
+  }, [])
 
   const publicGroups = [
     {
@@ -77,6 +96,46 @@ export default function GroupsPage() {
     return matchesSearch && matchesFilter
   })
 
+  const handleWalletConnect = (walletType: string) => {
+    const mockAddress = "0x1234567890abcdef1234567890abcdef12345678"
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("connected-wallet", walletType)
+      localStorage.setItem("wallet-address", mockAddress)
+    }
+
+    setWalletConnected(true)
+    setWalletType(walletType)
+    setAddress(mockAddress)
+    setShowWalletModal(false)
+  }
+
+  const handleDisconnect = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("connected-wallet")
+      localStorage.removeItem("wallet-address")
+    }
+    setWalletConnected(false)
+    setWalletType(null)
+    setAddress(null)
+  }
+
+  const handleJoinGroup = (groupId: number) => {
+    // Here you would implement the actual join group logic
+    // For now, we'll simulate joining and redirect to group details
+    console.log("Joining group:", groupId)
+    // In a real app, this would call a smart contract function
+    // then redirect to the group details page
+    window.location.href = `/groups/${groupId}`
+  }
+
+  const handleAcceptInvite = (inviteId: number) => {
+    console.log("Accepting invite:", inviteId)
+    // Simulate accepting invite and redirect
+    // In real app, this would call smart contract
+    window.location.href = `/groups/1` // Redirect to the group
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -99,6 +158,24 @@ export default function GroupsPage() {
                 Profile
               </Link>
             </nav>
+            {!walletConnected ? (
+              <Button variant="outline" onClick={() => setShowWalletModal(true)}>
+                Connect Wallet
+              </Button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  {walletType}
+                </Badge>
+                <span className="text-sm text-gray-600 font-mono">
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleDisconnect}>
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
             <Button asChild>
               <Link href="/groups/create">
                 <Plus className="w-4 h-4 mr-2" />
@@ -212,10 +289,12 @@ export default function GroupsPage() {
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-gray-500">Created by {group.creator}</div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          View Details
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/groups/${group.id}`}>View Details</Link>
                         </Button>
-                        <Button size="sm">Join Group</Button>
+                        <Button size="sm" onClick={() => handleJoinGroup(group.id)}>
+                          Join Group
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -272,7 +351,7 @@ export default function GroupsPage() {
 
                       <div className="flex gap-2">
                         <Button variant="outline">Decline</Button>
-                        <Button>Accept Invitation</Button>
+                        <Button onClick={() => handleAcceptInvite(invite.id)}>Accept Invitation</Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -282,6 +361,11 @@ export default function GroupsPage() {
           </TabsContent>
         </Tabs>
       </div>
+      <WalletConnectModal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
+        onConnect={handleWalletConnect}
+      />
     </div>
   )
 }
