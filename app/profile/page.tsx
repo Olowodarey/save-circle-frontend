@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -22,25 +22,85 @@ import {
   ArrowLeft,
   Save,
   X,
+  Contact,
+  Loader2,
 } from "lucide-react"
 import Link from "next/link"
+import {useAccount, useContract, useReadContract} from '@starknet-react/core'
+import {MY_CONTRACT_ABI} from "@/constants/abi/MyContract"
+import {CONTRACT_ADDRESS} from "@/constants/address"
+
 
 export default function ProfilePage() {
-  const [isEditing, setIsEditing] = useState(false)
+  const {address, isConnected} = useAccount();
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // const contract = useContract({
+  //   abi: MY_CONTRACT_ABI,
+  //   address: CONTRACT_ADDRESS,
+  // });
+  
+
+  const {
+    data: contractProfileData,
+    isLoading: isLoadingProfile,
+    error: profileError,
+    refetch: refetchProfile,
+  } = useReadContract({
+    args: [address?address:""],
+    abi: MY_CONTRACT_ABI,
+    address: CONTRACT_ADDRESS,
+    enabled: !!address,
+    watch: true,
+    functionName: "get_user_profile",
+  });
+
   const [profileData, setProfileData] = useState({
-    name: "Alex Thompson",
+    name: "",
     avatar: "/placeholder.svg?height=120&width=120",
-    walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
-    isRegistered: true,
-    totalLockAmount: 2500,
-    profileCreatedAt: "2023-12-15",
-    reputationScore: 85,
+    walletAddress: address || "",
+    isRegistered: false,
+    totalLockAmount: 0,
+    profileCreatedAt: "",
+    reputationScore: 0,
   })
 
   const [editForm, setEditForm] = useState({
     name: profileData.name,
     avatar: profileData.avatar,
   })
+
+  useEffect(() => {
+    if (contractProfileData && address) {
+
+      const contractData = {
+        name: contractProfileData.name || `User ${address.slice(0, 6)}`,
+        avatar: contractProfileData.avatar || "/placeholder.svg?height=120&width=120",
+        walletAddress: address,
+        isRegistered: contractProfileData.is_registered || false,
+        totalLockAmount: contractProfileData.total_lock_amount || 0,
+        profileCreatedAt: contractProfileData.profile_created_at ? new Date(Number(contractProfileData.profile_created_at)).toLocaleDateString() : "",
+        reputationScore:  0,
+      }
+
+      setProfileData({
+        name: String(contractData.name),
+        avatar: String(contractData.avatar),
+        walletAddress: contractData.walletAddress,
+        isRegistered: contractData.isRegistered,
+        totalLockAmount: Number(contractData.totalLockAmount),
+        profileCreatedAt: contractData.profileCreatedAt,
+        reputationScore: contractData.reputationScore,
+      });
+
+      setEditForm({
+        name: String(contractData.name),
+        avatar: String(contractData.avatar),
+      })
+    }
+  }, [contractProfileData, address]);
+
 
   // Analytics data
   const analytics = {
@@ -82,9 +142,20 @@ export default function ProfilePage() {
     },
   ]
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
+    setLoading(true);
+
+    try{
+
     setProfileData({ ...profileData, ...editForm })
     setIsEditing(false)
+
+    await refetchProfile()
+    }catch (error) {
+      console.error("Failed to update profile:", error)
+    }finally {
+      setLoading(false)
+    }
     // Here you would call the smart contract to update the profile
   }
 
@@ -97,6 +168,52 @@ export default function ProfilePage() {
     ]
     const newAvatar = avatars[Math.floor(Math.random() * avatars.length)]
     setEditForm({ ...editForm, avatar: newAvatar })
+  }
+
+  // Show loading state while fetching profile
+  if (isLoadingProfile) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span>Loading profile...</span>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error state if profile fetch failed
+  if (profileError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="p-6">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-red-600 mb-2">Failed to Load Profile</h2>
+            <p className="text-gray-600 mb-4">There was an error loading your profile data.</p>
+            <Button onClick={() => refetchProfile()}>
+              Try Again
+            </Button>
+          </div>
+        </Card>
+      </div>
+    )
+  }
+
+  // Show message if user is not registered
+  if (!profileData.isRegistered && !isLoadingProfile) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="p-6">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Profile Not Found</h2>
+            <p className="text-gray-600 mb-4">You need to register to view your profile.</p>
+            <Button asChild>
+              <Link href="/register">Register Now</Link>
+            </Button>
+          </div>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -176,10 +293,17 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4">
+                      {profileData.isRegistered ?(
                       <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
                         <User className="w-3 h-3 mr-1" />
                         Registered Member
                       </Badge>
+                      ):(
+                        <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
+                        <User className="w-3 h-3 mr-1" />
+                        Not Registered
+                      </Badge>
+                      )}
                       <div className="flex items-center gap-2">
                         <Star className="w-4 h-4 text-yellow-500" />
                         <span className="font-semibold">{profileData.reputationScore} Reputation</span>
