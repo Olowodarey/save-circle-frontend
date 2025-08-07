@@ -1,43 +1,66 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Users, Search, Filter, Globe, Lock, Star, Clock, Plus, LogOut } from "lucide-react"
-import Link from "next/link"
-import WalletConnectModal from "@/components/wallet-connect-modal"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Users,
+  Search,
+  Filter,
+  Globe,
+  Lock,
+  Star,
+  Clock,
+  Plus,
+  LogOut,
+} from "lucide-react";
+import Link from "next/link";
+import WalletConnectModal from "@/components/wallet/wallet-connect-modal";
 
 export default function GroupsPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterType, setFilterType] = useState("all")
-  const [showWalletModal, setShowWalletModal] = useState(false)
-  const [walletConnected, setWalletConnected] = useState(false)
-  const [walletType, setWalletType] = useState<string | null>(null)
-  const [address, setAddress] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [walletConnected, setWalletConnected] = useState(false);
+  const [walletType, setWalletType] = useState<string | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
 
   useEffect(() => {
     // Check wallet connection on mount
     if (typeof window !== "undefined") {
-      const savedWallet = localStorage.getItem("connected-wallet")
-      const savedAddress = localStorage.getItem("wallet-address")
+      const savedWallet = localStorage.getItem("connected-wallet");
+      const savedAddress = localStorage.getItem("wallet-address");
 
       if (savedWallet && savedAddress) {
-        setWalletConnected(true)
-        setWalletType(savedWallet)
-        setAddress(savedAddress)
+        setWalletConnected(true);
+        setWalletType(savedWallet);
+        setAddress(savedAddress);
       }
     }
-  }, [])
+  }, []);
 
   const publicGroups = [
     {
       id: 1,
       name: "Crypto Enthusiasts",
-      description: "A group for crypto enthusiasts to save together and discuss market trends",
+      description:
+        "A group for crypto enthusiasts to save together and discuss market trends",
       members: 8,
       maxMembers: 12,
       contribution: "75 USDC",
@@ -50,7 +73,8 @@ export default function GroupsPage() {
     {
       id: 2,
       name: "Starknet Builders",
-      description: "Developers and builders in the Starknet ecosystem saving for future projects",
+      description:
+        "Developers and builders in the Starknet ecosystem saving for future projects",
       members: 15,
       maxMembers: 20,
       contribution: "200 USDC",
@@ -63,7 +87,8 @@ export default function GroupsPage() {
     {
       id: 3,
       name: "DeFi Beginners",
-      description: "Perfect for newcomers to DeFi who want to start saving with a supportive community",
+      description:
+        "Perfect for newcomers to DeFi who want to start saving with a supportive community",
       members: 5,
       maxMembers: 10,
       contribution: "25 USDC",
@@ -73,7 +98,7 @@ export default function GroupsPage() {
       creator: "0x5555...9999",
       tags: ["beginner", "low-risk", "bi-weekly"],
     },
-  ]
+  ];
 
   const myInvites = [
     {
@@ -85,56 +110,58 @@ export default function GroupsPage() {
       maxMembers: 8,
       expiresIn: "2 days",
     },
-  ]
+  ];
 
   const filteredGroups = publicGroups.filter((group) => {
     const matchesSearch =
       group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      group.description.toLowerCase().includes(searchTerm.toLowerCase())
+      group.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter =
-      filterType === "all" || (filterType === "locked" && group.locked) || (filterType === "unlocked" && !group.locked)
-    return matchesSearch && matchesFilter
-  })
+      filterType === "all" ||
+      (filterType === "locked" && group.locked) ||
+      (filterType === "unlocked" && !group.locked);
+    return matchesSearch && matchesFilter;
+  });
 
   const handleWalletConnect = (walletType: string) => {
-    const mockAddress = "0x1234567890abcdef1234567890abcdef12345678"
+    const mockAddress = "0x1234567890abcdef1234567890abcdef12345678";
 
     if (typeof window !== "undefined") {
-      localStorage.setItem("connected-wallet", walletType)
-      localStorage.setItem("wallet-address", mockAddress)
+      localStorage.setItem("connected-wallet", walletType);
+      localStorage.setItem("wallet-address", mockAddress);
     }
 
-    setWalletConnected(true)
-    setWalletType(walletType)
-    setAddress(mockAddress)
-    setShowWalletModal(false)
-  }
+    setWalletConnected(true);
+    setWalletType(walletType);
+    setAddress(mockAddress);
+    setShowWalletModal(false);
+  };
 
   const handleDisconnect = () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("connected-wallet")
-      localStorage.removeItem("wallet-address")
+      localStorage.removeItem("connected-wallet");
+      localStorage.removeItem("wallet-address");
     }
-    setWalletConnected(false)
-    setWalletType(null)
-    setAddress(null)
-  }
+    setWalletConnected(false);
+    setWalletType(null);
+    setAddress(null);
+  };
 
   const handleJoinGroup = (groupId: number) => {
     // Here you would implement the actual join group logic
     // For now, we'll simulate joining and redirect to group details
-    console.log("Joining group:", groupId)
+    console.log("Joining group:", groupId);
     // In a real app, this would call a smart contract function
     // then redirect to the group details page
-    window.location.href = `/groups/${groupId}`
-  }
+    window.location.href = `/groups/${groupId}`;
+  };
 
   const handleAcceptInvite = (inviteId: number) => {
-    console.log("Accepting invite:", inviteId)
+    console.log("Accepting invite:", inviteId);
     // Simulate accepting invite and redirect
     // In real app, this would call smart contract
-    window.location.href = `/groups/1` // Redirect to the group
-  }
+    window.location.href = `/groups/1`; // Redirect to the group
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -146,25 +173,39 @@ export default function GroupsPage() {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">SC</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">Save Circle</span>
+              <span className="text-xl font-bold text-gray-900">
+                Save Circle
+              </span>
             </Link>
           </div>
           <div className="flex items-center gap-4">
             <nav className="hidden md:flex items-center gap-6">
-              <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="/dashboard"
+                className="text-gray-600 hover:text-gray-900"
+              >
                 Dashboard
               </Link>
-              <Link href="/profile" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="/profile"
+                className="text-gray-600 hover:text-gray-900"
+              >
                 Profile
               </Link>
             </nav>
             {!walletConnected ? (
-              <Button variant="outline" onClick={() => setShowWalletModal(true)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowWalletModal(true)}
+              >
                 Connect Wallet
               </Button>
             ) : (
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="bg-green-50 text-green-700 border-green-200"
+                >
                   <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                   {walletType}
                 </Badge>
@@ -188,8 +229,12 @@ export default function GroupsPage() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Savings Groups</h1>
-          <p className="text-gray-600">Discover and join savings circles that match your goals</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Savings Groups
+          </h1>
+          <p className="text-gray-600">
+            Discover and join savings circles that match your goals
+          </p>
         </div>
 
         <Tabs defaultValue="public" className="space-y-6">
@@ -198,7 +243,9 @@ export default function GroupsPage() {
             <TabsTrigger value="invites">
               My Invites
               {myInvites.length > 0 && (
-                <Badge className="ml-2 bg-red-100 text-red-800 hover:bg-red-100">{myInvites.length}</Badge>
+                <Badge className="ml-2 bg-red-100 text-red-800 hover:bg-red-100">
+                  {myInvites.length}
+                </Badge>
               )}
             </TabsTrigger>
           </TabsList>
@@ -231,29 +278,46 @@ export default function GroupsPage() {
             {/* Groups Grid */}
             <div className="grid gap-6">
               {filteredGroups.map((group) => (
-                <Card key={group.id} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={group.id}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <CardTitle className="text-xl">{group.name}</CardTitle>
+                          <CardTitle className="text-xl">
+                            {group.name}
+                          </CardTitle>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-green-600 border-green-200">
+                            <Badge
+                              variant="outline"
+                              className="text-green-600 border-green-200"
+                            >
                               <Globe className="w-3 h-3 mr-1" />
                               Public
                             </Badge>
                             {group.locked && (
-                              <Badge variant="outline" className="text-orange-600 border-orange-200">
+                              <Badge
+                                variant="outline"
+                                className="text-orange-600 border-orange-200"
+                              >
                                 <Lock className="w-3 h-3 mr-1" />
                                 Locked
                               </Badge>
                             )}
                           </div>
                         </div>
-                        <CardDescription className="text-base mb-3">{group.description}</CardDescription>
+                        <CardDescription className="text-base mb-3">
+                          {group.description}
+                        </CardDescription>
                         <div className="flex flex-wrap gap-2">
                           {group.tags.map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-xs">
+                            <Badge
+                              key={tag}
+                              variant="secondary"
+                              className="text-xs"
+                            >
                               {tag}
                             </Badge>
                           ))}
@@ -281,18 +345,25 @@ export default function GroupsPage() {
                         <p className="text-sm text-gray-500">Min. Reputation</p>
                         <div className="flex items-center gap-1">
                           <Star className="w-4 h-4 text-yellow-500" />
-                          <span className="font-semibold">{group.minReputation}</span>
+                          <span className="font-semibold">
+                            {group.minReputation}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <div className="text-sm text-gray-500">Created by {group.creator}</div>
+                      <div className="text-sm text-gray-500">
+                        Created by {group.creator}
+                      </div>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" asChild>
                           <Link href={`/groups/${group.id}`}>View Details</Link>
                         </Button>
-                        <Button size="sm" onClick={() => handleJoinGroup(group.id)}>
+                        <Button
+                          size="sm"
+                          onClick={() => handleJoinGroup(group.id)}
+                        >
                           Join Group
                         </Button>
                       </div>
@@ -308,8 +379,12 @@ export default function GroupsPage() {
               <Card>
                 <CardContent className="text-center py-12">
                   <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No pending invites</h3>
-                  <p className="text-gray-600 mb-4">You don't have any pending group invitations at the moment.</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No pending invites
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    You don't have any pending group invitations at the moment.
+                  </p>
                   <Button variant="outline" asChild>
                     <Link href="/groups">Browse Public Groups</Link>
                   </Button>
@@ -322,10 +397,17 @@ export default function GroupsPage() {
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div>
-                          <CardTitle className="text-lg">{invite.groupName}</CardTitle>
-                          <CardDescription>Invited by {invite.invitedBy}</CardDescription>
+                          <CardTitle className="text-lg">
+                            {invite.groupName}
+                          </CardTitle>
+                          <CardDescription>
+                            Invited by {invite.invitedBy}
+                          </CardDescription>
                         </div>
-                        <Badge variant="outline" className="text-red-600 border-red-200">
+                        <Badge
+                          variant="outline"
+                          className="text-red-600 border-red-200"
+                        >
                           <Clock className="w-3 h-3 mr-1" />
                           Expires in {invite.expiresIn}
                         </Badge>
@@ -351,7 +433,9 @@ export default function GroupsPage() {
 
                       <div className="flex gap-2">
                         <Button variant="outline">Decline</Button>
-                        <Button onClick={() => handleAcceptInvite(invite.id)}>Accept Invitation</Button>
+                        <Button onClick={() => handleAcceptInvite(invite.id)}>
+                          Accept Invitation
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -367,5 +451,5 @@ export default function GroupsPage() {
         onConnect={handleWalletConnect}
       />
     </div>
-  )
+  );
 }

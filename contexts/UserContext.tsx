@@ -1,11 +1,22 @@
-'use client'
+"use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAccount, useContract, useReadContract, useSendTransaction } from '@starknet-react/core';
-import { MY_CONTRACT_ABI } from '@/constants/abi/MyContract';
-import { CONTRACT_ADDRESS } from '@/constants/address';
-import { shortString } from 'starknet';
-import type { StarknetTypedContract } from '@starknet-react/core';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import {
+  useAccount,
+  useContract,
+  useReadContract,
+  useSendTransaction,
+} from "@starknet-react/core";
+import { MY_CONTRACT_ABI } from "@/constants/abi";
+import { CONTRACT_ADDRESS } from "@/constants/address";
+import { shortString } from "starknet";
+import type { StarknetTypedContract } from "@starknet-react/core";
 
 // Type definitions
 interface ProfileData {
@@ -62,12 +73,12 @@ interface UserContextType {
   profileData: ProfileData;
   analytics: Analytics;
   recentActivity: RecentActivity[];
-  
+
   // Loading states
   loading: boolean;
   isLoadingProfile: boolean;
   error: string | null;
-  
+
   // Registration state
   showRegistration: boolean;
   setShowRegistration: (show: boolean) => void;
@@ -78,20 +89,20 @@ interface UserContextType {
   isRegistrationError: boolean;
   registrationError: Error | null;
   registrationTxData: any;
-  
+
   // Edit state
   isEditing: boolean;
   setIsEditing: (editing: boolean) => void;
   editForm: EditForm;
   setEditForm: (form: EditForm) => void;
-  
+
   // Wallet data
   address?: string;
   isConnected: boolean | undefined;
-  
+
   // Contract
   contract?: StarknetTypedContract<typeof MY_CONTRACT_ABI>;
-  
+
   // Functions
   refreshUserData: () => Promise<void>;
   refetchProfile: () => Promise<any>;
@@ -99,7 +110,7 @@ interface UserContextType {
   handleSaveProfile: () => Promise<void>;
   generateNewRegistrationAvatar: () => void;
   generateNewEditAvatar: () => void;
-  
+
   // Computed values
   isRegistered: boolean;
   userProfile: ProfileData; // Alias for compatibility
@@ -114,14 +125,14 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error('useUser must be used within a UserProvider');
+    throw new Error("useUser must be used within a UserProvider");
   }
   return context;
 };
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const { address, isConnected } = useAccount();
-  
+
   // Profile state
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
@@ -142,7 +153,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   // Form states
   const [registrationData, setRegistrationData] = useState<RegistrationData>({
     name: "",
-    avatar: ""
+    avatar: "",
   });
 
   const [editForm, setEditForm] = useState<EditForm>({
@@ -172,35 +183,43 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   });
 
   // Registration transaction
-  const { 
-    send: sendRegistration, 
-    isPending: isRegistrationPending, 
-    isSuccess: isRegistrationSuccess, 
-    isError: isRegistrationError, 
+  const {
+    send: sendRegistration,
+    isPending: isRegistrationPending,
+    isSuccess: isRegistrationSuccess,
+    isError: isRegistrationError,
     error: registrationError,
-    data: registrationTxData 
+    data: registrationTxData,
   } = useSendTransaction({
-    calls: contract && registrationData.name.trim() 
-      ? [contract.populate("register_user", [
-          shortString.encodeShortString(registrationData.name.trim()),
-          shortString.encodeShortString(registrationData.avatar || "default_avatar")
-        ])]
-      : undefined,
+    calls:
+      contract && registrationData.name.trim()
+        ? [
+            contract.populate("register_user", [
+              shortString.encodeShortString(registrationData.name.trim()),
+              shortString.encodeShortString(
+                registrationData.avatar || "default_avatar"
+              ),
+            ]),
+          ]
+        : undefined,
   });
 
   // Update profile data when contract data changes
   useEffect(() => {
     if (contractProfileData && address) {
-      const contractData: ContractProfileData = contractProfileData as ContractProfileData;
-      
+      const contractData: ContractProfileData =
+        contractProfileData as ContractProfileData;
+
       const processedData = {
         name: contractData.name || `User ${address.slice(0, 6)}`,
         avatar: contractData.avatar || "/placeholder.svg?height=120&width=120",
         walletAddress: address,
         isRegistered: contractData.is_registered || false,
         totalLockAmount: contractData.total_lock_amount || 0,
-        profileCreatedAt: contractData.profile_created_at 
-          ? new Date(Number(contractData.profile_created_at) * 1000).toLocaleDateString() 
+        profileCreatedAt: contractData.profile_created_at
+          ? new Date(
+              Number(contractData.profile_created_at) * 1000
+            ).toLocaleDateString()
           : "",
         reputationScore: 0, // This might need to be calculated or fetched separately
       };
@@ -263,8 +282,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       try {
         await refetchProfile();
       } catch (err) {
-        setError('Failed to fetch user profile');
-        console.error('Error fetching user profile:', err);
+        setError("Failed to fetch user profile");
+        console.error("Error fetching user profile:", err);
       } finally {
         setLoading(false);
       }
@@ -296,7 +315,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       // Update local state immediately for better UX
       setProfileData({ ...profileData, ...editForm });
       setIsEditing(false);
-      
+
       // In a real implementation, you'd call a contract method to update profile
       // For now, we just refresh to get the latest data
       // await refetchProfile();
@@ -310,7 +329,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   const generateNewAvatar = (): string => {
     const avatars: string[] = [
-      "avatar1", "avatar2", "avatar3", "avatar4", "avatar5"
+      "avatar1",
+      "avatar2",
+      "avatar3",
+      "avatar4",
+      "avatar5",
     ];
     const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
     return randomAvatar;
@@ -371,12 +394,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     profileData,
     analytics,
     recentActivity,
-    
+
     // Loading states
     loading: loading || isLoadingProfile,
     isLoadingProfile,
     error: error || (profileError as string | null),
-    
+
     // Registration state
     showRegistration,
     setShowRegistration,
@@ -387,20 +410,20 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     isRegistrationError,
     registrationError,
     registrationTxData,
-    
+
     // Edit state
     isEditing,
     setIsEditing,
     editForm,
     setEditForm,
-    
+
     // Wallet data
     address,
     isConnected: isConnected ?? false,
-    
+
     // Contract
     contract,
-    
+
     // Functions
     refreshUserData,
     refetchProfile,
@@ -408,15 +431,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     handleSaveProfile,
     generateNewRegistrationAvatar,
     generateNewEditAvatar,
-    
+
     // Computed values
     isRegistered: profileData.isRegistered,
     userProfile: profileData, // Alias for compatibility
   };
 
-  return (
-    <UserContext.Provider value={value}>
-      {children}
-    </UserContext.Provider>
-  );
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

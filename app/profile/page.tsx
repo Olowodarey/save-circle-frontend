@@ -1,14 +1,20 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   User,
   Edit,
@@ -24,15 +30,14 @@ import {
   X,
   Contact,
   Loader2,
-} from "lucide-react"
-import Link from "next/link"
-import {useAccount, useContract, useReadContract} from '@starknet-react/core'
-import {MY_CONTRACT_ABI} from "@/constants/abi/MyContract"
-import {CONTRACT_ADDRESS} from "@/constants/address"
-
+} from "lucide-react";
+import Link from "next/link";
+import { useAccount, useContract, useReadContract } from "@starknet-react/core";
+import { MY_CONTRACT_ABI } from "@/constants/abi";
+import { CONTRACT_ADDRESS } from "@/constants/address";
 
 export default function ProfilePage() {
-  const {address, isConnected} = useAccount();
+  const { address, isConnected } = useAccount();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -40,7 +45,6 @@ export default function ProfilePage() {
   //   abi: MY_CONTRACT_ABI,
   //   address: CONTRACT_ADDRESS,
   // });
-  
 
   const {
     data: contractProfileData,
@@ -48,7 +52,7 @@ export default function ProfilePage() {
     error: profileError,
     refetch: refetchProfile,
   } = useReadContract({
-    args: [address?address:""],
+    args: [address ? address : ""],
     abi: MY_CONTRACT_ABI,
     address: CONTRACT_ADDRESS,
     enabled: !!address,
@@ -64,25 +68,29 @@ export default function ProfilePage() {
     totalLockAmount: 0,
     profileCreatedAt: "",
     reputationScore: 0,
-  })
+  });
 
   const [editForm, setEditForm] = useState({
     name: profileData.name,
     avatar: profileData.avatar,
-  })
+  });
 
   useEffect(() => {
     if (contractProfileData && address) {
-
       const contractData = {
         name: contractProfileData.name || `User ${address.slice(0, 6)}`,
-        avatar: contractProfileData.avatar || "/placeholder.svg?height=120&width=120",
+        avatar:
+          contractProfileData.avatar || "/placeholder.svg?height=120&width=120",
         walletAddress: address,
         isRegistered: contractProfileData.is_registered || false,
         totalLockAmount: contractProfileData.total_lock_amount || 0,
-        profileCreatedAt: contractProfileData.profile_created_at ? new Date(Number(contractProfileData.profile_created_at)).toLocaleDateString() : "",
-        reputationScore:  0,
-      }
+        profileCreatedAt: contractProfileData.profile_created_at
+          ? new Date(
+              Number(contractProfileData.profile_created_at)
+            ).toLocaleDateString()
+          : "",
+        reputationScore: 0,
+      };
 
       setProfileData({
         name: String(contractData.name),
@@ -97,10 +105,9 @@ export default function ProfilePage() {
       setEditForm({
         name: String(contractData.name),
         avatar: String(contractData.avatar),
-      })
+      });
     }
   }, [contractProfileData, address]);
-
 
   // Analytics data
   const analytics = {
@@ -113,7 +120,7 @@ export default function ProfilePage() {
     totalPayments: 25,
     joinedGroups: 7,
     createdGroups: 1,
-  }
+  };
 
   const recentActivity = [
     {
@@ -140,24 +147,23 @@ export default function ProfilePage() {
       icon: Users,
       color: "text-purple-600",
     },
-  ]
+  ];
 
   const handleSaveProfile = async () => {
     setLoading(true);
 
-    try{
+    try {
+      setProfileData({ ...profileData, ...editForm });
+      setIsEditing(false);
 
-    setProfileData({ ...profileData, ...editForm })
-    setIsEditing(false)
-
-    await refetchProfile()
-    }catch (error) {
-      console.error("Failed to update profile:", error)
-    }finally {
-      setLoading(false)
+      await refetchProfile();
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    } finally {
+      setLoading(false);
     }
     // Here you would call the smart contract to update the profile
-  }
+  };
 
   const generateNewAvatar = () => {
     const avatars = [
@@ -165,10 +171,10 @@ export default function ProfilePage() {
       "/placeholder.svg?height=120&width=120",
       "/placeholder.svg?height=120&width=120",
       "/placeholder.svg?height=120&width=120",
-    ]
-    const newAvatar = avatars[Math.floor(Math.random() * avatars.length)]
-    setEditForm({ ...editForm, avatar: newAvatar })
-  }
+    ];
+    const newAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+    setEditForm({ ...editForm, avatar: newAvatar });
+  };
 
   // Show loading state while fetching profile
   if (isLoadingProfile) {
@@ -179,7 +185,7 @@ export default function ProfilePage() {
           <span>Loading profile...</span>
         </div>
       </div>
-    )
+    );
   }
 
   // Show error state if profile fetch failed
@@ -188,15 +194,17 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="p-6">
           <div className="text-center">
-            <h2 className="text-xl font-semibold text-red-600 mb-2">Failed to Load Profile</h2>
-            <p className="text-gray-600 mb-4">There was an error loading your profile data.</p>
-            <Button onClick={() => refetchProfile()}>
-              Try Again
-            </Button>
+            <h2 className="text-xl font-semibold text-red-600 mb-2">
+              Failed to Load Profile
+            </h2>
+            <p className="text-gray-600 mb-4">
+              There was an error loading your profile data.
+            </p>
+            <Button onClick={() => refetchProfile()}>Try Again</Button>
           </div>
         </Card>
       </div>
-    )
+    );
   }
 
   // Show message if user is not registered
@@ -205,15 +213,19 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="p-6">
           <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Profile Not Found</h2>
-            <p className="text-gray-600 mb-4">You need to register to view your profile.</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Profile Not Found
+            </h2>
+            <p className="text-gray-600 mb-4">
+              You need to register to view your profile.
+            </p>
             <Button asChild>
               <Link href="/register">Register Now</Link>
             </Button>
           </div>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -251,13 +263,21 @@ export default function ProfilePage() {
             <div className="flex flex-col md:flex-row items-start gap-6">
               <div className="flex flex-col items-center gap-4">
                 <Avatar className="w-32 h-32">
-                  <AvatarImage src={isEditing ? editForm.avatar : profileData.avatar} />
+                  <AvatarImage
+                    src={isEditing ? editForm.avatar : profileData.avatar}
+                  />
                   <AvatarFallback className="text-4xl">
-                    {(isEditing ? editForm.name : profileData.name).charAt(0).toUpperCase()}
+                    {(isEditing ? editForm.name : profileData.name)
+                      .charAt(0)
+                      .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 {isEditing && (
-                  <Button variant="outline" size="sm" onClick={generateNewAvatar}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={generateNewAvatar}
+                  >
                     Generate New
                   </Button>
                 )}
@@ -271,7 +291,9 @@ export default function ProfilePage() {
                       <Input
                         id="editName"
                         value={editForm.name}
-                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, name: e.target.value })
+                        }
                       />
                     </div>
                     <div className="flex gap-2">
@@ -279,7 +301,10 @@ export default function ProfilePage() {
                         <Save className="w-4 h-4 mr-2" />
                         Save Changes
                       </Button>
-                      <Button variant="outline" onClick={() => setIsEditing(false)}>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsEditing(false)}
+                      >
                         <X className="w-4 h-4 mr-2" />
                         Cancel
                       </Button>
@@ -288,30 +313,39 @@ export default function ProfilePage() {
                 ) : (
                   <>
                     <div>
-                      <h1 className="text-3xl font-bold text-gray-900">{profileData.name}</h1>
-                      <p className="text-gray-600 font-mono text-sm mt-1">{profileData.walletAddress}</p>
+                      <h1 className="text-3xl font-bold text-gray-900">
+                        {profileData.name}
+                      </h1>
+                      <p className="text-gray-600 font-mono text-sm mt-1">
+                        {profileData.walletAddress}
+                      </p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4">
-                      {profileData.isRegistered ?(
-                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                        <User className="w-3 h-3 mr-1" />
-                        Registered Member
-                      </Badge>
-                      ):(
+                      {profileData.isRegistered ? (
+                        <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                          <User className="w-3 h-3 mr-1" />
+                          Registered Member
+                        </Badge>
+                      ) : (
                         <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
-                        <User className="w-3 h-3 mr-1" />
-                        Not Registered
-                      </Badge>
+                          <User className="w-3 h-3 mr-1" />
+                          Not Registered
+                        </Badge>
                       )}
                       <div className="flex items-center gap-2">
                         <Star className="w-4 h-4 text-yellow-500" />
-                        <span className="font-semibold">{profileData.reputationScore} Reputation</span>
+                        <span className="font-semibold">
+                          {profileData.reputationScore} Reputation
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-500" />
                         <span className="text-sm text-gray-600">
-                          Member since {new Date(profileData.profileCreatedAt).toLocaleDateString()}
+                          Member since{" "}
+                          {new Date(
+                            profileData.profileCreatedAt
+                          ).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
@@ -320,7 +354,9 @@ export default function ProfilePage() {
                       <div className="p-4 bg-blue-50 rounded-lg">
                         <div className="flex items-center gap-2">
                           <Wallet className="w-5 h-5 text-blue-600" />
-                          <span className="font-medium text-blue-900">Total Locked</span>
+                          <span className="font-medium text-blue-900">
+                            Total Locked
+                          </span>
                         </div>
                         <p className="text-2xl font-bold text-blue-900 mt-1">
                           {profileData.totalLockAmount.toLocaleString()} USDC
@@ -329,7 +365,9 @@ export default function ProfilePage() {
                       <div className="p-4 bg-green-50 rounded-lg">
                         <div className="flex items-center gap-2">
                           <TrendingUp className="w-5 h-5 text-green-600" />
-                          <span className="font-medium text-green-900">Total Saved</span>
+                          <span className="font-medium text-green-900">
+                            Total Saved
+                          </span>
                         </div>
                         <p className="text-2xl font-bold text-green-900 mt-1">
                           {analytics.totalSaved.toLocaleString()} USDC
@@ -338,9 +376,13 @@ export default function ProfilePage() {
                       <div className="p-4 bg-purple-50 rounded-lg">
                         <div className="flex items-center gap-2">
                           <Users className="w-5 h-5 text-purple-600" />
-                          <span className="font-medium text-purple-900">Active Groups</span>
+                          <span className="font-medium text-purple-900">
+                            Active Groups
+                          </span>
                         </div>
-                        <p className="text-2xl font-bold text-purple-900 mt-1">{analytics.activeGroups}</p>
+                        <p className="text-2xl font-bold text-purple-900 mt-1">
+                          {analytics.activeGroups}
+                        </p>
                       </div>
                     </div>
                   </>
@@ -362,47 +404,73 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Completed Cycles</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Completed Cycles
+                  </CardTitle>
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analytics.completedCycles}</div>
-                  <p className="text-xs text-muted-foreground">100% completion rate</p>
+                  <div className="text-2xl font-bold">
+                    {analytics.completedCycles}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    100% completion rate
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Earned</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Earned
+                  </CardTitle>
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analytics.totalEarned.toLocaleString()} USDC</div>
-                  <p className="text-xs text-muted-foreground">From completed cycles</p>
+                  <div className="text-2xl font-bold">
+                    {analytics.totalEarned.toLocaleString()} USDC
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    From completed cycles
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Avg. Contribution</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Avg. Contribution
+                  </CardTitle>
                   <Wallet className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analytics.averageContribution} USDC</div>
+                  <div className="text-2xl font-bold">
+                    {analytics.averageContribution} USDC
+                  </div>
                   <p className="text-xs text-muted-foreground">Per cycle</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Payment Rate</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Payment Rate
+                  </CardTitle>
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {Math.round((analytics.onTimePayments / analytics.totalPayments) * 100)}%
+                    {Math.round(
+                      (analytics.onTimePayments / analytics.totalPayments) * 100
+                    )}
+                    %
                   </div>
-                  <Progress value={(analytics.onTimePayments / analytics.totalPayments) * 100} className="mt-2" />
+                  <Progress
+                    value={
+                      (analytics.onTimePayments / analytics.totalPayments) * 100
+                    }
+                    className="mt-2"
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -411,17 +479,26 @@ export default function ProfilePage() {
             <Card>
               <CardHeader>
                 <CardTitle>Reputation Progress</CardTitle>
-                <CardDescription>Your journey to the next reputation tier</CardDescription>
+                <CardDescription>
+                  Your journey to the next reputation tier
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Advanced (75+)</span>
-                    <span className="text-sm text-gray-600">{profileData.reputationScore}/90</span>
+                    <span className="text-sm text-gray-600">
+                      {profileData.reputationScore}/90
+                    </span>
                   </div>
-                  <Progress value={((profileData.reputationScore - 75) / (90 - 75)) * 100} />
+                  <Progress
+                    value={
+                      ((profileData.reputationScore - 75) / (90 - 75)) * 100
+                    }
+                  />
                   <p className="text-sm text-gray-600">
-                    {90 - profileData.reputationScore} points needed to reach Expert tier
+                    {90 - profileData.reputationScore} points needed to reach
+                    Expert tier
                   </p>
                 </div>
               </CardContent>
@@ -432,24 +509,39 @@ export default function ProfilePage() {
             <Card>
               <CardHeader>
                 <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Your latest transactions and group activities</CardDescription>
+                <CardDescription>
+                  Your latest transactions and group activities
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {recentActivity.map((activity, index) => (
-                    <div key={index} className="flex items-center justify-between py-3 border-b last:border-b-0">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between py-3 border-b last:border-b-0"
+                    >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                          <activity.icon className={`w-5 h-5 ${activity.color}`} />
+                          <activity.icon
+                            className={`w-5 h-5 ${activity.color}`}
+                          />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">{activity.description}</p>
-                          <p className="text-sm text-gray-500">{activity.date}</p>
+                          <p className="font-medium text-gray-900">
+                            {activity.description}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {activity.date}
+                          </p>
                         </div>
                       </div>
                       {activity.amount && (
                         <span
-                          className={`font-medium ${activity.amount.startsWith("+") ? "text-green-600" : "text-red-600"}`}
+                          className={`font-medium ${
+                            activity.amount.startsWith("+")
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
                         >
                           {activity.amount}
                         </span>
@@ -470,19 +562,27 @@ export default function ProfilePage() {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Groups Joined</span>
-                    <span className="font-semibold">{analytics.joinedGroups}</span>
+                    <span className="font-semibold">
+                      {analytics.joinedGroups}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Groups Created</span>
-                    <span className="font-semibold">{analytics.createdGroups}</span>
+                    <span className="font-semibold">
+                      {analytics.createdGroups}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Currently Active</span>
-                    <span className="font-semibold">{analytics.activeGroups}</span>
+                    <span className="font-semibold">
+                      {analytics.activeGroups}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Completed Cycles</span>
-                    <span className="font-semibold">{analytics.completedCycles}</span>
+                    <span className="font-semibold">
+                      {analytics.completedCycles}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -494,11 +594,15 @@ export default function ProfilePage() {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Total Payments</span>
-                    <span className="font-semibold">{analytics.totalPayments}</span>
+                    <span className="font-semibold">
+                      {analytics.totalPayments}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">On-Time Payments</span>
-                    <span className="font-semibold text-green-600">{analytics.onTimePayments}</span>
+                    <span className="font-semibold text-green-600">
+                      {analytics.onTimePayments}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Late Payments</span>
@@ -509,7 +613,11 @@ export default function ProfilePage() {
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Success Rate</span>
                     <span className="font-semibold">
-                      {Math.round((analytics.onTimePayments / analytics.totalPayments) * 100)}%
+                      {Math.round(
+                        (analytics.onTimePayments / analytics.totalPayments) *
+                          100
+                      )}
+                      %
                     </span>
                   </div>
                 </CardContent>
@@ -519,5 +627,5 @@ export default function ProfilePage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

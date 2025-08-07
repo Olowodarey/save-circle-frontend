@@ -2,7 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { StarknetProvider } from "@/components/starknet-provider" ;
+import { StarknetProvider } from "@/app/provider/starknet-provider" ;
 import {Toaster} from "sonner";
 import {UserProvider} from "@/contexts/UserContext"
 

@@ -1,36 +1,51 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus, Users, TrendingUp, Wallet, Clock, Star, Lock, LogOut } from "lucide-react"
-import Link from "next/link"
-import WalletConnectModal from "@/components/wallet-connect-modal"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Plus,
+  Users,
+  TrendingUp,
+  Wallet,
+  Clock,
+  Star,
+  Lock,
+  LogOut,
+} from "lucide-react";
+import Link from "next/link";
+import WalletConnectModal from "@/components/wallet/wallet-connect-modal";
 
 export default function Dashboard() {
-  const [walletConnected, setWalletConnected] = useState(false)
-  const [userRegistered, setUserRegistered] = useState(true)
-  const [showOnboarding, setShowOnboarding] = useState(false)
-  const [address, setAddress] = useState<string | null>(null)
-  const [walletType, setWalletType] = useState<string | null>(null)
-  const [showWalletModal, setShowWalletModal] = useState(false)
+  const [walletConnected, setWalletConnected] = useState(false);
+  const [userRegistered, setUserRegistered] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [address, setAddress] = useState<string | null>(null);
+  const [walletType, setWalletType] = useState<string | null>(null);
+  const [showWalletModal, setShowWalletModal] = useState(false);
 
   useEffect(() => {
     // Check wallet connection on mount
     if (typeof window !== "undefined") {
-      const savedWallet = localStorage.getItem("connected-wallet")
-      const savedAddress = localStorage.getItem("wallet-address")
+      const savedWallet = localStorage.getItem("connected-wallet");
+      const savedAddress = localStorage.getItem("wallet-address");
 
       if (savedWallet && savedAddress) {
-        setWalletConnected(true)
-        setWalletType(savedWallet)
-        setAddress(savedAddress)
+        setWalletConnected(true);
+        setWalletType(savedWallet);
+        setAddress(savedAddress);
       }
     }
-  }, [])
+  }, []);
 
   const myGroups = [
     {
@@ -57,42 +72,42 @@ export default function Dashboard() {
       locked: false,
       myTurn: true,
     },
-  ]
+  ];
 
   const stats = {
     totalSaved: "1,250 USDC",
     activeGroups: 2,
     completedCycles: 3,
     reputationScore: 85,
-  }
+  };
 
   const handleConnect = () => {
-    setShowWalletModal(true)
-  }
+    setShowWalletModal(true);
+  };
 
   const handleWalletConnect = (walletType: string) => {
-    const mockAddress = "0x1234567890abcdef1234567890abcdef12345678"
+    const mockAddress = "0x1234567890abcdef1234567890abcdef12345678";
 
     if (typeof window !== "undefined") {
-      localStorage.setItem("connected-wallet", walletType)
-      localStorage.setItem("wallet-address", mockAddress)
+      localStorage.setItem("connected-wallet", walletType);
+      localStorage.setItem("wallet-address", mockAddress);
     }
 
-    setWalletConnected(true)
-    setWalletType(walletType)
-    setAddress(mockAddress)
-    setShowWalletModal(false)
-  }
+    setWalletConnected(true);
+    setWalletType(walletType);
+    setAddress(mockAddress);
+    setShowWalletModal(false);
+  };
 
   const handleDisconnect = () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("connected-wallet")
-      localStorage.removeItem("wallet-address")
+      localStorage.removeItem("connected-wallet");
+      localStorage.removeItem("wallet-address");
     }
-    setWalletConnected(false)
-    setWalletType(null)
-    setAddress(null)
-  }
+    setWalletConnected(false);
+    setWalletType(null);
+    setAddress(null);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -104,12 +119,17 @@ export default function Dashboard() {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">SC</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">Save Circle</span>
+              <span className="text-xl font-bold text-gray-900">
+                Save Circle
+              </span>
             </Link>
           </div>
 
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
+            <Link
+              href="/dashboard"
+              className="text-gray-600 hover:text-gray-900"
+            >
               Dashboard
             </Link>
             <Link href="/groups" className="text-gray-600 hover:text-gray-900">
@@ -118,7 +138,10 @@ export default function Dashboard() {
             <Link href="/profile" className="text-gray-600 hover:text-gray-900">
               Profile
             </Link>
-            <Link href="/reputation" className="text-gray-600 hover:text-gray-900">
+            <Link
+              href="/reputation"
+              className="text-gray-600 hover:text-gray-900"
+            >
               Reputation
             </Link>
           </nav>
@@ -128,7 +151,10 @@ export default function Dashboard() {
               <Button onClick={handleConnect}>Connect Wallet</Button>
             ) : (
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="bg-green-50 text-green-700 border-green-200"
+                >
                   <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                   {walletType}
                 </Badge>
@@ -151,10 +177,15 @@ export default function Dashboard() {
           <Card className="w-full max-w-md mx-4">
             <CardHeader className="text-center">
               <CardTitle>Welcome to Save Circle!</CardTitle>
-              <CardDescription>Complete your profile to get started</CardDescription>
+              <CardDescription>
+                Complete your profile to get started
+              </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <Button onClick={() => setShowOnboarding(true)} className="w-full">
+              <Button
+                onClick={() => setShowOnboarding(true)}
+                className="w-full"
+              >
                 Create Profile
               </Button>
             </CardContent>
@@ -167,10 +198,15 @@ export default function Dashboard() {
           <Card className="w-full max-w-md mx-4">
             <CardHeader className="text-center">
               <CardTitle>Onboarding</CardTitle>
-              <CardDescription>Let&apos;s complete your profile</CardDescription>
+              <CardDescription>
+                Let&apos;s complete your profile
+              </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <Button onClick={() => setShowOnboarding(false)} className="w-full">
+              <Button
+                onClick={() => setShowOnboarding(false)}
+                className="w-full"
+              >
                 Complete Setup
               </Button>
             </CardContent>
@@ -188,35 +224,47 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalSaved}</div>
-              <p className="text-xs text-muted-foreground">+12% from last month</p>
+              <p className="text-xs text-muted-foreground">
+                +12% from last month
+              </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Groups</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Groups
+              </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.activeGroups}</div>
-              <p className="text-xs text-muted-foreground">2 groups participating</p>
+              <p className="text-xs text-muted-foreground">
+                2 groups participating
+              </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed Cycles</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Completed Cycles
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.completedCycles}</div>
-              <p className="text-xs text-muted-foreground">100% completion rate</p>
+              <p className="text-xs text-muted-foreground">
+                100% completion rate
+              </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Reputation Score</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Reputation Score
+              </CardTitle>
               <Star className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -253,22 +301,40 @@ export default function Dashboard() {
                     <div className="flex items-center gap-3">
                       <CardTitle className="text-lg">{group.name}</CardTitle>
                       <div className="flex items-center gap-2">
-                        <Badge variant={group.type === "private" ? "secondary" : "outline"}>{group.type}</Badge>
+                        <Badge
+                          variant={
+                            group.type === "private" ? "secondary" : "outline"
+                          }
+                        >
+                          {group.type}
+                        </Badge>
                         {group.locked && (
-                          <Badge variant="outline" className="text-orange-600 border-orange-200">
+                          <Badge
+                            variant="outline"
+                            className="text-orange-600 border-orange-200"
+                          >
                             <Lock className="w-3 h-3 mr-1" />
                             Locked
                           </Badge>
                         )}
                         {group.myTurn && (
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Your Turn</Badge>
+                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                            Your Turn
+                          </Badge>
                         )}
                       </div>
                     </div>
-                    <Badge variant={group.status === "active" ? "default" : "secondary"}>{group.status}</Badge>
+                    <Badge
+                      variant={
+                        group.status === "active" ? "default" : "secondary"
+                      }
+                    >
+                      {group.status}
+                    </Badge>
                   </div>
                   <CardDescription>
-                    {group.members}/{group.maxMembers} members • {group.contribution} per cycle
+                    {group.members}/{group.maxMembers} members •{" "}
+                    {group.contribution} per cycle
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -276,11 +342,15 @@ export default function Dashboard() {
                     <div className="flex items-center gap-6">
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-600">{group.members} members</span>
+                        <span className="text-sm text-gray-600">
+                          {group.members} members
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-600">Next payout in {group.nextPayout}</span>
+                        <span className="text-sm text-gray-600">
+                          Next payout in {group.nextPayout}
+                        </span>
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -299,7 +369,9 @@ export default function Dashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Your latest transactions and group activities</CardDescription>
+                <CardDescription>
+                  Your latest transactions and group activities
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -309,11 +381,15 @@ export default function Dashboard() {
                         <TrendingUp className="w-4 h-4 text-green-600" />
                       </div>
                       <div>
-                        <p className="font-medium">Received payout from DeFi Builders</p>
+                        <p className="font-medium">
+                          Received payout from DeFi Builders
+                        </p>
                         <p className="text-sm text-gray-500">2 hours ago</p>
                       </div>
                     </div>
-                    <span className="font-medium text-green-600">+400 USDC</span>
+                    <span className="font-medium text-green-600">
+                      +400 USDC
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between py-2">
@@ -322,7 +398,9 @@ export default function Dashboard() {
                         <Users className="w-4 h-4 text-blue-600" />
                       </div>
                       <div>
-                        <p className="font-medium">Made contribution to Tech Professionals Circle</p>
+                        <p className="font-medium">
+                          Made contribution to Tech Professionals Circle
+                        </p>
                         <p className="text-sm text-gray-500">1 day ago</p>
                       </div>
                     </div>
@@ -335,7 +413,9 @@ export default function Dashboard() {
                         <Star className="w-4 h-4 text-purple-600" />
                       </div>
                       <div>
-                        <p className="font-medium">Reputation score increased</p>
+                        <p className="font-medium">
+                          Reputation score increased
+                        </p>
                         <p className="text-sm text-gray-500">3 days ago</p>
                       </div>
                     </div>
@@ -353,5 +433,5 @@ export default function Dashboard() {
         onConnect={handleWalletConnect}
       />
     </div>
-  )
+  );
 }
