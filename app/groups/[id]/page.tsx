@@ -29,6 +29,8 @@ import { useGroupDetails } from "@/hooks/use-group-details"
 import { useAccount } from "@starknet-react/core"
 import JoinGroupButton from "@/components/groups/joingroupbutton"
 import GroupActivationButton from "@/components/groups/group-activation-button"
+import GroupContribution from "@/components/groups/group-contribution"
+import GroupLiquidityLock from "@/components/groups/group-liquidity-lock"
 
 export default function GroupDetailsPage() {
   const params = useParams()
@@ -241,11 +243,31 @@ export default function GroupDetailsPage() {
                       Activate this group to start contributions
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-4">
                     <GroupActivationButton 
                       groupDetails={groupDetails}
                       onActivationSuccess={refetch}
                     />
+                    
+                    {/* Debug Refresh Button */}
+                    <Button 
+                      variant="outline" 
+                      onClick={refetch} 
+                      disabled={loading}
+                      className="w-full"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Refreshing...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Force Refresh Status
+                        </>
+                      )}
+                    </Button>
                   </CardContent>
                 </Card>
                 
@@ -294,9 +316,26 @@ export default function GroupDetailsPage() {
                       <span className="text-gray-600">Created:</span>
                       <span className="font-medium">{new Date(groupDetails.createdAt).toLocaleDateString()}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Status:</span>
-                      <span className="font-medium capitalize">{groupDetails.status}</span>
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant={groupDetails.status === "active" ? "default" : "secondary"}
+                          className={groupDetails.status === "active" ? "bg-green-100 text-green-800 border-green-200" : ""}
+                        >
+                          {groupDetails.status === "active" && <CheckCircle className="w-3 h-3 mr-1" />}
+                          {groupDetails.status}
+                        </Badge>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={refetch}
+                          disabled={loading}
+                          className="h-6 w-6 p-0"
+                        >
+                          <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+                        </Button>
+                      </div>
                     </div>
                     {groupDetails.status === "active" && (
                       <div className="flex justify-between text-sm">
@@ -315,6 +354,8 @@ export default function GroupDetailsPage() {
         <Tabs defaultValue="members" className="space-y-6">
           <TabsList>
             <TabsTrigger value="members">Members ({groupDetails.members})</TabsTrigger>
+            <TabsTrigger value="contribute">Contribute</TabsTrigger>
+            <TabsTrigger value="lock">Lock Liquidity</TabsTrigger>
             <TabsTrigger value="history">Payment History</TabsTrigger>
             <TabsTrigger value="rules">Rules & Terms</TabsTrigger>
           </TabsList>
@@ -379,6 +420,20 @@ export default function GroupDetailsPage() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="contribute" className="space-y-4">
+            <GroupContribution 
+              groupDetails={groupDetails}
+              onContributionSuccess={refetch}
+            />
+          </TabsContent>
+
+          <TabsContent value="lock" className="space-y-4">
+            <GroupLiquidityLock 
+              groupDetails={groupDetails}
+              onLockSuccess={refetch}
+            />
           </TabsContent>
 
           <TabsContent value="history" className="space-y-4">

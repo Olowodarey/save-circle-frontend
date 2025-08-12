@@ -47,7 +47,11 @@ export default function GroupActivationButton({
     if (success) {
       setShowSuccess(true)
       setTimeout(() => setShowSuccess(false), 3000)
-      onActivationSuccess?.()
+      
+      // Add a small delay to ensure contract state has updated before refetching
+      setTimeout(() => {
+        onActivationSuccess?.()
+      }, 1000)
     }
   }
 

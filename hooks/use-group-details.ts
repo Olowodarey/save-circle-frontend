@@ -121,22 +121,92 @@ export function useGroupDetails(groupId: string) {
       return `${amountInTokens} USDC`
     }
 
-    // Get state string
+    // Get state string - handle GroupState enum from contract
     const getStateString = (state: any) => {
-      if (typeof state === 'object' && state.variant) {
-        const variantKey = Object.keys(state.variant)[0]
-        return variantKey.toLowerCase()
+      console.log('Processing state:', state, 'Type:', typeof state)
+      
+      // Handle enum object with variant property
+      if (typeof state === 'object' && state !== null) {
+        // First check for variant property (Starknet enum format)
+        if (state.variant) {
+          console.log('State has variant property:', state.variant)
+          console.log('Variant type:', typeof state.variant)
+          
+          if (typeof state.variant === 'object' && state.variant !== null) {
+            const variantKeys = Object.keys(state.variant)
+            console.log('All variant keys:', variantKeys)
+            console.log('Variant keys length:', variantKeys.length)
+            
+            // Log each key and its value
+            variantKeys.forEach((key, index) => {
+              console.log(`Variant key ${index}:`, key, '=', state.variant[key])
+            })
+            
+            // Find the key that has a truthy value or is an object
+            const activeKey = variantKeys.find(key => {
+              const value = state.variant[key]
+              console.log(`Checking key '${key}' with value:`, value)
+              // In Starknet enums, the active variant usually has an object value {}
+              // while inactive variants might be null/undefined
+              return value !== null && value !== undefined
+            })
+            
+            if (activeKey) {
+              console.log('Found active variant key:', activeKey)
+              return activeKey.toLowerCase()
+            }
+            
+            // Fallback to first key if no active key found
+            if (variantKeys.length > 0) {
+              const variantKey = variantKeys[0]
+              console.log('Using first variant key as fallback:', variantKey)
+              return variantKey.toLowerCase()
+            }
+          }
+        }
+        
+        // Handle direct enum variant (e.g., { Active: {} } or { Created: {} })
+        const allKeys = Object.keys(state)
+        console.log('All state keys:', allKeys)
+        
+        // Filter out non-enum keys and look for enum variants
+        const enumVariants = ['Created', 'Active', 'Completed', 'Defaulted']
+        const foundVariant = allKeys.find(key => enumVariants.includes(key))
+        
+        if (foundVariant) {
+          console.log('Found direct enum variant:', foundVariant)
+          return foundVariant.toLowerCase()
+        }
+        
+        // Fallback: use first key if no variant property
+        if (allKeys.length > 0 && !state.variant) {
+          const enumKey = allKeys[0]
+          console.log('Using first key as enum:', enumKey)
+          return enumKey.toLowerCase()
+        }
       }
       
-      const stateNum = Number(state)
-      switch (stateNum) {
-        case 0: return "created"
-        case 1: return "active"
-        case 2: return "paused"
-        case 3: return "completed"
-        case 4: return "cancelled"
-        default: return "unknown"
+      // Handle numeric enum values (fallback)
+      if (typeof state === 'number' || !isNaN(Number(state))) {
+        const stateNum = Number(state)
+        console.log('Processing numeric state:', stateNum)
+        switch (stateNum) {
+          case 0: return "created"
+          case 1: return "active"
+          case 2: return "completed"
+          case 3: return "defaulted"
+          default: return "unknown"
+        }
       }
+      
+      // Handle string values
+      if (typeof state === 'string') {
+        console.log('Processing string state:', state)
+        return state.toLowerCase()
+      }
+      
+      console.log('Unknown state format:', state)
+      return "unknown"
     }
 
     // Generate tags based on group properties
@@ -283,12 +353,20 @@ export function useGroupDetails(groupId: string) {
       // First, get the group info
       const groupInfo = await contract.call("get_group_info", [{ low: groupId, high: 0 }]) as GroupInfo
       
+      console.log('=== GROUP INFO DEBUG ===')
+      console.log('Raw group info from contract:', groupInfo)
+      console.log('Group state from contract:', groupInfo.state)
+      console.log('State type:', typeof groupInfo.state)
+      console.log('State JSON:', JSON.stringify(groupInfo.state, null, 2))
+      console.log('State keys:', groupInfo.state ? Object.keys(groupInfo.state) : 'null')
+      
       if (Number(groupInfo.group_id) === 0) {
         setError("Group not found")
         return
       }
 
       const formattedGroup = formatGroupDetails(groupInfo, groupId)
+      console.log('Formatted group status:', formattedGroup.status)
       setGroupDetails(formattedGroup)
 
       // Then, fetch all members
@@ -311,9 +389,60 @@ export function useGroupDetails(groupId: string) {
 
         // Check if current user is a member
         if (address) {
-          const isUserMember = formattedMembers.some(member => 
-            member.address.toLowerCase() === address.toLowerCase()
-          )
+          console.log('=== MEMBERSHIP CHECK DEBUG ===')
+          console.log('Current user address:', address)
+          
+          // Helper function to normalize addresses for comparison
+          const normalizeAddress = (addr: string): string[] => {
+            const cleaned = addr.toLowerCase().replace(/^0x/, '')
+            const formats = []
+            
+            // Add hex format (with and without 0x)
+            formats.push(`0x${cleaned}`)
+            formats.push(cleaned)
+            
+            // Convert hex to decimal if it's a valid hex
+            try {
+              const decimal = BigInt(`0x${cleaned}`).toString()
+              formats.push(decimal)
+            } catch (e) {
+              // If not valid hex, treat as decimal and try to convert to hex
+              try {
+                const hex = BigInt(addr).toString(16)
+                formats.push(`0x${hex}`)
+                formats.push(hex)
+              } catch (e2) {
+                // Keep original if conversion fails
+              }
+            }
+            
+            return [...new Set(formats)] // Remove duplicates
+          }
+          
+          const userFormats = normalizeAddress(address)
+          console.log('User address formats:', userFormats)
+          console.log('Group members:', formattedMembers.map(m => ({ name: m.name, address: m.address })))
+          
+          const isUserMember = formattedMembers.some(member => {
+            const memberFormats = normalizeAddress(member.address)
+            
+            // Check if any user format matches any member format
+            const isMatch = userFormats.some(userFormat => 
+              memberFormats.some(memberFormat => 
+                userFormat.toLowerCase() === memberFormat.toLowerCase()
+              )
+            )
+            
+            console.log(`Comparing member '${member.name}':`, {
+              memberFormats,
+              userFormats,
+              isMatch
+            })
+            
+            return isMatch
+          })
+          
+          console.log('Final membership result:', isUserMember)
           setGroupDetails(prev => prev ? { ...prev, isUserMember } : null)
         }
       }
