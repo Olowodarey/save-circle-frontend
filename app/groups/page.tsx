@@ -29,88 +29,28 @@ import {
   Clock,
   Plus,
   LogOut,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import WalletConnectModal from "@/components/wallet/wallet-connect-modal";
+import { useGroups } from "@/hooks/use-groups";
+import { useAccount } from "@starknet-react/core";
 
 export default function GroupsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [showWalletModal, setShowWalletModal] = useState(false);
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [walletType, setWalletType] = useState<string | null>(null);
-  const [address, setAddress] = useState<string | null>(null);
+  
+  // Use Starknet React hooks for wallet connection
+  const { address, isConnected } = useAccount();
+  
+  // Use the groups hook to fetch contract data
+  const { publicGroups, userInvites, loading, error, refetch } = useGroups();
 
-  useEffect(() => {
-    // Check wallet connection on mount
-    if (typeof window !== "undefined") {
-      const savedWallet = localStorage.getItem("connected-wallet");
-      const savedAddress = localStorage.getItem("wallet-address");
+  // Remove the old wallet connection effect since we're using Starknet React
 
-      if (savedWallet && savedAddress) {
-        setWalletConnected(true);
-        setWalletType(savedWallet);
-        setAddress(savedAddress);
-      }
-    }
-  }, []);
-
-  const publicGroups = [
-    {
-      id: 1,
-      name: "Crypto Enthusiasts",
-      description:
-        "A group for crypto enthusiasts to save together and discuss market trends",
-      members: 8,
-      maxMembers: 12,
-      contribution: "75 USDC",
-      frequency: "Weekly",
-      minReputation: 70,
-      locked: false,
-      creator: "0x1234...5678",
-      tags: ["crypto", "weekly", "medium-risk"],
-    },
-    {
-      id: 2,
-      name: "Starknet Builders",
-      description:
-        "Developers and builders in the Starknet ecosystem saving for future projects",
-      members: 15,
-      maxMembers: 20,
-      contribution: "200 USDC",
-      frequency: "Monthly",
-      minReputation: 85,
-      locked: true,
-      creator: "0x9876...4321",
-      tags: ["starknet", "developers", "monthly"],
-    },
-    {
-      id: 3,
-      name: "DeFi Beginners",
-      description:
-        "Perfect for newcomers to DeFi who want to start saving with a supportive community",
-      members: 5,
-      maxMembers: 10,
-      contribution: "25 USDC",
-      frequency: "Bi-weekly",
-      minReputation: 50,
-      locked: false,
-      creator: "0x5555...9999",
-      tags: ["beginner", "low-risk", "bi-weekly"],
-    },
-  ];
-
-  const myInvites = [
-    {
-      id: 1,
-      groupName: "Private Investors Circle",
-      invitedBy: "0x1111...2222",
-      contribution: "500 USDC",
-      members: 6,
-      maxMembers: 8,
-      expiresIn: "2 days",
-    },
-  ];
+  // Groups data now comes from the contract via useGroups hook
 
   const filteredGroups = publicGroups.filter((group) => {
     const matchesSearch =
@@ -124,30 +64,11 @@ export default function GroupsPage() {
   });
 
   const handleWalletConnect = (walletType: string) => {
-    const mockAddress = "0x1234567890abcdef1234567890abcdef12345678";
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("connected-wallet", walletType);
-      localStorage.setItem("wallet-address", mockAddress);
-    }
-
-    setWalletConnected(true);
-    setWalletType(walletType);
-    setAddress(mockAddress);
+    // Wallet connection is now handled by Starknet React
     setShowWalletModal(false);
   };
 
-  const handleDisconnect = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("connected-wallet");
-      localStorage.removeItem("wallet-address");
-    }
-    setWalletConnected(false);
-    setWalletType(null);
-    setAddress(null);
-  };
-
-  const handleJoinGroup = (groupId: number) => {
+  const handleJoinGroup = (groupId: string) => {
     // Here you would implement the actual join group logic
     // For now, we'll simulate joining and redirect to group details
     console.log("Joining group:", groupId);
@@ -193,7 +114,7 @@ export default function GroupsPage() {
                 Profile
               </Link>
             </nav>
-            {!walletConnected ? (
+            {!isConnected ? (
               <Button
                 variant="outline"
                 onClick={() => setShowWalletModal(true)}
@@ -207,14 +128,11 @@ export default function GroupsPage() {
                   className="bg-green-50 text-green-700 border-green-200"
                 >
                   <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                  {walletType}
+                  Connected
                 </Badge>
                 <span className="text-sm text-gray-600 font-mono">
                   {address?.slice(0, 6)}...{address?.slice(-4)}
                 </span>
-                <Button variant="ghost" size="sm" onClick={handleDisconnect}>
-                  <LogOut className="w-4 h-4" />
-                </Button>
               </div>
             )}
             <Button asChild>
@@ -242,9 +160,9 @@ export default function GroupsPage() {
             <TabsTrigger value="public">Public Groups</TabsTrigger>
             <TabsTrigger value="invites">
               My Invites
-              {myInvites.length > 0 && (
+              {userInvites.length > 0 && (
                 <Badge className="ml-2 bg-red-100 text-red-800 hover:bg-red-100">
-                  {myInvites.length}
+                  {userInvites.length}
                 </Badge>
               )}
             </TabsTrigger>
@@ -275,9 +193,57 @@ export default function GroupsPage() {
               </Select>
             </div>
 
+            {/* Loading State */}
+            {loading && (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                <span className="ml-2 text-gray-600">Loading groups...</span>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <div className="text-red-600 mb-4">
+                    <span className="text-lg font-semibold">Error loading groups</span>
+                    <p className="text-sm mt-2">{error}</p>
+                  </div>
+                  <Button onClick={refetch} variant="outline">
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Try Again
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Empty State */}
+            {!loading && !error && filteredGroups.length === 0 && (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No groups found
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {searchTerm || filterType !== "all" 
+                      ? "No groups match your current filters." 
+                      : "No groups have been created yet. Be the first to create one!"}
+                  </p>
+                  <Button asChild>
+                    <Link href="/groups/create">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Group
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Groups Grid */}
-            <div className="grid gap-6">
-              {filteredGroups.map((group) => (
+            {!loading && !error && filteredGroups.length > 0 && (
+              <div className="grid gap-6">
+                {filteredGroups.map((group) => (
                 <Card
                   key={group.id}
                   className="hover:shadow-lg transition-shadow"
@@ -371,11 +337,12 @@ export default function GroupsPage() {
                   </CardContent>
                 </Card>
               ))}
-            </div>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="invites" className="space-y-6">
-            {myInvites.length === 0 ? (
+            {userInvites?.length === 0 ? (
               <Card>
                 <CardContent className="text-center py-12">
                   <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -392,7 +359,7 @@ export default function GroupsPage() {
               </Card>
             ) : (
               <div className="space-y-4">
-                {myInvites.map((invite) => (
+                {userInvites.map((invite: any) => (
                   <Card key={invite.id}>
                     <CardHeader>
                       <div className="flex items-center justify-between">

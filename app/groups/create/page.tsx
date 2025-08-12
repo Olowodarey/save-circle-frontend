@@ -1,6 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useGroupContract } from "@/hooks/use-group-contract"
+import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,12 +17,32 @@ import { Globe, Lock, Mail, Plus, X, ArrowLeft, Shield, Info, Coins } from "luci
 import Link from "next/link"
 
 export default function CreateGroupPage() {
+  const router = useRouter()
+  const { toast } = useToast()
+  const {
+    createPublicGroup,
+    createPrivateGroup,
+    isCreating,
+    resetState,
+    isConnected,
+  } = useGroupContract()
+
   const [groupType, setGroupType] = useState<"public" | "private">("public")
   const [lockEnabled, setLockEnabled] = useState(false)
   const [inviteEmails, setInviteEmails] = useState<string[]>([])
   const [currentEmail, setCurrentEmail] = useState("")
   const [selectedToken, setSelectedToken] = useState("usdc")
   const [lockAmount, setLockAmount] = useState("")
+
+  // Form state
+  const [formData, setFormData] = useState({
+    groupName: "",
+    description: "",
+    maxMembers: "",
+    contributionAmount: "",
+    frequency: "",
+    minReputation: "0",
+  })
 
   const supportedTokens = [
     { value: "usdc", label: "USDC", icon: "💵" },
@@ -39,6 +62,108 @@ export default function CreateGroupPage() {
 
   const removeEmail = (email: string) => {
     setInviteEmails(inviteEmails.filter((e) => e !== email))
+  }
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const validateForm = () => {
+    const { groupName, maxMembers, contributionAmount, frequency } = formData
+    
+    if (!groupName.trim()) {
+      toast({ title: "Error", description: "Group name is required", variant: "destructive" })
+      return false
+    }
+    
+    if (!maxMembers || parseInt(maxMembers) < 2) {
+      toast({ title: "Error", description: "Minimum 2 members required", variant: "destructive" })
+      return false
+    }
+    
+    if (groupType === "public" && parseInt(maxMembers) > 100) {
+      toast({ title: "Error", description: "Maximum 100 members for public groups", variant: "destructive" })
+      return false
+    }
+    
+    if (groupType === "private" && parseInt(maxMembers) > 50) {
+      toast({ title: "Error", description: "Maximum 50 members for private groups", variant: "destructive" })
+      return false
+    }
+    
+    if (!contributionAmount || parseFloat(contributionAmount) <= 0) {
+      toast({ title: "Error", description: "Valid contribution amount is required", variant: "destructive" })
+      return false
+    }
+    
+    if (!frequency) {
+      toast({ title: "Error", description: "Payment frequency is required", variant: "destructive" })
+      return false
+    }
+    
+    if (groupType === "private" && inviteEmails.length === 0) {
+      toast({ title: "Error", description: "At least one member must be invited for private groups", variant: "destructive" })
+      return false
+    }
+    
+    return true
+  }
+
+  const handleCreateGroup = async () => {
+    if (!isConnected) {
+      toast({ title: "Error", description: "Please connect your wallet first", variant: "destructive" })
+      return
+    }
+
+    if (!validateForm()) return
+
+    try {
+      resetState()
+      
+      const groupParams = {
+        groupName: formData.groupName,
+        description: formData.description,
+        maxMembers: formData.maxMembers,
+        contributionAmount: formData.contributionAmount,
+        frequency: formData.frequency,
+        lockEnabled,
+        lockAmount,
+        selectedToken,
+      }
+
+      let result
+      if (groupType === "public") {
+        result = await createPublicGroup({
+          ...groupParams,
+          minReputation: formData.minReputation,
+        })
+      } else {
+        result = await createPrivateGroup({
+          ...groupParams,
+          minReputation: formData.minReputation,
+          inviteEmails,
+        })
+      }
+
+      if (result?.transaction_hash) {
+        toast({
+          title: "Success!",
+          description: `Group created successfully! Transaction: ${result.transaction_hash.slice(0, 10)}...`,
+        })
+        
+        // Redirect to groups page after a short delay
+        setTimeout(() => {
+          router.push("/groups")
+        }, 2000)
+      }
+    } catch (error: any) {
+      console.error("Error creating group:", error)
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create group. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -102,11 +227,24 @@ export default function CreateGroupPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="groupName">Group Name</Label>
-                    <Input id="groupName" placeholder="e.g., Crypto Enthusiasts Circle" />
+                    <Input 
+                      id="groupName" 
+                      placeholder="e.g., Crypto Enthusiasts Circle" 
+                      value={formData.groupName}
+                      onChange={(e) => handleInputChange("groupName", e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="maxMembers">Maximum Members</Label>
-                    <Input id="maxMembers" type="number" placeholder="Enter max members (2-100)" min="2" max="100" />
+                    <Input 
+                      id="maxMembers" 
+                      type="number" 
+                      placeholder="Enter max members (2-100)" 
+                      min="2" 
+                      max="100" 
+                      value={formData.maxMembers}
+                      onChange={(e) => handleInputChange("maxMembers", e.target.value)}
+                    />
                     <p className="text-sm text-gray-500">Minimum 2 members, maximum 100 members</p>
                   </div>
                 </div>
@@ -117,14 +255,22 @@ export default function CreateGroupPage() {
                     id="description"
                     placeholder="Describe your group's purpose and goals..."
                     className="min-h-[100px]"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange("description", e.target.value)}
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="contribution">Contribution Amount</Label>
-                    <div className="flex">
-                      <Input id="contribution" placeholder="100" className="rounded-r-none" />
+                    <div className="space-y-2">
+                      <Input 
+                        id="contribution" 
+                        placeholder="100" 
+                        className="rounded-r-none" 
+                        value={formData.contributionAmount}
+                        onChange={(e) => handleInputChange("contributionAmount", e.target.value)}
+                      />
                       <Select value={selectedToken} onValueChange={setSelectedToken}>
                         <SelectTrigger className="w-32 rounded-l-none border-l-0">
                           <SelectValue />
@@ -147,7 +293,7 @@ export default function CreateGroupPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="frequency">Payment Frequency</Label>
-                    <Select>
+                    <Select value={formData.frequency} onValueChange={(value) => handleInputChange("frequency", value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select frequency" />
                       </SelectTrigger>
@@ -160,7 +306,7 @@ export default function CreateGroupPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="minReputation">Minimum Reputation</Label>
-                    <Select>
+                    <Select value={formData.minReputation} onValueChange={(value) => handleInputChange("minReputation", value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select minimum" />
                       </SelectTrigger>
@@ -275,7 +421,12 @@ export default function CreateGroupPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="privateGroupName">Group Name</Label>
-                    <Input id="privateGroupName" placeholder="e.g., Private Investors Circle" />
+                    <Input 
+                      id="privateGroupName" 
+                      placeholder="e.g., Private Investors Circle" 
+                      value={formData.groupName}
+                      onChange={(e) => handleInputChange("groupName", e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="privateMaxMembers">Maximum Members</Label>
@@ -285,6 +436,8 @@ export default function CreateGroupPage() {
                       placeholder="Enter max members (2-50)"
                       min="2"
                       max="50"
+                      value={formData.maxMembers}
+                      onChange={(e) => handleInputChange("maxMembers", e.target.value)}
                     />
                     <p className="text-sm text-gray-500">Minimum 2 members, maximum 50 members for private groups</p>
                   </div>
@@ -296,6 +449,8 @@ export default function CreateGroupPage() {
                     id="privateDescription"
                     placeholder="Describe your private group's purpose..."
                     className="min-h-[100px]"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange("description", e.target.value)}
                   />
                 </div>
 
@@ -303,7 +458,13 @@ export default function CreateGroupPage() {
                   <div className="space-y-2">
                     <Label htmlFor="privateContribution">Contribution Amount</Label>
                     <div className="flex">
-                      <Input id="privateContribution" placeholder="500" className="rounded-r-none" />
+                      <Input 
+                        id="privateContribution" 
+                        placeholder="500" 
+                        className="rounded-r-none" 
+                        value={formData.contributionAmount}
+                        onChange={(e) => handleInputChange("contributionAmount", e.target.value)}
+                      />
                       <Select value={selectedToken} onValueChange={setSelectedToken}>
                         <SelectTrigger className="w-32 rounded-l-none border-l-0">
                           <SelectValue />
@@ -326,7 +487,7 @@ export default function CreateGroupPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="privateFrequency">Payment Frequency</Label>
-                    <Select>
+                    <Select value={formData.frequency} onValueChange={(value) => handleInputChange("frequency", value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select frequency" />
                       </SelectTrigger>
@@ -514,7 +675,13 @@ export default function CreateGroupPage() {
           <Button variant="outline" asChild>
             <Link href="/groups">Cancel</Link>
           </Button>
-          <Button className="px-8">Create Group</Button>
+          <Button 
+            className="px-8" 
+            onClick={handleCreateGroup}
+            disabled={isCreating || !isConnected}
+          >
+            {isCreating ? "Creating..." : "Create Group"}
+          </Button>
         </div>
       </div>
     </div>

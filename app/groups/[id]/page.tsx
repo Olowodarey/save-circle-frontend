@@ -20,165 +20,101 @@ import {
   AlertCircle,
   CheckCircle,
   UserPlus,
+  Loader2,
+  RefreshCw,
 } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
+import { useGroupDetails } from "@/hooks/use-group-details"
+import { useAccount } from "@starknet-react/core"
+import JoinGroupButton from "@/components/groups/joingroupbutton"
 
 export default function GroupDetailsPage() {
   const params = useParams()
-  const groupId = params.id
+  const groupId = params.id as string
+  const { address, isConnected } = useAccount()
+  
+  // Use the group details hook to fetch real contract data
+  const { groupDetails, members, loading, error, refetch } = useGroupDetails(groupId)
 
-  // Mock data - in real app, this would be fetched based on groupId
-  const groupData = {
-    id: 1,
-    name: "Crypto Enthusiasts",
-    description:
-      "A group for crypto enthusiasts to save together and discuss market trends. We focus on building wealth through disciplined savings while staying updated on the latest crypto developments.",
-    type: "public",
-    members: 8,
-    maxMembers: 12,
-    contribution: "75 USDC",
-    frequency: "Weekly",
-    minReputation: 70,
-    locked: false,
-    creator: {
-      address: "0x1234...5678",
-      name: "Alex Thompson",
-      reputation: 92,
-    },
-    tags: ["crypto", "weekly", "medium-risk"],
-    status: "active",
-    createdAt: "2024-01-15",
-    nextPayoutDate: "2024-02-01",
-    currentCycle: 3,
-    totalCycles: 12,
-    totalPoolAmount: "900 USDC",
-    isUserMember: false,
-    userCanJoin: true, // Based on reputation and other criteria
+  // Members data now comes from the contract via useGroupDetails hook
+
+  // Payment history would need additional contract functions to implement
+  const paymentHistory: any[] = [] // Placeholder for now
+
+
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/groups">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Groups
+                </Link>
+              </Button>
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">SC</span>
+                </div>
+                <span className="text-xl font-bold text-gray-900">Save Circle</span>
+              </Link>
+            </div>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <span className="ml-2 text-gray-600">Loading group details...</span>
+          </div>
+        </div>
+      </div>
+    )
   }
 
-  const members = [
-    {
-      address: "0x1234...5678",
-      name: "Alex Thompson",
-      avatar: "/placeholder.svg?height=40&width=40",
-      reputation: 92,
-      joinedAt: "2024-01-15",
-      isCreator: true,
-      paymentStatus: "paid",
-      position: 1,
-    },
-    {
-      address: "0x2345...6789",
-      name: "Sarah Chen",
-      avatar: "/placeholder.svg?height=40&width=40",
-      reputation: 88,
-      joinedAt: "2024-01-16",
-      isCreator: false,
-      paymentStatus: "paid",
-      position: 2,
-    },
-    {
-      address: "0x3456...789a",
-      name: "Mike Johnson",
-      avatar: "/placeholder.svg?height=40&width=40",
-      reputation: 75,
-      joinedAt: "2024-01-17",
-      isCreator: false,
-      paymentStatus: "pending",
-      position: 3,
-    },
-    {
-      address: "0x4567...89ab",
-      name: "Emma Davis",
-      avatar: "/placeholder.svg?height=40&width=40",
-      reputation: 81,
-      joinedAt: "2024-01-18",
-      isCreator: false,
-      paymentStatus: "paid",
-      position: 4,
-    },
-    {
-      address: "0x5678...9abc",
-      name: "David Wilson",
-      avatar: "/placeholder.svg?height=40&width=40",
-      reputation: 79,
-      joinedAt: "2024-01-19",
-      isCreator: false,
-      paymentStatus: "paid",
-      position: 5,
-    },
-    {
-      address: "0x6789...abcd",
-      name: "Lisa Garcia",
-      avatar: "/placeholder.svg?height=40&width=40",
-      reputation: 86,
-      joinedAt: "2024-01-20",
-      isCreator: false,
-      paymentStatus: "paid",
-      position: 6,
-    },
-    {
-      address: "0x789a...bcde",
-      name: "James Brown",
-      avatar: "/placeholder.svg?height=40&width=40",
-      reputation: 73,
-      joinedAt: "2024-01-21",
-      isCreator: false,
-      paymentStatus: "paid",
-      position: 7,
-    },
-    {
-      address: "0x89ab...cdef",
-      name: "Anna Martinez",
-      avatar: "/placeholder.svg?height=40&width=40",
-      reputation: 84,
-      joinedAt: "2024-01-22",
-      isCreator: false,
-      paymentStatus: "paid",
-      position: 8,
-    },
-  ]
-
-  const paymentHistory = [
-    {
-      cycle: 3,
-      date: "2024-01-29",
-      recipient: "Mike Johnson",
-      amount: "900 USDC",
-      status: "completed",
-    },
-    {
-      cycle: 2,
-      date: "2024-01-22",
-      recipient: "Sarah Chen",
-      amount: "900 USDC",
-      status: "completed",
-    },
-    {
-      cycle: 1,
-      date: "2024-01-15",
-      recipient: "Alex Thompson",
-      amount: "900 USDC",
-      status: "completed",
-    },
-  ]
-
-  const [showJoinModal, setShowJoinModal] = useState(false)
-
-  const handleJoinGroup = () => {
-    // Here you would call the smart contract to join the group
-    console.log("Joining group:", groupId)
-
-    // Simulate joining process
-    setTimeout(() => {
-      // Update the group data to reflect that user has joined
-      // In a real app, this would refetch data from the blockchain
-      alert("Successfully joined the group!")
-      setShowJoinModal(false)
-      // Optionally redirect to dashboard or refresh the page
-      window.location.reload()
-    }, 1000)
+  // Show error state
+  if (error || !groupDetails) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/groups">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Groups
+                </Link>
+              </Button>
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">SC</span>
+                </div>
+                <span className="text-xl font-bold text-gray-900">Save Circle</span>
+              </Link>
+            </div>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-8">
+          <Card>
+            <CardContent className="text-center py-12">
+              <div className="text-red-600 mb-4">
+                <AlertCircle className="w-12 h-12 mx-auto mb-4" />
+                <span className="text-lg font-semibold">Error loading group</span>
+                <p className="text-sm mt-2">{error || "Group not found"}</p>
+              </div>
+              <Button onClick={refetch} variant="outline">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -212,26 +148,26 @@ export default function GroupDetailsPage() {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
-                      <h1 className="text-3xl font-bold text-gray-900">{groupData.name}</h1>
+                      <h1 className="text-3xl font-bold text-gray-900">{groupDetails.name}</h1>
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-green-600 border-green-200">
                           <Globe className="w-3 h-3 mr-1" />
-                          {groupData.type}
+                          {groupDetails.type}
                         </Badge>
-                        {groupData.locked && (
+                        {groupDetails.locked && (
                           <Badge variant="outline" className="text-orange-600 border-orange-200">
                             <Lock className="w-3 h-3 mr-1" />
                             Locked
                           </Badge>
                         )}
-                        <Badge variant={groupData.status === "active" ? "default" : "secondary"}>
-                          {groupData.status}
+                        <Badge variant={groupDetails.status === "active" ? "default" : "secondary"}>
+                          {groupDetails.status}
                         </Badge>
                       </div>
                     </div>
-                    <p className="text-gray-600 mb-4">{groupData.description}</p>
+                    <p className="text-gray-600 mb-4">{groupDetails.description}</p>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {groupData.tags.map((tag) => (
+                      {groupDetails.tags.map((tag: string) => (
                         <Badge key={tag} variant="secondary" className="text-xs">
                           {tag}
                         </Badge>
@@ -248,7 +184,7 @@ export default function GroupDetailsPage() {
                       <span className="text-sm font-medium text-blue-900">Members</span>
                     </div>
                     <p className="text-xl font-bold text-blue-900">
-                      {groupData.members}/{groupData.maxMembers}
+                      {groupDetails.members}/{groupDetails.maxMembers}
                     </p>
                   </div>
                   <div className="p-4 bg-green-50 rounded-lg">
@@ -256,21 +192,21 @@ export default function GroupDetailsPage() {
                       <DollarSign className="w-4 h-4 text-green-600" />
                       <span className="text-sm font-medium text-green-900">Contribution</span>
                     </div>
-                    <p className="text-xl font-bold text-green-900">{groupData.contribution}</p>
+                    <p className="text-xl font-bold text-green-900">{groupDetails.contribution}</p>
                   </div>
                   <div className="p-4 bg-purple-50 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
                       <Calendar className="w-4 h-4 text-purple-600" />
                       <span className="text-sm font-medium text-purple-900">Frequency</span>
                     </div>
-                    <p className="text-xl font-bold text-purple-900">{groupData.frequency}</p>
+                    <p className="text-xl font-bold text-purple-900">{groupDetails.frequency}</p>
                   </div>
                   <div className="p-4 bg-yellow-50 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
                       <Star className="w-4 h-4 text-yellow-600" />
                       <span className="text-sm font-medium text-yellow-900">Min. Reputation</span>
                     </div>
-                    <p className="text-xl font-bold text-yellow-900">{groupData.minReputation}</p>
+                    <p className="text-xl font-bold text-yellow-900">{groupDetails.minReputation}</p>
                   </div>
                 </div>
 
@@ -280,14 +216,14 @@ export default function GroupDetailsPage() {
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm font-medium">Group Progress</span>
                       <span className="text-sm text-gray-600">
-                        Cycle {groupData.currentCycle} of {groupData.totalCycles}
+                        Cycle {groupDetails.currentCycle} of {groupDetails.totalCycles}
                       </span>
                     </div>
-                    <Progress value={(groupData.currentCycle / groupData.totalCycles) * 100} />
+                    <Progress value={(groupDetails.currentCycle / groupDetails.totalCycles) * 100} />
                   </div>
                   <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>Next payout: {groupData.nextPayoutDate}</span>
-                    <span>Total pool: {groupData.totalPoolAmount}</span>
+                    <span>Next payout: {groupDetails.nextPayoutDate}</span>
+                    <span>Total pool: {groupDetails.totalPoolAmount}</span>
                   </div>
                 </div>
               </div>
@@ -298,47 +234,25 @@ export default function GroupDetailsPage() {
                   <CardHeader>
                     <CardTitle className="text-lg">Join This Group</CardTitle>
                     <CardDescription>
-                      {groupData.userCanJoin
+                      {groupDetails.userCanJoin
                         ? "You meet all requirements to join this group"
                         : "You don't meet the requirements to join this group"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {groupData.userCanJoin ? (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-green-600">
-                          <CheckCircle className="w-4 h-4" />
-                          <span className="text-sm">Reputation requirement met</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-green-600">
-                          <CheckCircle className="w-4 h-4" />
-                          <span className="text-sm">Spots available</span>
-                        </div>
-                        <Button className="w-full" onClick={() => setShowJoinModal(true)}>
-                          <UserPlus className="w-4 h-4 mr-2" />
-                          Join Group
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-red-600">
-                          <AlertCircle className="w-4 h-4" />
-                          <span className="text-sm">Reputation too low (need {groupData.minReputation}+)</span>
-                        </div>
-                        <Button disabled className="w-full">
-                          Cannot Join
-                        </Button>
-                      </div>
-                    )}
+                    <JoinGroupButton 
+                      groupDetails={groupDetails}
+                      onJoinSuccess={refetch}
+                    />
 
                     <div className="pt-4 border-t space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Created by:</span>
-                        <span className="font-medium">{groupData.creator.name}</span>
+                        <span className="font-medium">{groupDetails.creator.name}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Created:</span>
-                        <span className="font-medium">{new Date(groupData.createdAt).toLocaleDateString()}</span>
+                        <span className="font-medium">{new Date(groupDetails.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -351,7 +265,7 @@ export default function GroupDetailsPage() {
         {/* Detailed Information */}
         <Tabs defaultValue="members" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="members">Members ({groupData.members})</TabsTrigger>
+            <TabsTrigger value="members">Members ({groupDetails.members})</TabsTrigger>
             <TabsTrigger value="history">Payment History</TabsTrigger>
             <TabsTrigger value="rules">Rules & Terms</TabsTrigger>
           </TabsList>
@@ -463,7 +377,7 @@ export default function GroupDetailsPage() {
                     Payment Rules
                   </h4>
                   <ul className="space-y-2 text-sm text-gray-600 ml-6">
-                    <li>• Contributions must be made every {groupData.frequency.toLowerCase()}</li>
+                    <li>• Contributions must be made every {groupDetails.frequency.toLowerCase()}</li>
                     <li>• Late payments may result in reputation penalties</li>
                     <li>• Payouts are distributed in order of joining</li>
                     <li>• All transactions are recorded on the blockchain</li>
@@ -476,14 +390,14 @@ export default function GroupDetailsPage() {
                     Membership Requirements
                   </h4>
                   <ul className="space-y-2 text-sm text-gray-600 ml-6">
-                    <li>• Minimum reputation score: {groupData.minReputation}</li>
+                    <li>• Minimum reputation score: {groupDetails.minReputation}</li>
                     <li>• Must have a verified Starknet wallet</li>
                     <li>• Commitment to complete full cycle</li>
                     <li>• Follow community guidelines</li>
                   </ul>
                 </div>
 
-                {groupData.locked && (
+                {groupDetails.locked && (
                   <div>
                     <h4 className="font-semibold mb-3 flex items-center gap-2">
                       <Lock className="w-4 h-4 text-orange-600" />
@@ -517,45 +431,7 @@ export default function GroupDetailsPage() {
         </Tabs>
       </div>
 
-      {/* Join Confirmation Modal */}
-      {showJoinModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>Join {groupData.name}?</CardTitle>
-              <CardDescription>You're about to join this savings group. Please confirm the details.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Contribution:</span>
-                  <span className="font-medium">{groupData.contribution}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Frequency:</span>
-                  <span className="font-medium">{groupData.frequency}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Your position:</span>
-                  <span className="font-medium">#{groupData.members + 1}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Expected payout:</span>
-                  <span className="font-medium">{groupData.totalPoolAmount}</span>
-                </div>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <Button variant="outline" className="flex-1 bg-transparent" onClick={() => setShowJoinModal(false)}>
-                  Cancel
-                </Button>
-                <Button className="flex-1" onClick={handleJoinGroup}>
-                  Confirm & Join
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+
     </div>
   )
 }
