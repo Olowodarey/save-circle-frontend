@@ -218,7 +218,7 @@ export function useGroupDetails(groupId: string) {
       minReputation: minReputationRequired,
       locked: groupInfo.requires_lock,
       creator: {
-        address: groupInfo.creator,
+        address: String(groupInfo.creator),
         name: `User ${String(groupInfo.creator).slice(0, 6)}...${String(groupInfo.creator).slice(-4)}`,
         reputation: 95, // Mock reputation for now
       },
@@ -250,9 +250,12 @@ export function useGroupDetails(groupId: string) {
       return `${amountInTokens} USDC`
     }
 
+    // Safely convert address to string
+    const userAddress = String(member.user)
+    
     return {
-      address: member.user,
-      name: `User ${member.user.slice(0, 6)}...${member.user.slice(-4)}`,
+      address: userAddress,
+      name: `User ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`,
       avatar: "/placeholder.svg?height=40&width=40",
       reputation: Math.floor(Math.random() * 30) + 70, // Mock reputation 70-100
       joinedAt: new Date(Number(member.joined_at) * 1000).toISOString().split('T')[0],
@@ -300,7 +303,7 @@ export function useGroupDetails(groupId: string) {
         const memberInfos = await Promise.all(memberPromises)
         
         const formattedMembers = memberInfos.map((member, index) => {
-          const isCreator = member.user === groupInfo.creator
+          const isCreator = String(member.user).toLowerCase() === String(groupInfo.creator).toLowerCase()
           return formatMember(member, index, isCreator)
         })
 

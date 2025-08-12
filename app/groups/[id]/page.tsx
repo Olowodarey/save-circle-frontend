@@ -28,6 +28,7 @@ import { useParams } from "next/navigation"
 import { useGroupDetails } from "@/hooks/use-group-details"
 import { useAccount } from "@starknet-react/core"
 import JoinGroupButton from "@/components/groups/joingroupbutton"
+import GroupActivationButton from "@/components/groups/group-activation-button"
 
 export default function GroupDetailsPage() {
   const params = useParams()
@@ -36,6 +37,8 @@ export default function GroupDetailsPage() {
   
   // Use the group details hook to fetch real contract data
   const { groupDetails, members, loading, error, refetch } = useGroupDetails(groupId)
+  
+  // No frontend permission checks - let the contract handle it
 
   // Members data now comes from the contract via useGroupDetails hook
 
@@ -229,32 +232,78 @@ export default function GroupDetailsPage() {
               </div>
 
               {/* Action Panel */}
-              <div className="lg:w-80">
+              <div className="lg:w-80 space-y-4">
+                {/* Group Activation Card - Always visible, contract handles permissions */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Join This Group</CardTitle>
+                    <CardTitle className="text-lg">Group Management</CardTitle>
                     <CardDescription>
-                      {groupDetails.userCanJoin
-                        ? "You meet all requirements to join this group"
-                        : "You don't meet the requirements to join this group"}
+                      Activate this group to start contributions
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <JoinGroupButton 
+                  <CardContent>
+                    <GroupActivationButton 
                       groupDetails={groupDetails}
-                      onJoinSuccess={refetch}
+                      onActivationSuccess={refetch}
                     />
+                  </CardContent>
+                </Card>
+                
+                {/* Join Group Card - Always show */}
+                {(
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Join This Group</CardTitle>
+                      <CardDescription>
+                        {groupDetails.userCanJoin
+                          ? "You meet all requirements to join this group"
+                          : "You don't meet the requirements to join this group"}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <JoinGroupButton 
+                        groupDetails={groupDetails}
+                        onJoinSuccess={refetch}
+                      />
 
-                    <div className="pt-4 border-t space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Created by:</span>
-                        <span className="font-medium">{groupDetails.creator.name}</span>
+                      <div className="pt-4 border-t space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Created by:</span>
+                          <span className="font-medium">{groupDetails.creator.name}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Created:</span>
+                          <span className="font-medium">{new Date(groupDetails.createdAt).toLocaleDateString()}</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Created:</span>
-                        <span className="font-medium">{new Date(groupDetails.createdAt).toLocaleDateString()}</span>
-                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {/* Group Information Card - Always visible */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Group Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Created by:</span>
+                      <span className="font-medium">{groupDetails.creator.name}</span>
                     </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Created:</span>
+                      <span className="font-medium">{new Date(groupDetails.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Status:</span>
+                      <span className="font-medium capitalize">{groupDetails.status}</span>
+                    </div>
+                    {groupDetails.status === "active" && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Next Payout:</span>
+                        <span className="font-medium">{groupDetails.nextPayoutDate}</span>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
