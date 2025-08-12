@@ -4,6 +4,7 @@ import React from "react";
 import { sepolia} from "@starknet-react/chains";
 import {
   StarknetConfig,
+  jsonRpcProvider,
   publicProvider,
   ready,
   braavos,
@@ -20,6 +21,19 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
     // Randomize the order of the connectors.
     order: "random",
   });
+
+
+  const provider = jsonRpcProvider({
+    rpc: () => {
+      return {
+        nodeUrl: "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/xi0vRGP4g0IT5lePSjZHm",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+    },
+  });
+ 
  
   return (
     <StarknetConfig

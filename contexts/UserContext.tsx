@@ -14,7 +14,7 @@ import {
   useSendTransaction,
 } from "@starknet-react/core";
 import { MY_CONTRACT_ABI } from "@/constants/abi";
-import { CONTRACT_ADDRESS } from "@/constants/address";
+import { CONTRACT_ADDRESS } from "@/constants";
 import { shortString } from "starknet";
 import type { StarknetTypedContract } from "@starknet-react/core";
 

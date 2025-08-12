@@ -21,6 +21,7 @@ import { useGroupContribution } from "@/hooks/use-group-contribution"
 import { useAccount } from "@starknet-react/core"
 import { FormattedGroupDetails } from "@/hooks/use-group-details"
 
+
 interface GroupContributionProps {
   groupDetails: FormattedGroupDetails
   onContributionSuccess?: () => void

@@ -16,7 +16,7 @@ import {
 import Link from "next/link";
 import { useAccount, useReadContract } from "@starknet-react/core";
 import { MY_CONTRACT_ABI } from "@/constants/abi";
-import { CONTRACT_ADDRESS } from "@/constants/address";
+import { CONTRACT_ADDRESS } from "@/constants";
 
 // Import new components
 import ProfileHeader from "@/components/profile/ProfileHeader";
