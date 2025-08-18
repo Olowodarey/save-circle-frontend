@@ -27,6 +27,20 @@ export const LockType = {
   None: 1,
 };
 
+// Helper functions for enum variant names
+const getLockTypeVariant = (type: number): string => {
+  return type === LockType.Progressive ? "Progressive" : "None";
+};
+
+const getTimeUnitVariant = (unit: number): string => {
+  switch (unit) {
+    case TimeUnit.Days: return "Days";
+    case TimeUnit.Weeks: return "Weeks";
+    case TimeUnit.Months: return "Months";
+    default: return "Days";
+  }
+};
+
 // Type definitions for group creation
 export interface CreatePublicGroupParams {
   memberLimit: number;
@@ -134,14 +148,13 @@ export function useGroupContract() {
         : LockType.None;
 
       const callData = [
+        params.groupName, // name: ByteArray
+        params.description, // description: ByteArray
         parseInt(params.maxMembers), // member_limit: u32
         contributionAmountWei, // contribution_amount: u256
-        new CairoCustomEnum({ [Object.keys(LockType)[lockType]]: {} }), // lock_type: LockType enum
+        new CairoCustomEnum({ [getLockTypeVariant(lockType)]: {} }), // lock_type: LockType enum
         BigInt(duration), // cycle_duration: u64
-        new CairoCustomEnum({ [Object.keys(TimeUnit)[unit]]: {} }), // cycle_unit: TimeUnit enum
-        new CairoCustomEnum({
-          [Object.keys(GroupVisibility)[GroupVisibility.Public]]: {},
-        }), // visibility: GroupVisibility enum
+        new CairoCustomEnum({ [getTimeUnitVariant(unit)]: {} }), // cycle_unit: TimeUnit enum
         params.lockEnabled, // requires_lock: bool
         reputationScore, // min_reputation_score: u32
       ] as const;
@@ -227,13 +240,15 @@ export function useGroupContract() {
       );
 
       const callData = [
+        params.groupName, // name: ByteArray
+        params.description, // description: ByteArray
         parseInt(params.maxMembers), // member_limit: u32
         contributionAmountWei, // contribution_amount: u256
         BigInt(duration), // cycle_duration: u64
-        new CairoCustomEnum({ [Object.keys(TimeUnit)[unit]]: {} }), // cycle_unit: TimeUnit enum
+        new CairoCustomEnum({ [getTimeUnitVariant(unit)]: {} }), // cycle_unit: TimeUnit enum
         invitedAddresses, // invited_members: Array<ContractAddress>
         params.lockEnabled, // requires_lock: bool
-        new CairoCustomEnum({ [Object.keys(LockType)[lockType]]: {} }), // lock_type: LockType enum
+        new CairoCustomEnum({ [getLockTypeVariant(lockType)]: {} }), // lock_type: LockType enum
         reputationScore, // min_reputation_score: u32
       ] as const;
 

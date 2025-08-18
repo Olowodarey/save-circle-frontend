@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
  
-import { sepolia} from "@starknet-react/chains";
+import { sepolia, mainnet} from "@starknet-react/chains";
 import {
   StarknetConfig,
   jsonRpcProvider,
@@ -26,7 +26,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
   const provider = jsonRpcProvider({
     rpc: () => {
       return {
-        nodeUrl: "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/xi0vRGP4g0IT5lePSjZHm",
+        nodeUrl: "https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_8/xi0vRGP4g0IT5lePSjZHm",
         headers: {
           "Content-Type": "application/json",
         },
@@ -37,7 +37,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
  
   return (
     <StarknetConfig
-      chains={[sepolia]}
+      chains={[mainnet]}
       provider={publicProvider()}
       connectors={connectors}
       explorer={voyager}

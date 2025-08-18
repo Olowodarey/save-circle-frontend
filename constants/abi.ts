@@ -1,5 +1,4 @@
-export const MY_CONTRACT_ABI = 
-[
+export const MY_CONTRACT_ABI = [
   {
     "name": "pause",
     "type": "function",
@@ -11,6 +10,18 @@ export const MY_CONTRACT_ABI =
     "name": "unpause",
     "type": "function",
     "inputs": [],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "name": "add_admin",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "new_admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ],
     "outputs": [],
     "state_mutability": "external"
   },
@@ -41,6 +52,24 @@ export const MY_CONTRACT_ABI =
     "name": "SavecircleImpl",
     "type": "impl",
     "interface_name": "save_circle::interfaces::Isavecircle::Isavecircle"
+  },
+  {
+    "name": "core::byte_array::ByteArray",
+    "type": "struct",
+    "members": [
+      {
+        "name": "data",
+        "type": "core::array::Array::<core::bytes_31::bytes31>"
+      },
+      {
+        "name": "pending_word",
+        "type": "core::felt252"
+      },
+      {
+        "name": "pending_word_len",
+        "type": "core::integer::u32"
+      }
+    ]
   },
   {
     "name": "core::bool",
@@ -80,11 +109,11 @@ export const MY_CONTRACT_ABI =
       },
       {
         "name": "name",
-        "type": "core::felt252"
+        "type": "core::byte_array::ByteArray"
       },
       {
         "name": "avatar",
-        "type": "core::felt252"
+        "type": "core::byte_array::ByteArray"
       },
       {
         "name": "is_registered",
@@ -97,6 +126,156 @@ export const MY_CONTRACT_ABI =
       {
         "name": "profile_created_at",
         "type": "core::integer::u64"
+      },
+      {
+        "name": "reputation_score",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "total_contribution",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "total_joined_groups",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "total_created_groups",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "total_earned",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "completed_cycles",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "active_groups",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "on_time_payments",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "total_payments",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "payment_rate",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "average_contribution",
+        "type": "core::integer::u256"
+      }
+    ]
+  },
+  {
+    "name": "save_circle::enums::Enums::ActivityType",
+    "type": "enum",
+    "variants": [
+      {
+        "name": "Contribution",
+        "type": "()"
+      },
+      {
+        "name": "PayoutReceived",
+        "type": "()"
+      },
+      {
+        "name": "GroupJoined",
+        "type": "()"
+      },
+      {
+        "name": "GroupCreated",
+        "type": "()"
+      },
+      {
+        "name": "GroupCompleted",
+        "type": "()"
+      },
+      {
+        "name": "GroupLeft",
+        "type": "()"
+      },
+      {
+        "name": "LockDeposited",
+        "type": "()"
+      },
+      {
+        "name": "LockWithdrawn",
+        "type": "()"
+      },
+      {
+        "name": "PenaltyPaid",
+        "type": "()"
+      },
+      {
+        "name": "ReputationGained",
+        "type": "()"
+      },
+      {
+        "name": "ReputationLost",
+        "type": "()"
+      },
+      {
+        "name": "UserRegistered",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "name": "core::option::Option::<core::integer::u256>",
+    "type": "enum",
+    "variants": [
+      {
+        "name": "Some",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "None",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "name": "save_circle::structs::Structs::UserActivity",
+    "type": "struct",
+    "members": [
+      {
+        "name": "activity_id",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "user_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "activity_type",
+        "type": "save_circle::enums::Enums::ActivityType"
+      },
+      {
+        "name": "description",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "group_id",
+        "type": "core::option::Option::<core::integer::u256>"
+      },
+      {
+        "name": "timestamp",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "is_positive_amount",
+        "type": "core::bool"
       }
     ]
   },
@@ -119,6 +298,14 @@ export const MY_CONTRACT_ABI =
     "type": "enum",
     "variants": [
       {
+        "name": "Minutes",
+        "type": "()"
+      },
+      {
+        "name": "Hours",
+        "type": "()"
+      },
+      {
         "name": "Days",
         "type": "()"
       },
@@ -128,20 +315,6 @@ export const MY_CONTRACT_ABI =
       },
       {
         "name": "Months",
-        "type": "()"
-      }
-    ]
-  },
-  {
-    "name": "save_circle::enums::Enums::GroupVisibility",
-    "type": "enum",
-    "variants": [
-      {
-        "name": "Public",
-        "type": "()"
-      },
-      {
-        "name": "Private",
         "type": "()"
       }
     ]
@@ -169,12 +342,34 @@ export const MY_CONTRACT_ABI =
     ]
   },
   {
+    "name": "save_circle::enums::Enums::GroupVisibility",
+    "type": "enum",
+    "variants": [
+      {
+        "name": "Public",
+        "type": "()"
+      },
+      {
+        "name": "Private",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "name": "save_circle::structs::Structs::GroupInfo",
     "type": "struct",
     "members": [
       {
         "name": "group_id",
         "type": "core::integer::u256"
+      },
+      {
+        "name": "group_name",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "description",
+        "type": "core::byte_array::ByteArray"
       },
       {
         "name": "creator",
@@ -221,6 +416,10 @@ export const MY_CONTRACT_ABI =
         "type": "core::integer::u64"
       },
       {
+        "name": "last_payout_time",
+        "type": "core::integer::u64"
+      },
+      {
         "name": "total_cycles",
         "type": "core::integer::u32"
       },
@@ -237,8 +436,100 @@ export const MY_CONTRACT_ABI =
         "type": "core::integer::u32"
       },
       {
-        "name": "invited_members",
+        "name": "completed_cycles",
         "type": "core::integer::u32"
+      },
+      {
+        "name": "total_pool_amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "remaining_pool_amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "next_payout_recipient",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "is_active",
+        "type": "core::bool"
+      }
+    ]
+  },
+  {
+    "name": "save_circle::structs::Structs::UserStatistics",
+    "type": "struct",
+    "members": [
+      {
+        "name": "user_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "total_saved",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "total_earned",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "success_rate",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "average_cycle_duration",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "favorite_contribution_amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "longest_active_streak",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "current_active_streak",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "groups_completed_successfully",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "groups_left_early",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "total_penalties_paid",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "updated_at",
+        "type": "core::integer::u64"
+      }
+    ]
+  },
+  {
+    "name": "save_circle::structs::Structs::ProfileViewData",
+    "type": "struct",
+    "members": [
+      {
+        "name": "profile",
+        "type": "save_circle::structs::Structs::UserProfile"
+      },
+      {
+        "name": "recent_activities",
+        "type": "core::array::Array::<save_circle::structs::Structs::UserActivity>"
+      },
+      {
+        "name": "joined_groups",
+        "type": "core::array::Array::<save_circle::structs::Structs::GroupInfo>"
+      },
+      {
+        "name": "statistics",
+        "type": "save_circle::structs::Structs::UserStatistics"
       }
     ]
   },
@@ -285,6 +576,48 @@ export const MY_CONTRACT_ABI =
       {
         "name": "missed_contributions",
         "type": "core::integer::u32"
+      },
+      {
+        "name": "total_contributed",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "total_recieved",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "is_active",
+        "type": "core::bool"
+      }
+    ]
+  },
+  {
+    "name": "save_circle::structs::Structs::UserGroupDetails",
+    "type": "struct",
+    "members": [
+      {
+        "name": "group_info",
+        "type": "save_circle::structs::Structs::GroupInfo"
+      },
+      {
+        "name": "member_data",
+        "type": "save_circle::structs::Structs::GroupMember"
+      },
+      {
+        "name": "next_payout_date",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "position_in_queue",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "total_contributed_so_far",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "expected_payout_amount",
+        "type": "core::integer::u256"
       }
     ]
   },
@@ -298,11 +631,11 @@ export const MY_CONTRACT_ABI =
         "inputs": [
           {
             "name": "name",
-            "type": "core::felt252"
+            "type": "core::byte_array::ByteArray"
           },
           {
             "name": "avatar",
-            "type": "core::felt252"
+            "type": "core::byte_array::ByteArray"
           }
         ],
         "outputs": [
@@ -313,7 +646,7 @@ export const MY_CONTRACT_ABI =
         "state_mutability": "external"
       },
       {
-        "name": "get_user_profile",
+        "name": "get_user_profile_view_data",
         "type": "function",
         "inputs": [
           {
@@ -323,7 +656,7 @@ export const MY_CONTRACT_ABI =
         ],
         "outputs": [
           {
-            "type": "save_circle::structs::Structs::UserProfile"
+            "type": "save_circle::structs::Structs::ProfileViewData"
           }
         ],
         "state_mutability": "view"
@@ -332,6 +665,14 @@ export const MY_CONTRACT_ABI =
         "name": "create_public_group",
         "type": "function",
         "inputs": [
+          {
+            "name": "name",
+            "type": "core::byte_array::ByteArray"
+          },
+          {
+            "name": "description",
+            "type": "core::byte_array::ByteArray"
+          },
           {
             "name": "member_limit",
             "type": "core::integer::u32"
@@ -351,10 +692,6 @@ export const MY_CONTRACT_ABI =
           {
             "name": "cycle_unit",
             "type": "save_circle::enums::Enums::TimeUnit"
-          },
-          {
-            "name": "visibility",
-            "type": "save_circle::enums::Enums::GroupVisibility"
           },
           {
             "name": "requires_lock",
@@ -392,6 +729,14 @@ export const MY_CONTRACT_ABI =
         "name": "create_private_group",
         "type": "function",
         "inputs": [
+          {
+            "name": "name",
+            "type": "core::byte_array::ByteArray"
+          },
+          {
+            "name": "description",
+            "type": "core::byte_array::ByteArray"
+          },
           {
             "name": "member_limit",
             "type": "core::integer::u32"
@@ -431,6 +776,22 @@ export const MY_CONTRACT_ABI =
           }
         ],
         "state_mutability": "external"
+      },
+      {
+        "name": "get_user_profile",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "user_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "save_circle::structs::Structs::UserProfile"
+          }
+        ],
+        "state_mutability": "view"
       },
       {
         "name": "join_group",
@@ -484,6 +845,58 @@ export const MY_CONTRACT_ABI =
         "outputs": [
           {
             "type": "core::integer::u32"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "name": "get_user_joined_groups",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "user_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::array::Array::<save_circle::structs::Structs::UserGroupDetails>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "name": "get_user_activities",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "user_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "limit",
+            "type": "core::integer::u32"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::array::Array::<save_circle::structs::Structs::UserActivity>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "name": "get_user_statistics",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "user_address",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "save_circle::structs::Structs::UserStatistics"
           }
         ],
         "state_mutability": "view"
@@ -637,17 +1050,6 @@ export const MY_CONTRACT_ABI =
         "state_mutability": "view"
       },
       {
-        "name": "get_protocol_treasury",
-        "type": "function",
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "core::integer::u256"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
         "name": "activate_group",
         "type": "function",
         "inputs": [
@@ -710,6 +1112,30 @@ export const MY_CONTRACT_ABI =
           }
         ],
         "state_mutability": "view"
+      },
+      {
+        "name": "admin_withdraw_from_pool",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "group_id",
+            "type": "core::integer::u256"
+          },
+          {
+            "name": "amount",
+            "type": "core::integer::u256"
+          },
+          {
+            "name": "recipient",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "external"
       }
     ]
   },
@@ -1116,7 +1542,7 @@ export const MY_CONTRACT_ABI =
       {
         "kind": "data",
         "name": "name",
-        "type": "core::felt252"
+        "type": "core::byte_array::ByteArray"
       }
     ]
   },
@@ -1298,6 +1724,70 @@ export const MY_CONTRACT_ABI =
     ]
   },
   {
+    "kind": "struct",
+    "name": "save_circle::events::Events::PayoutSent",
+    "type": "event",
+    "members": [
+      {
+        "kind": "data",
+        "name": "group_id",
+        "type": "core::integer::u256"
+      },
+      {
+        "kind": "data",
+        "name": "recipient",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "kind": "data",
+        "name": "amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "kind": "data",
+        "name": "cycle_number",
+        "type": "core::integer::u64"
+      },
+      {
+        "kind": "data",
+        "name": "timestamp",
+        "type": "core::integer::u64"
+      }
+    ]
+  },
+  {
+    "kind": "struct",
+    "name": "save_circle::events::Events::AdminPoolWithdrawal",
+    "type": "event",
+    "members": [
+      {
+        "kind": "data",
+        "name": "admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "kind": "data",
+        "name": "group_id",
+        "type": "core::integer::u256"
+      },
+      {
+        "kind": "data",
+        "name": "amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "kind": "data",
+        "name": "recipient",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "kind": "data",
+        "name": "remaining_balance",
+        "type": "core::integer::u256"
+      }
+    ]
+  },
+  {
     "kind": "enum",
     "name": "save_circle::contracts::Savecircle::SaveCircle::Event",
     "type": "event",
@@ -1356,11 +1846,17 @@ export const MY_CONTRACT_ABI =
         "kind": "nested",
         "name": "PayoutDistributed",
         "type": "save_circle::events::Events::PayoutDistributed"
+      },
+      {
+        "kind": "nested",
+        "name": "PayoutSent",
+        "type": "save_circle::events::Events::PayoutSent"
+      },
+      {
+        "kind": "nested",
+        "name": "AdminPoolWithdrawal",
+        "type": "save_circle::events::Events::AdminPoolWithdrawal"
       }
     ]
   }
 ] as const
-
-
-
-  
