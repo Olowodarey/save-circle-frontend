@@ -8,8 +8,16 @@ import {
 } from "@starknet-react/core";
 import { MY_CONTRACT_ABI } from "@/constants/abi";
 import { CONTRACT_ADDRESS } from "@/constants";
+import { useAutoswap } from "./use-autoswap";
 
-export function useLiquidityLock() {
+export interface LiquidityLockOptions {
+  groupId: string;
+  amount: string;
+  tokenType: "USDC" | "STRK" | "ETH" | "USDT";
+  enableAutoswap?: boolean;
+}
+
+export function useEnhancedLiquidityLock() {
   const { account, address, isConnected } = useAccount();
   const [isLocking, setIsLocking] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
@@ -17,6 +25,12 @@ export function useLiquidityLock() {
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
   const [lockedBalance, setLockedBalance] = useState<string>("0");
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+  const [swapPreview, setSwapPreview] = useState<{
+    inputAmount: string;
+    outputAmount: string;
+    inputToken: string;
+    outputToken: string;
+  } | null>(null);
 
   const { contract } = useContract({
     abi: MY_CONTRACT_ABI,
@@ -26,6 +40,20 @@ export function useLiquidityLock() {
   const { sendAsync } = useSendTransaction({
     calls: [],
   });
+
+  const {
+    executeSwap,
+    getSwapQuote,
+    approveToken,
+    isSwapping,
+    isApproving,
+    swapError,
+    approvalError,
+    approvalStatus,
+    clearSwapError,
+    clearApprovalError,
+    tokenAddresses,
+  } = useAutoswap();
 
   // Helper function to format u256 for contract calls
   const formatU256 = (value: string | bigint) => {
@@ -64,12 +92,37 @@ export function useLiquidityLock() {
     }
   };
 
-  // Lock liquidity for a group
-  const lockLiquidity = async (
-    groupId: string,
-    amount: string,
-    tokenAddress: string = CONTRACT_ADDRESS
-  ) => {
+  // Get swap preview for non-USDC tokens
+  const getSwapPreview = async (tokenType: string, amount: string) => {
+    if (tokenType === "USDC") {
+      setSwapPreview(null);
+      return;
+    }
+
+    try {
+      const quote = await getSwapQuote(
+        tokenType as keyof typeof tokenAddresses,
+        "USDC",
+        amount
+      );
+      
+      if (quote) {
+        setSwapPreview({
+          inputAmount: quote.inputAmount,
+          outputAmount: quote.outputAmount,
+          inputToken: quote.inputToken,
+          outputToken: quote.outputToken,
+        });
+      }
+    } catch (error) {
+      console.error("Error getting swap preview:", error);
+    }
+  };
+
+  // Enhanced lock liquidity with autoswap support
+  const lockLiquidityWithAutoswap = async (options: LiquidityLockOptions) => {
+    const { groupId, amount, tokenType, enableAutoswap = true } = options;
+
     if (!account || !isConnected || !address) {
       setLockError("Please connect your wallet first");
       return false;
@@ -77,18 +130,60 @@ export function useLiquidityLock() {
 
     setIsLocking(true);
     setLockError(null);
+    clearSwapError();
 
     try {
-      // Format parameters
+      let finalAmount = amount;
+      let tokenAddress = tokenAddresses.USDC; // Default to USDC
+
+      // If not USDC and autoswap is enabled, perform swap first
+      if (tokenType !== "USDC" && enableAutoswap) {
+        console.log(`Swapping ${amount} ${tokenType} to USDC...`);
+        
+        const swapResult = await executeSwap(
+          tokenType as keyof typeof tokenAddresses,
+          "USDC",
+          amount
+        );
+
+        if (!swapResult.success) {
+          setLockError("Failed to swap tokens before locking");
+          return false;
+        }
+
+        if (swapResult.outputAmount) {
+          finalAmount = swapResult.outputAmount;
+          console.log(`Swap successful: ${finalAmount} USDC received`);
+          
+          // After swap, we need to approve USDC for the liquidity lock contract
+          console.log(`Approving ${finalAmount} USDC for liquidity lock...`);
+          const approvalSuccess = await approveToken(
+            tokenAddresses.USDC,
+            CONTRACT_ADDRESS,
+            finalAmount,
+            "USDC"
+          );
+
+          if (!approvalSuccess) {
+            setLockError("Failed to approve USDC for liquidity lock");
+            return false;
+          }
+        }
+      } else if (tokenType !== "USDC") {
+        // If autoswap is disabled but token is not USDC, use the original token
+        tokenAddress = tokenAddresses[tokenType as keyof typeof tokenAddresses];
+      }
+
+      // Format parameters for contract call
       const groupIdU256 = formatU256(groupId);
-      const amountU256 = formatAmountForContract(amount);
+      const amountU256 = formatAmountForContract(finalAmount);
 
       // Prepare the contract call
       const call = {
         contractAddress: CONTRACT_ADDRESS,
         entrypoint: "lock_liquidity",
         calldata: [
-          tokenAddress, // token_address
+          tokenAddress, // token_address (USDC after swap or original token)
           amountU256.low.toString(), // amount low
           amountU256.high.toString(), // amount high
           groupIdU256.low.toString(), // group_id low
@@ -111,12 +206,26 @@ export function useLiquidityLock() {
 
       return true;
     } catch (error: any) {
-      console.error("Liquidity lock failed:", error);
+      console.error("Enhanced liquidity lock failed:", error);
       setLockError(error.message || "Failed to lock liquidity");
       return false;
     } finally {
       setIsLocking(false);
     }
+  };
+
+  // Original lock liquidity function (for backward compatibility)
+  const lockLiquidity = async (
+    groupId: string,
+    amount: string,
+    tokenAddress: string = tokenAddresses.USDC
+  ) => {
+    return lockLiquidityWithAutoswap({
+      groupId,
+      amount,
+      tokenType: "USDC",
+      enableAutoswap: false,
+    });
   };
 
   // Withdraw locked liquidity
@@ -174,16 +283,41 @@ export function useLiquidityLock() {
   }, [contract, address, isConnected]);
 
   return {
+    // Enhanced functions
+    lockLiquidityWithAutoswap,
+    getSwapPreview,
+    
+    // Original functions (backward compatibility)
     lockLiquidity,
     withdrawLocked,
     fetchLockedBalance,
+    
+    // Approval functions from autoswap hook
+    approveToken,
+    
+    // State
     lockedBalance,
-    isLocking,
+    isLocking: isLocking || isSwapping,
     isWithdrawing,
     isLoadingBalance,
-    lockError,
+    lockError: lockError || swapError,
     withdrawError,
-    clearLockError: () => setLockError(null),
+    swapPreview,
+    isApproving,
+    approvalError,
+    approvalStatus,
+    
+    // Utilities
+    clearLockError: () => {
+      setLockError(null);
+      clearSwapError();
+    },
     clearWithdrawError: () => setWithdrawError(null),
+    clearSwapPreview: () => setSwapPreview(null),
+    clearApprovalError,
+    
+    // Token addresses for reference
+    supportedTokens: Object.keys(tokenAddresses) as Array<keyof typeof tokenAddresses>,
+    tokenAddresses,
   };
 }
