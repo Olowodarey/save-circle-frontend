@@ -148,6 +148,7 @@ interface JoinedGroup {
 
 interface MyGroupsJoinedProps {
   userAddress?: string;
+  
 }
 
 export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {

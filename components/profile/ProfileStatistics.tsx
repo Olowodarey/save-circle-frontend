@@ -74,11 +74,11 @@ export default function ProfileStatistics({ analytics }: ProfileStatisticsProps)
           <div className="flex justify-between items-center">
             <span className="text-sm">Success Rate</span>
             <span className="font-semibold">
-              {Math.round(
-                (analytics.onTimePayments / analytics.totalPayments) *
-                  100
-              )}
-              %
+              {analytics.totalPayments > 0
+                ? `${Math.round(
+                    (analytics.onTimePayments / analytics.totalPayments) * 100
+                  )}%`
+                : "0%"}
             </span>
           </div>
         </CardContent>
