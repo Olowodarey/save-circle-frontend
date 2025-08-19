@@ -26,6 +26,7 @@ interface ActivityItem {
   icon: LucideIcon;
   color: string;
 }
+
 import Link from "next/link";
 import { useAccount, useReadContract } from "@starknet-react/core";
 import { MY_CONTRACT_ABI } from "@/constants/abi";
@@ -37,6 +38,63 @@ import ProfileOverview from "@/components/profile/ProfileOverview";
 import ProfileActivity from "@/components/profile/ProfileActivity";
 import ProfileStatistics from "@/components/profile/ProfileStatistics";
 import MyGroupsJoined from "@/components/profile/MyGroupsJoined";
+
+// Utility function to convert felt252 (hex) to string
+function felt252ToString(felt: any): string {
+  if (!felt) return '';
+  
+  try {
+    // Convert to string if it's not already
+    const hexString = felt.toString();
+    
+    // Remove '0x' prefix if present
+    const cleanHex = hexString.startsWith('0x') ? hexString.slice(2) : hexString;
+    
+    // Convert hex to bytes
+    const bytes = [];
+    for (let i = 0; i < cleanHex.length; i += 2) {
+      const byte = parseInt(cleanHex.substr(i, 2), 16);
+      if (byte !== 0) { // Skip null bytes
+        bytes.push(byte);
+      }
+    }
+    
+    // Convert bytes to string
+    return String.fromCharCode(...bytes);
+  } catch (error) {
+    console.error('Error converting felt252 to string:', error);
+    return '';
+  }
+}
+
+// Alternative using TextDecoder (more robust for UTF-8)
+function felt252ToStringAlt(felt: any): string {
+  if (!felt) return '';
+  
+  try {
+    const hexString = felt.toString();
+    const cleanHex = hexString.startsWith('0x') ? hexString.slice(2) : hexString;
+    
+    // Convert hex string to Uint8Array
+    const bytes = new Uint8Array(cleanHex.length / 2);
+    for (let i = 0; i < cleanHex.length; i += 2) {
+      bytes[i / 2] = parseInt(cleanHex.substr(i, 2), 16);
+    }
+    
+    // Remove trailing null bytes
+    let endIndex = bytes.length;
+    while (endIndex > 0 && bytes[endIndex - 1] === 0) {
+      endIndex--;
+    }
+    
+    // Decode to string
+    const decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: false });
+    return decoder.decode(bytes.slice(0, endIndex));
+  } catch (error) {
+    console.error('Error converting felt252 to string:', error);
+    return '';
+  }
+}
 
 export default function ProfilePage() {
   const { address, isConnected } = useAccount();
@@ -159,7 +217,8 @@ export default function ProfilePage() {
       };
 
       const contractData = {
-        name: contractProfileData.name || `User ${address.slice(0, 6)}`,
+        // Convert felt252 name to string
+        name: felt252ToString(contractProfileData.name) || `User ${address.slice(0, 6)}`,
         avatar: contractProfileData.avatar || "/placeholder.svg?height=120&width=120",
         walletAddress: address,
         isRegistered: contractProfileData.is_registered || false,
