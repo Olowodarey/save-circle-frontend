@@ -441,8 +441,8 @@ export default function ProfilePage() {
           <TabsContent value="my-groups" className="space-y-6">
             <MyGroupsJoined 
               userAddress={address} 
-              groupsData={userJoinedGroups} 
-              isLoading={isLoadingJoinedGroups}
+              // groupsData={userJoinedGroups} 
+              // isLoading={isLoadingJoinedGroups}
             />
           </TabsContent>
         </Tabs>
