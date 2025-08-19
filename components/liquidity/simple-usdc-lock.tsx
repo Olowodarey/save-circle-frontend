@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, CheckCircle, AlertCircle, DollarSign } from "lucide-react"
 import { useAccount, useSendTransaction, useReadContract } from "@starknet-react/core"
-import { uint256 } from "starknet"
+import { Call } from "starknet"
 
 // USDC token address on Starknet
 const USDC_TOKEN_ADDRESS = "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8"
@@ -20,47 +20,12 @@ const LIQUIDITY_LOCK_CONTRACT = "0x037c49f99be664a2d5ede866a619e7ff629adf7a021ad
 const ERC20_ABI = [
   {
     type: "function",
-    name: "approve",
-    state_mutability: "external",
-    inputs: [
-      { name: "spender", type: "core::starknet::contract_address::ContractAddress" },
-      { name: "amount", type: "core::integer::u256" },
-    ],
-    outputs: [{ type: "core::bool" }],
-  },
-  {
-    type: "function",
-    name: "allowance",
-    state_mutability: "view",
-    inputs: [
-      { name: "owner", type: "core::starknet::contract_address::ContractAddress" },
-      { name: "spender", type: "core::starknet::contract_address::ContractAddress" },
-    ],
-    outputs: [{ type: "core::integer::u256" }],
-  },
-  {
-    type: "function",
     name: "balance_of",
     state_mutability: "view",
     inputs: [
       { name: "account", type: "core::starknet::contract_address::ContractAddress" },
     ],
     outputs: [{ type: "core::integer::u256" }],
-  },
-] as const
-
-// Liquidity lock contract ABI (simplified)
-const LOCK_ABI = [
-  {
-    type: "function",
-    name: "lock_liquidity", 
-    state_mutability: "external",
-    inputs: [
-      { name: "token_address", type: "core::starknet::contract_address::ContractAddress" },
-      { name: "amount", type: "core::integer::u256" },
-      { name: "group_id", type: "core::integer::u256" },
-    ],
-    outputs: [],
   },
 ] as const
 
@@ -72,10 +37,10 @@ interface SimpleUsdcLockProps {
 export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
   const { address, status } = useAccount()
   const [amount, setAmount] = useState("")
-  const [step, setStep] = useState<"approve" | "lock" | "success">("approve")
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [txHash, setTxHash] = useState<string | null>(null)
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const { sendAsync } = useSendTransaction({})
 
@@ -88,22 +53,13 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
     enabled: Boolean(address),
   })
 
-  // Check current allowance
-  const { data: allowance, refetch: refetchAllowance } = useReadContract({
-    abi: ERC20_ABI,
-    functionName: "allowance",
-    address: USDC_TOKEN_ADDRESS,
-    args: address ? [address, LIQUIDITY_LOCK_CONTRACT] : undefined,
-    enabled: Boolean(address),
-  })
-
   const formatBalance = (balance: any) => {
     if (!balance) return "0"
     const balanceNum = Number(balance) / 1e6 // USDC has 6 decimals
     return balanceNum.toFixed(2)
   }
 
-  const handleApprove = async () => {
+  const handleApproveAndLock = async () => {
     if (!address || !amount) return
 
     setIsProcessing(true)
@@ -112,8 +68,9 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
     try {
       // Convert amount to proper format (USDC has 6 decimals)
       const amountInWei = BigInt(Math.floor(parseFloat(amount) * 1e6))
+      const groupIdBigInt = BigInt(groupId)
       
-      // Format U256 values using the same method as the working implementation
+      // Format U256 values - split into low and high 128-bit parts
       const formatU256 = (value: bigint) => {
         const MAX_U128 = BigInt("0xffffffffffffffffffffffffffffffff")
         return {
@@ -123,107 +80,9 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
       }
       
       const amountU256 = formatU256(amountInWei)
+      const groupIdU256 = formatU256(groupIdBigInt)
 
-      console.log("Approving USDC for liquidity lock:", {
-        amount: amount,
-        amountInWei: amountInWei.toString(),
-        spender: LIQUIDITY_LOCK_CONTRACT,
-        amountU256: { low: amountU256.low.toString(), high: amountU256.high.toString() },
-      })
-
-      const approveCall = {
-        contractAddress: USDC_TOKEN_ADDRESS,
-        entrypoint: "approve",
-        calldata: [
-          LIQUIDITY_LOCK_CONTRACT, // spender
-          amountU256.low.toString(), // amount low
-          amountU256.high.toString(), // amount high
-        ],
-      }
-
-      console.log("Approve call details:", approveCall)
-
-      const result = await sendAsync([approveCall])
-      console.log("Approval transaction sent:", result)
-
-      if (result?.transaction_hash) {
-        setTxHash(result.transaction_hash)
-        
-        // Wait for transaction confirmation with polling
-        let attempts = 0
-        const maxAttempts = 20 // Wait up to 60 seconds (3s * 20)
-        
-        const pollForApproval = async () => {
-          attempts++
-          console.log(`Polling for approval confirmation, attempt ${attempts}/${maxAttempts}`)
-          
-          try {
-            await refetchAllowance()
-            
-            // Check if approval went through
-            const currentAllowanceValue = allowance ? Number(allowance) / 1e6 : 0
-            const requiredAmount = parseFloat(amount)
-            
-            console.log(`Current allowance: ${currentAllowanceValue}, Required: ${requiredAmount}`)
-            
-            if (currentAllowanceValue >= requiredAmount) {
-              console.log("Approval confirmed, moving to lock step")
-              setStep("lock")
-              setIsProcessing(false)
-              return
-            }
-            
-            if (attempts < maxAttempts) {
-              setTimeout(pollForApproval, 3000)
-            } else {
-              console.log("Approval polling timeout")
-              setError("Approval transaction is taking longer than expected. Please check your transaction and try again.")
-              setIsProcessing(false)
-            }
-          } catch (error) {
-            console.error("Error polling for approval:", error)
-            if (attempts < maxAttempts) {
-              setTimeout(pollForApproval, 3000)
-            } else {
-              setError("Failed to confirm approval. Please try again.")
-              setIsProcessing(false)
-            }
-          }
-        }
-        
-        // Start polling after initial delay
-        setTimeout(pollForApproval, 3000)
-      }
-    } catch (error: any) {
-      console.error("Approval failed:", error)
-      setError(error.message || "Failed to approve USDC")
-      setIsProcessing(false)
-    }
-  }
-
-  const handleLock = async () => {
-    if (!address || !amount) return
-
-    setIsProcessing(true)
-    setError(null)
-
-    try {
-      // Convert amount to proper format (USDC has 6 decimals)
-      const amountInWei = BigInt(Math.floor(parseFloat(amount) * 1e6))
-      
-      // Format U256 values using the same method as the working implementation
-      const formatU256 = (value: bigint) => {
-        const MAX_U128 = BigInt("0xffffffffffffffffffffffffffffffff")
-        return {
-          low: value & MAX_U128,
-          high: value >> BigInt(128),
-        }
-      }
-      
-      const amountU256 = formatU256(amountInWei)
-      const groupIdU256 = formatU256(BigInt(groupId))
-
-      console.log("Locking USDC liquidity:", {
+      console.log("Multicall: Approve and Lock USDC:", {
         amount: amount,
         amountInWei: amountInWei.toString(),
         groupId: groupId,
@@ -231,31 +90,43 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
         groupIdU256: { low: groupIdU256.low.toString(), high: groupIdU256.high.toString() },
       })
 
-      const lockCall = {
-        contractAddress: LIQUIDITY_LOCK_CONTRACT,
-        entrypoint: "lock_liquidity",
-        calldata: [
-          USDC_TOKEN_ADDRESS, // token_address
-          amountU256.low.toString(), // amount low
-          amountU256.high.toString(), // amount high
-          groupIdU256.low.toString(), // group_id low
-          groupIdU256.high.toString(), // group_id high
-        ],
-      }
+      // Create multicall with both approve and lock operations
+      const calls: Call[] = [
+        {
+          entrypoint: "approve",
+          contractAddress: USDC_TOKEN_ADDRESS,
+          calldata: [
+            LIQUIDITY_LOCK_CONTRACT, // spender
+            amountU256.low.toString(), // amount low
+            amountU256.high.toString(), // amount high
+          ],
+        },
+        {
+          entrypoint: "lock_liquidity",
+          contractAddress: LIQUIDITY_LOCK_CONTRACT,
+          calldata: [
+            USDC_TOKEN_ADDRESS, // token_address
+            amountU256.low.toString(), // amount low
+            amountU256.high.toString(), // amount high
+            groupIdU256.low.toString(), // group_id low
+            groupIdU256.high.toString(), // group_id high
+          ],
+        },
+      ]
 
-      console.log("Lock call details:", lockCall)
+      console.log("Multicall details:", calls)
 
-      const result = await sendAsync([lockCall])
-      console.log("Lock transaction sent:", result)
+      const result = await sendAsync(calls)
+      console.log("Multicall transaction sent:", result)
 
       if (result?.transaction_hash) {
         setTxHash(result.transaction_hash)
-        setStep("success")
+        setIsSuccess(true)
         onSuccess?.()
       }
     } catch (error: any) {
-      console.error("Lock failed:", error)
-      setError(error.message || "Failed to lock USDC")
+      console.error("Multicall failed:", error)
+      setError(error.message || "Failed to approve and lock USDC")
     } finally {
       setIsProcessing(false)
     }
@@ -263,13 +134,9 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
 
   const isConnected = status === "connected"
   const userBalance = formatBalance(balance)
-  const currentAllowance = allowance ? Number(allowance) / 1e6 : 0
-  const hasEnoughAllowance = currentAllowance >= parseFloat(amount || "0")
+  const hasInsufficientBalance = parseFloat(amount || "0") > parseFloat(userBalance)
   
-  // Auto-advance to lock step if user already has sufficient allowance
-  const shouldShowLockStep = step === "approve" && amount && hasEnoughAllowance && currentAllowance > 0
-
-  if (step === "success") {
+  if (isSuccess) {
     return (
       <Card>
         <CardContent className="pt-6">
@@ -279,6 +146,9 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
               <div className="space-y-2">
                 <p className="font-medium">Liquidity locked successfully!</p>
                 <p>Amount: {amount} USDC</p>
+                <p className="text-sm text-green-600">
+                  ✅ Approved and locked in a single transaction
+                </p>
                 {txHash && (
                   <p className="text-xs font-mono">
                     Tx: {txHash.slice(0, 20)}...
@@ -287,6 +157,20 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
               </div>
             </AlertDescription>
           </Alert>
+          <div className="mt-4">
+            <Button
+              onClick={() => {
+                setIsSuccess(false)
+                setAmount("")
+                setTxHash(null)
+                setError(null)
+              }}
+              variant="outline"
+              className="w-full"
+            >
+              Lock More USDC
+            </Button>
+          </div>
         </CardContent>
       </Card>
     )
@@ -300,7 +184,7 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
           Lock USDC Liquidity
         </CardTitle>
         <CardDescription>
-          Lock your USDC tokens for this group. This ensures commitment and builds trust.
+          Lock your USDC tokens for this group in a single transaction. This ensures commitment and builds trust.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -320,11 +204,6 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
               <p className="text-sm text-blue-700">
                 Your USDC Balance: <span className="font-semibold">{userBalance} USDC</span>
               </p>
-              {currentAllowance > 0 && (
-                <p className="text-xs text-blue-600 mt-1">
-                  Current Allowance: {currentAllowance.toFixed(2)} USDC
-                </p>
-              )}
             </div>
 
             {/* Amount Input */}
@@ -334,10 +213,28 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
                 id="amount"
                 type="number"
                 placeholder="0.00"
+                step="0.01"
+                min="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 disabled={isProcessing}
               />
+              {hasInsufficientBalance && amount && (
+                <p className="text-sm text-red-600">
+                  Insufficient balance. You have {userBalance} USDC available.
+                </p>
+              )}
+            </div>
+
+            {/* Multicall Info */}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+              <div className="flex items-start space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                <div className="text-sm text-green-700">
+                  <p className="font-medium">One-Step Process</p>
+                  <p>Both approval and locking will happen in a single transaction, saving you time and gas fees.</p>
+                </div>
+              </div>
             </div>
 
             {/* Error Display */}
@@ -350,72 +247,39 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
               </Alert>
             )}
 
-            {/* Action Buttons */}
-            <div className="space-y-3">
-              {step === "approve" && !shouldShowLockStep && (
-                <Button
-                  onClick={handleApprove}
-                  disabled={!amount || isProcessing || parseFloat(amount) > parseFloat(userBalance)}
-                  className="w-full"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Approving...
-                    </>
-                  ) : (
-                    `Approve ${amount || "0"} USDC`
-                  )}
-                </Button>
-              )}
-
-              {(step === "lock" || shouldShowLockStep) && (
+            {/* Action Button */}
+            <Button
+              onClick={handleApproveAndLock}
+              disabled={!amount || isProcessing || hasInsufficientBalance || parseFloat(amount) <= 0}
+              className="w-full"
+              size="lg"
+            >
+              {isProcessing ? (
                 <>
-                  {shouldShowLockStep && (
-                    <Alert className="border-green-200 bg-green-50">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <AlertDescription className="text-green-800">
-                        ✅ USDC already approved! You can proceed to lock.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                  <Button
-                    onClick={handleLock}
-                    disabled={!amount || isProcessing || !hasEnoughAllowance || parseFloat(amount) > parseFloat(userBalance)}
-                    className="w-full"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Locking...
-                      </>
-                    ) : (
-                      `Lock ${amount || "0"} USDC`
-                    )}
-                  </Button>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Processing Transaction...
+                </>
+              ) : (
+                <>
+                  <DollarSign className="h-4 w-4" />
+                  Lock {amount || "0"} USDC
                 </>
               )}
-            </div>
+            </Button>
 
-            {/* Step Indicator */}
-            <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                step === "approve" ? "bg-blue-500 text-white" : 
-                step === "lock" || step === "success" ? "bg-green-500 text-white" : "bg-gray-300"
-              }`}>
-                1
-              </div>
-              <span>Approve</span>
-              <div className="w-8 h-px bg-gray-300"></div>
-           
-              <span>Lock</span>
+            {/* Process Info */}
+            <div className="text-center text-sm text-gray-600">
+              <p>This will approve and lock your USDC in one transaction</p>
             </div>
 
             {/* Transaction Hash */}
-            {txHash && (
+            {txHash && !isSuccess && (
               <div className="text-center">
                 <p className="text-xs text-gray-600 font-mono">
                   Transaction: {txHash.slice(0, 10)}...{txHash.slice(-10)}
+                </p>
+                <p className="text-xs text-blue-600 mt-1">
+                  Transaction submitted. Waiting for confirmation...
                 </p>
               </div>
             )}
