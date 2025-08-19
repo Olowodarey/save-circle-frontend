@@ -148,7 +148,7 @@ export default function ProfilePage() {
     lockedAmount: 0,
   });
 
-  const [recentActivity, setRecentActivity] = useState([]);
+  const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
 
   // Update profile data when contract data changes
   useEffect(() => {
