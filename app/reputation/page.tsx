@@ -5,95 +5,241 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Star, TrendingUp, Award, Users, Clock, CheckCircle, XCircle, ArrowLeft } from "lucide-react"
+import { Star, TrendingUp, Award, Users, Clock, CheckCircle, XCircle, ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useReadContract, useAccount } from "@starknet-react/core"
+import { MY_CONTRACT_ABI } from "@/constants/abi"
+import { CONTRACT_ADDRESS } from "@/constants"
+import { useEffect, useState } from "react"
 
 export default function ReputationPage() {
-  const reputationScore = 85
-  const nextTierScore = 90
-  const progressToNext = ((reputationScore - 75) / (nextTierScore - 75)) * 100
+  const { address, isConnected } = useAccount()
+  const [processedActivities, setProcessedActivities] = useState<any[]>([])
 
-  const reputationHistory = [
-    {
-      date: "2024-01-15",
-      action: "Completed savings cycle in Tech Professionals Circle",
-      points: "+10",
-      type: "positive",
-    },
-    {
-      date: "2024-01-10",
-      action: "Made on-time contribution to DeFi Builders",
-      points: "+5",
-      type: "positive",
-    },
-    {
-      date: "2024-01-05",
-      action: "Successfully received payout without issues",
-      points: "+3",
-      type: "positive",
-    },
-    {
-      date: "2023-12-28",
-      action: "Late contribution to previous group",
-      points: "-2",
-      type: "negative",
-    },
-    {
-      date: "2023-12-20",
-      action: "Joined first savings circle",
-      points: "+15",
-      type: "positive",
-    },
-  ]
+  // Fetch user profile data
+  const { data: profileData, error: profileError, isPending: profilePending } = useReadContract({
+    abi: MY_CONTRACT_ABI,
+    functionName: "get_user_profile",
+    address: CONTRACT_ADDRESS,
+    args: [address || "0x0"],
+    enabled: !!address && isConnected,
+  })
 
+  // Fetch user activities for reputation history
+  const { data: activitiesData, error: activitiesError, isPending: activitiesPending } = useReadContract({
+    abi: MY_CONTRACT_ABI,
+    functionName: "get_user_activities",
+    address: CONTRACT_ADDRESS,
+    args: [address || "0x0", 20], // Get last 20 activities
+    enabled: !!address && isConnected,
+  })
+
+  // Fetch user statistics
+  const { data: statisticsData, error: statisticsError, isPending: statisticsPending } = useReadContract({
+    abi: MY_CONTRACT_ABI,
+    functionName: "get_user_statistics",
+    address: CONTRACT_ADDRESS,
+    args: [address || "0x0"],
+    enabled: !!address && isConnected,
+  })
+
+  // Process activities to show reputation-related events
+  useEffect(() => {
+    if (activitiesData) {
+      const reputationActivities = activitiesData
+        .filter((activity: any) => {
+          const activityType = Number(activity.activity_type)
+          // Filter for reputation-affecting activities
+          return [0, 1, 2, 4, 8, 9, 10].includes(activityType) // Contribution, PayoutReceived, GroupJoined, GroupCompleted, PenaltyPaid, ReputationGained, ReputationLost
+        })
+        .map((activity: any) => {
+          const activityType = Number(activity.activity_type)
+          const timestamp = new Date(Number(activity.timestamp) * 1000)
+          
+          let action = ""
+          let points = ""
+          let type = "positive"
+          
+          switch (activityType) {
+            case 0: // Contribution
+              action = "Made on-time contribution"
+              points = "+2"
+              type = "positive"
+              break
+            case 1: // PayoutReceived
+              action = "Successfully received payout"
+              points = "+3"
+              type = "positive"
+              break
+            case 2: // GroupJoined
+              action = "Joined savings circle"
+              points = "+5"
+              type = "positive"
+              break
+            case 4: // GroupCompleted
+              action = "Successfully completed savings cycle"
+              points = "+10"
+              type = "positive"
+              break
+            case 8: // PenaltyPaid
+              action = "Late contribution penalty"
+              points = "-5"
+              type = "negative"
+              break
+            case 9: // ReputationGained
+              action = activity.description || "Reputation increased"
+              points = `+${Math.floor(Number(activity.amount) / 1e18)}`
+              type = "positive"
+              break
+            case 10: // ReputationLost
+              action = activity.description || "Reputation decreased"
+              points = `-${Math.floor(Number(activity.amount) / 1e18)}`
+              type = "negative"
+              break
+            default:
+              action = activity.description || "Activity recorded"
+              points = "0"
+              type = "positive"
+          }
+          
+          return {
+            date: timestamp.toLocaleDateString(),
+            action,
+            points,
+            type,
+            timestamp
+          }
+        })
+        .sort((a: any, b: any) => b.timestamp - a.timestamp)
+        .slice(0, 10) // Show last 10 reputation-related activities
+      
+      setProcessedActivities(reputationActivities)
+    }
+  }, [activitiesData])
+
+  // Get reputation score and other data from contract
+  const reputationScore = profileData ? Number(profileData.reputation_score) : 0
+  const completedCycles = profileData ? Number(profileData.completed_cycles) : 0
+  const totalGroups = profileData ? Number(profileData.total_joined_groups) : 0
+  const createdGroups = profileData ? Number(profileData.total_created_groups) : 0
+  const paymentRate = profileData ? Number(profileData.payment_rate) : 0
+  const onTimePayments = profileData ? Number(profileData.on_time_payments) : 0
+  const totalPayments = profileData ? Number(profileData.total_payments) : 0
+
+  const getTierInfo = (score: number) => {
+    if (score >= 90) return { name: "Expert", color: "text-purple-600", bgColor: "bg-purple-100", min: 90, next: null }
+    if (score >= 75) return { name: "Advanced", color: "text-blue-600", bgColor: "bg-blue-100", min: 75, next: 90 }
+    if (score >= 50) return { name: "Intermediate", color: "text-green-600", bgColor: "bg-green-100", min: 50, next: 75 }
+    if (score >= 25) return { name: "Beginner", color: "text-yellow-600", bgColor: "bg-yellow-100", min: 25, next: 50 }
+    return { name: "New", color: "text-gray-600", bgColor: "bg-gray-100", min: 0, next: 25 }
+  }
+
+  const currentTier = getTierInfo(reputationScore)
+  const nextTierScore = currentTier.next || 100
+  const progressToNext = currentTier.next 
+    ? ((reputationScore - currentTier.min) / (nextTierScore - currentTier.min)) * 100
+    : 100
+
+  // Dynamic achievements based on contract data
   const achievements = [
     {
       title: "First Circle",
       description: "Joined your first savings circle",
       icon: Users,
-      earned: true,
-      date: "Dec 2023",
+      earned: totalGroups > 0,
+      date: totalGroups > 0 ? "Achieved" : null,
     },
     {
       title: "Perfect Contributor",
-      description: "Made 10 consecutive on-time contributions",
+      description: "Maintain 90%+ on-time payment rate",
       icon: CheckCircle,
-      earned: true,
-      date: "Jan 2024",
+      earned: (onTimePayments / Math.max(totalPayments, 1)) >= 0.9 && totalPayments >= 5,
+      date: (onTimePayments / Math.max(totalPayments, 1)) >= 0.9 && totalPayments >= 5 ? "Achieved" : null,
     },
     {
       title: "Circle Completer",
       description: "Successfully completed 3 full savings cycles",
       icon: Award,
-      earned: true,
-      date: "Jan 2024",
+      earned: completedCycles >= 3,
+      date: completedCycles >= 3 ? "Achieved" : null,
     },
     {
       title: "Community Builder",
       description: "Created your first savings group",
       icon: Star,
-      earned: false,
-      date: null,
+      earned: createdGroups > 0,
+      date: createdGroups > 0 ? "Achieved" : null,
     },
     {
       title: "Trusted Member",
       description: "Reach reputation score of 90+",
       icon: TrendingUp,
-      earned: false,
-      date: null,
+      earned: reputationScore >= 90,
+      date: reputationScore >= 90 ? "Achieved" : null,
     },
+    {
+      title: "Veteran Saver",
+      description: "Complete 10+ savings cycles",
+      icon: Award,
+      earned: completedCycles >= 10,
+      date: completedCycles >= 10 ? "Achieved" : null,
+    }
   ]
 
-  const getTierInfo = (score: number) => {
-    if (score >= 90) return { name: "Expert", color: "text-purple-600", bgColor: "bg-purple-100" }
-    if (score >= 75) return { name: "Advanced", color: "text-blue-600", bgColor: "bg-blue-100" }
-    if (score >= 50) return { name: "Intermediate", color: "text-green-600", bgColor: "bg-green-100" }
-    if (score >= 25) return { name: "Beginner", color: "text-yellow-600", bgColor: "bg-yellow-100" }
-    return { name: "New", color: "text-gray-600", bgColor: "bg-gray-100" }
+  // Calculate success rate percentage
+  const successRate = statisticsData ? Number(statisticsData.success_rate) : 0
+
+  // Show loading state
+  if (!isConnected) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="w-full max-w-md mx-4">
+          <CardHeader className="text-center">
+            <CardTitle>Connect Wallet</CardTitle>
+            <CardDescription>
+              Connect your wallet to view your reputation
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <Button asChild>
+              <Link href="/dashboard">Go to Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
-  const currentTier = getTierInfo(reputationScore)
-  const nextTier = getTierInfo(nextTierScore)
+  if (profilePending || activitiesPending || statisticsPending) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading your reputation data...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (profileError || activitiesError || statisticsError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="w-full max-w-md mx-4">
+          <CardHeader>
+            <CardTitle className="text-red-600">Error Loading Reputation</CardTitle>
+            <CardDescription>
+              {profileError?.message || activitiesError?.message || statisticsError?.message}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => window.location.reload()} className="w-full">
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -141,17 +287,31 @@ export default function ReputationPage() {
                 </Badge>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Progress to {nextTier.name}</span>
-                  <span className="font-medium">
-                    {reputationScore}/{nextTierScore}
-                  </span>
+              {currentTier.next && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Progress to {getTierInfo(nextTierScore).name}</span>
+                    <span className="font-medium">
+                      {reputationScore}/{nextTierScore}
+                    </span>
+                  </div>
+                  <Progress value={progressToNext} className="h-2" />
+                  <p className="text-sm text-gray-500">
+                    {nextTierScore - reputationScore} points needed to reach {getTierInfo(nextTierScore).name} tier
+                  </p>
                 </div>
-                <Progress value={progressToNext} className="h-2" />
-                <p className="text-sm text-gray-500">
-                  {nextTierScore - reputationScore} points needed to reach {nextTier.name} tier
-                </p>
+              )}
+
+              {/* Additional Stats */}
+              <div className="mt-6 grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">{successRate}%</div>
+                  <div className="text-sm text-gray-600">Success Rate</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">{completedCycles}</div>
+                  <div className="text-sm text-gray-600">Completed Cycles</div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -162,20 +322,20 @@ export default function ReputationPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Access to Advanced groups</span>
+                <CheckCircle className={`w-4 h-4 ${reputationScore >= 50 ? 'text-green-500' : 'text-gray-400'}`} />
+                <span className={reputationScore >= 50 ? '' : 'text-gray-400'}>Access to Advanced groups</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Lower collateral requirements</span>
+                <CheckCircle className={`w-4 h-4 ${reputationScore >= 75 ? 'text-green-500' : 'text-gray-400'}`} />
+                <span className={reputationScore >= 75 ? '' : 'text-gray-400'}>Lower collateral requirements</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <XCircle className="w-4 h-4 text-gray-400" />
-                <span>Priority in group selection</span>
+              <div className="flex items-center gap-2 text-sm">
+                <CheckCircle className={`w-4 h-4 ${reputationScore >= 75 ? 'text-green-500' : 'text-gray-400'}`} />
+                <span className={reputationScore >= 75 ? '' : 'text-gray-400'}>Priority in group selection</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <XCircle className="w-4 h-4 text-gray-400" />
-                <span>Create premium groups</span>
+              <div className="flex items-center gap-2 text-sm">
+                <CheckCircle className={`w-4 h-4 ${reputationScore >= 90 ? 'text-green-500' : 'text-gray-400'}`} />
+                <span className={reputationScore >= 90 ? '' : 'text-gray-400'}>Create premium groups</span>
               </div>
             </CardContent>
           </Card>
@@ -192,33 +352,41 @@ export default function ReputationPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Your reputation changes over the last few months</CardDescription>
+                <CardDescription>Your reputation changes over time</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {reputationHistory.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between py-3 border-b last:border-b-0">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            item.type === "positive" ? "bg-green-100" : "bg-red-100"
-                          }`}
-                        >
-                          {item.type === "positive" ? (
-                            <TrendingUp className="w-4 h-4 text-green-600" />
-                          ) : (
-                            <Clock className="w-4 h-4 text-red-600" />
-                          )}
+                {processedActivities.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-600 mb-2">No Reputation History</h3>
+                    <p className="text-gray-500">Start participating in groups to build your reputation</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {processedActivities.map((item, index) => (
+                      <div key={index} className="flex items-center justify-between py-3 border-b last:border-b-0">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              item.type === "positive" ? "bg-green-100" : "bg-red-100"
+                            }`}
+                          >
+                            {item.type === "positive" ? (
+                              <TrendingUp className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <Clock className="w-4 h-4 text-red-600" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{item.action}</p>
+                            <p className="text-sm text-gray-500">{item.date}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{item.action}</p>
-                          <p className="text-sm text-gray-500">{item.date}</p>
-                        </div>
+                        <Badge variant={item.type === "positive" ? "default" : "destructive"}>{item.points}</Badge>
                       </div>
-                      <Badge variant={item.type === "positive" ? "default" : "destructive"}>{item.points}</Badge>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -253,7 +421,7 @@ export default function ReputationPage() {
                   </CardHeader>
                   {achievement.earned && achievement.date && (
                     <CardContent className="pt-0">
-                      <p className="text-sm text-gray-600">Earned in {achievement.date}</p>
+                      <p className="text-sm text-gray-600">{achievement.date}</p>
                     </CardContent>
                   )}
                 </Card>
@@ -322,7 +490,7 @@ export default function ReputationPage() {
               ].map((tier, index) => (
                 <Card
                   key={index}
-                  className={`border-${tier.color}-200 ${reputationScore >= tier.min ? `bg-${tier.color}-50` : ""}`}
+                  className={`${reputationScore >= tier.min ? `border-${tier.color}-200 bg-${tier.color}-50` : "border-gray-200"}`}
                 >
                   <CardHeader>
                     <div className="flex items-center justify-between">
