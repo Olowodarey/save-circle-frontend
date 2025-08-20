@@ -19,7 +19,7 @@ import { useAccount } from "@starknet-react/core";
 // import {toast} from "sonner"
 
 export default function HomePage() {
-  const { address, isConnected } = useAccount();
+  // const { address, isConnected } = useAccount();
   const [showWalletModal, setShowWalletModal] = useState(false);
 
   const handleWalletConnect = (walletType: string) => {
