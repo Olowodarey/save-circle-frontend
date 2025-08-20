@@ -12,7 +12,21 @@ import {
   TrendingUp,
   DollarSign,
   Users as UsersIcon,
+  Shield,
+  Activity,
+  LucideIcon,
 } from "lucide-react";
+
+// Define types for the activity data
+interface ActivityItem {
+  type: string;
+  description: string;
+  amount: string;
+  date: string;
+  icon: LucideIcon;
+  color: string;
+}
+
 import Link from "next/link";
 import { useAccount, useReadContract } from "@starknet-react/core";
 import { MY_CONTRACT_ABI } from "@/constants/abi";
@@ -25,11 +39,69 @@ import ProfileActivity from "@/components/profile/ProfileActivity";
 import ProfileStatistics from "@/components/profile/ProfileStatistics";
 import MyGroupsJoined from "@/components/profile/MyGroupsJoined";
 
+// Utility function to convert felt252 (hex) to string
+function felt252ToString(felt: any): string {
+  if (!felt) return '';
+  
+  try {
+    // Convert to string if it's not already
+    const hexString = felt.toString();
+    
+    // Remove '0x' prefix if present
+    const cleanHex = hexString.startsWith('0x') ? hexString.slice(2) : hexString;
+    
+    // Convert hex to bytes
+    const bytes = [];
+    for (let i = 0; i < cleanHex.length; i += 2) {
+      const byte = parseInt(cleanHex.substr(i, 2), 16);
+      if (byte !== 0) { // Skip null bytes
+        bytes.push(byte);
+      }
+    }
+    
+    // Convert bytes to string
+    return String.fromCharCode(...bytes);
+  } catch (error) {
+    console.error('Error converting felt252 to string:', error);
+    return '';
+  }
+}
+
+// Alternative using TextDecoder (more robust for UTF-8)
+function felt252ToStringAlt(felt: any): string {
+  if (!felt) return '';
+  
+  try {
+    const hexString = felt.toString();
+    const cleanHex = hexString.startsWith('0x') ? hexString.slice(2) : hexString;
+    
+    // Convert hex string to Uint8Array
+    const bytes = new Uint8Array(cleanHex.length / 2);
+    for (let i = 0; i < cleanHex.length; i += 2) {
+      bytes[i / 2] = parseInt(cleanHex.substr(i, 2), 16);
+    }
+    
+    // Remove trailing null bytes
+    let endIndex = bytes.length;
+    while (endIndex > 0 && bytes[endIndex - 1] === 0) {
+      endIndex--;
+    }
+    
+    // Decode to string
+    const decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: false });
+    return decoder.decode(bytes.slice(0, endIndex));
+  } catch (error) {
+    console.error('Error converting felt252 to string:', error);
+    return '';
+  }
+}
+
 export default function ProfilePage() {
   const { address, isConnected } = useAccount();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // User Profile Data
   const {
     data: contractProfileData,
     isLoading: isLoadingProfile,
@@ -44,6 +116,62 @@ export default function ProfilePage() {
     functionName: "get_user_profile",
   });
 
+  // User Activities Data
+  const {
+    data: userActivities,
+    isLoading: isLoadingActivities,
+    error: activitiesError,
+  } = useReadContract({
+    args: [address ? address : "", 20], // Get last 20 activities
+    abi: MY_CONTRACT_ABI,
+    address: CONTRACT_ADDRESS,
+    enabled: !!address,
+    watch: true,
+    functionName: "get_user_activities",
+  });
+
+  // User Statistics Data
+  const {
+    data: userStatistics,
+    isLoading: isLoadingStatistics,
+    error: statisticsError,
+  } = useReadContract({
+    args: [address ? address : ""],
+    abi: MY_CONTRACT_ABI,
+    address: CONTRACT_ADDRESS,
+    enabled: !!address,
+    watch: true,
+    functionName: "get_user_statistics",
+  });
+
+  // User Joined Groups Data
+  const {
+    data: userJoinedGroups,
+    isLoading: isLoadingJoinedGroups,
+    error: joinedGroupsError,
+  } = useReadContract({
+    args: [address ? address : ""],
+    abi: MY_CONTRACT_ABI,
+    address: CONTRACT_ADDRESS,
+    enabled: !!address,
+    watch: true,
+    functionName: "get_user_joined_groups",
+  });
+
+  // User's Locked Balance
+  const {
+    data: lockedBalance,
+    isLoading: isLoadingLockedBalance,
+    error: lockedBalanceError,
+  } = useReadContract({
+    args: [address ? address : ""],
+    abi: MY_CONTRACT_ABI,
+    address: CONTRACT_ADDRESS,
+    enabled: !!address,
+    watch: true,
+    functionName: "get_locked_balance",
+  });
+
   const [profileData, setProfileData] = useState({
     name: "",
     avatar: "/placeholder.svg?height=120&width=120",
@@ -52,76 +180,170 @@ export default function ProfilePage() {
     totalLockAmount: 0,
     profileCreatedAt: "",
     reputationScore: 0,
+    totalContribution: 0,
+    totalJoinedGroups: 0,
+    totalCreatedGroups: 0,
+    totalEarned: 0,
+    completedCycles: 0,
+    activeGroups: 0,
+    onTimePayments: 0,
+    totalPayments: 0,
+    paymentRate: 0,
+    averageContribution: 0,
   });
 
+  const [analytics, setAnalytics] = useState({
+    totalSaved: 0,
+    activeGroups: 0,
+    completedCycles: 0,
+    totalEarned: 0,
+    averageContribution: 0,
+    onTimePayments: 0,
+    totalPayments: 0,
+    joinedGroups: 0,
+    createdGroups: 0,
+    successRate: 0,
+    lockedAmount: 0,
+  });
+
+  const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+
+  // Update profile data when contract data changes
   useEffect(() => {
     if (contractProfileData && address) {
-      const contractData = {
-        name: contractProfileData.name || `User ${address.slice(0, 6)}`,
-        avatar:
-          contractProfileData.avatar || "/placeholder.svg?height=120&width=120",
-        walletAddress: address,
-        isRegistered: contractProfileData.is_registered || false,
-        totalLockAmount: contractProfileData.total_lock_amount || 0,
-        profileCreatedAt: contractProfileData.profile_created_at
-          ? new Date(
-              Number(contractProfileData.profile_created_at)
-            ).toLocaleDateString()
-          : "",
-        reputationScore: 0,
+      const formatU256 = (value: any) => {
+        if (!value) return 0;
+        return Number(value) / 1e6; // Assuming 6 decimal places for USDC
       };
 
-      setProfileData({
-        name: String(contractData.name),
-        avatar: String(contractData.avatar),
-        walletAddress: contractData.walletAddress,
-        isRegistered: contractData.isRegistered,
-        totalLockAmount: Number(contractData.totalLockAmount),
-        profileCreatedAt: contractData.profileCreatedAt,
-        reputationScore: contractData.reputationScore,
-      });
+      const contractData = {
+        // Convert felt252 name to string
+        name: felt252ToString(contractProfileData.name) || `User ${address.slice(0, 6)}`,
+        avatar: contractProfileData.avatar || "/placeholder.svg?height=120&width=120",
+        walletAddress: address,
+        isRegistered: contractProfileData.is_registered || false,
+        totalLockAmount: formatU256(contractProfileData.total_lock_amount),
+        profileCreatedAt: contractProfileData.profile_created_at
+          ? new Date(Number(contractProfileData.profile_created_at) * 1000).toLocaleDateString()
+          : "",
+        reputationScore: Number(contractProfileData.reputation_score) || 0,
+        totalContribution: formatU256(contractProfileData.total_contribution),
+        totalJoinedGroups: Number(contractProfileData.total_joined_groups) || 0,
+        totalCreatedGroups: Number(contractProfileData.total_created_groups) || 0,
+        totalEarned: formatU256(contractProfileData.total_earned),
+        completedCycles: Number(contractProfileData.completed_cycles) || 0,
+        activeGroups: Number(contractProfileData.active_groups) || 0,
+        onTimePayments: Number(contractProfileData.on_time_payments) || 0,
+        totalPayments: Number(contractProfileData.total_payments) || 0,
+        paymentRate: formatU256(contractProfileData.payment_rate),
+        averageContribution: formatU256(contractProfileData.average_contribution),
+      };
+
+      setProfileData(contractData);
     }
   }, [contractProfileData, address]);
 
-  // Analytics data
-  const analytics = {
-    totalSaved: 3750,
-    activeGroups: 2,
-    completedCycles: 5,
-    totalEarned: 1250,
-    averageContribution: 125,
-    onTimePayments: 23,
-    totalPayments: 25,
-    joinedGroups: 7,
-    createdGroups: 1,
-  };
+  // Update analytics data from user statistics
+  useEffect(() => {
+    if (userStatistics) {
+      const formatU256 = (value: any) => {
+        if (!value) return 0;
+        return Number(value) / 1e6; // Assuming 6 decimal places for USDC
+      };
 
-  const recentActivity = [
-    {
-      type: "payout",
-      description: "Received payout from DeFi Builders",
-      amount: "+400 USDC",
-      date: "2 hours ago",
-      icon: TrendingUp,
-      color: "text-green-600",
-    },
-    {
-      type: "contribution",
-      description: "Made contribution to Tech Professionals Circle",
-      amount: "-100 USDC",
-      date: "1 day ago",
-      icon: DollarSign,
-      color: "text-blue-600",
-    },
-    {
-      type: "joined",
-      description: "Joined Crypto Enthusiasts group",
-      amount: "",
-      date: "3 days ago",
-      icon: UsersIcon,
-      color: "text-purple-600",
-    },
-  ];
+      const locked = lockedBalance ? formatU256(lockedBalance) : 0;
+
+      setAnalytics({
+        totalSaved: formatU256(userStatistics.total_saved),
+        activeGroups: profileData.activeGroups,
+        completedCycles: profileData.completedCycles,
+        totalEarned: formatU256(userStatistics.total_earned),
+        averageContribution: profileData.averageContribution,
+        onTimePayments: profileData.onTimePayments,
+        totalPayments: profileData.totalPayments,
+        joinedGroups: profileData.totalJoinedGroups,
+        createdGroups: profileData.totalCreatedGroups,
+        successRate: Number(userStatistics.success_rate) || 0,
+        lockedAmount: locked,
+      });
+    }
+  }, [userStatistics, profileData, lockedBalance]);
+
+  // Update recent activity from contract data
+  useEffect(() => {
+    if (userActivities && Array.isArray(userActivities)) {
+      const formattedActivities = userActivities.slice(0, 10).map((activity: any) => {
+        const formatU256 = (value: any) => {
+          if (!value) return 0;
+          return Number(value) / 1e6;
+        };
+
+        const getActivityDetails = (activityType: any) => {
+          switch (activityType) {
+            case 0: // Contribution
+              return {
+                type: "contribution",
+                description: activity.description || "Made contribution to group",
+                amount: `-${formatU256(activity.amount)} USDC`,
+                icon: DollarSign,
+                color: "text-blue-600",
+              };
+            case 1: // PayoutReceived
+              return {
+                type: "payout",
+                description: activity.description || "Received payout",
+                amount: `+${formatU256(activity.amount)} USDC`,
+                icon: TrendingUp,
+                color: "text-green-600",
+              };
+            case 2: // GroupJoined
+              return {
+                type: "joined",
+                description: activity.description || "Joined a group",
+                amount: "",
+                icon: UsersIcon,
+                color: "text-purple-600",
+              };
+            case 3: // GroupCreated
+              return {
+                type: "created",
+                description: activity.description || "Created a group",
+                amount: "",
+                icon: UsersIcon,
+                color: "text-blue-600",
+              };
+            case 6: // LockDeposited
+              return {
+                type: "lock",
+                description: activity.description || "Deposited liquidity lock",
+                amount: `${formatU256(activity.amount)} USDC locked`,
+                icon: Shield,
+                color: "text-orange-600",
+              };
+            default:
+              return {
+                type: "other",
+                description: activity.description || "Activity",
+                amount: activity.amount ? `${formatU256(activity.amount)} USDC` : "",
+                icon: Activity,
+                color: "text-gray-600",
+              };
+          }
+        };
+
+        const details = getActivityDetails(activity.activity_type);
+        
+        return {
+          ...details,
+          date: activity.timestamp 
+            ? new Date(Number(activity.timestamp) * 1000).toLocaleTimeString() 
+            : "Recently",
+        };
+      });
+
+      setRecentActivity(formattedActivities);
+    }
+  }, [userActivities]);
 
   const handleSaveProfile = async () => {
     setLoading(true);
@@ -135,8 +357,10 @@ export default function ProfilePage() {
     }
   };
 
+  const isLoading = isLoadingProfile || isLoadingActivities || isLoadingStatistics;
+
   // Show loading state while fetching profile
-  if (isLoadingProfile) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex items-center gap-2">
@@ -230,9 +454,23 @@ export default function ProfilePage() {
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="activity">Recent Activity</TabsTrigger>
+            <TabsTrigger value="activity">
+              Recent Activity
+              {recentActivity.length > 0 && (
+                <span className="ml-1 bg-blue-500 text-white text-xs rounded-full px-2 py-0.5">
+                  {recentActivity.length}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="statistics">Statistics</TabsTrigger>
-            <TabsTrigger value="my-groups">My Groups Joined</TabsTrigger>
+            <TabsTrigger value="my-groups">
+              My Groups
+              {analytics.joinedGroups > 0 && (
+                <span className="ml-1 bg-green-500 text-white text-xs rounded-full px-2 py-0.5">
+                  {analytics.joinedGroups}
+                </span>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -241,14 +479,30 @@ export default function ProfilePage() {
 
           <TabsContent value="activity" className="space-y-4">
             <ProfileActivity recentActivity={recentActivity} />
+            {isLoadingActivities && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                <span>Loading activities...</span>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="statistics" className="space-y-6">
             <ProfileStatistics analytics={analytics} />
+            {isLoadingStatistics && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                <span>Loading statistics...</span>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="my-groups" className="space-y-6">
-            <MyGroupsJoined userAddress={address} />
+            <MyGroupsJoined 
+              userAddress={address} 
+              // groupsData={userJoinedGroups} 
+              // isLoading={isLoadingJoinedGroups}
+            />
           </TabsContent>
         </Tabs>
       </div>

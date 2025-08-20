@@ -25,6 +25,36 @@ interface ProfileOverviewProps {
 }
 
 export default function ProfileOverview({ analytics, profileData }: ProfileOverviewProps) {
+  // Helper function to safely calculate payment rate
+  const calculatePaymentRate = () => {
+    const { onTimePayments, totalPayments } = analytics;
+    
+    // Check if values exist and totalPayments is not zero
+    if (!totalPayments || totalPayments === 0 || onTimePayments === undefined || onTimePayments === null) {
+      return 0;
+    }
+    
+    // Ensure onTimePayments doesn't exceed totalPayments
+    const safeOnTimePayments = Math.min(onTimePayments, totalPayments);
+    
+    return Math.round((safeOnTimePayments / totalPayments) * 100);
+  };
+
+  // Helper function to safely calculate reputation progress
+  const calculateReputationProgress = () => {
+    const score = profileData?.reputationScore || 0;
+    
+    // Ensure score is within valid range for Advanced tier (75-90)
+    if (score < 75) return 0;
+    if (score >= 90) return 100;
+    
+    return ((score - 75) / (90 - 75)) * 100;
+  };
+
+  const paymentRate = calculatePaymentRate();
+  const reputationProgress = calculateReputationProgress();
+  const pointsNeeded = Math.max(0, 90 - (profileData?.reputationScore || 0));
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -37,10 +67,10 @@ export default function ProfileOverview({ analytics, profileData }: ProfileOverv
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {analytics.completedCycles}
+              {analytics?.completedCycles || 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              100% completion rate
+              {analytics?.completedCycles > 0 ? "100% completion rate" : "No completed cycles yet"}
             </p>
           </CardContent>
         </Card>
@@ -54,7 +84,7 @@ export default function ProfileOverview({ analytics, profileData }: ProfileOverv
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {analytics.totalEarned.toLocaleString()} USDC
+              {(analytics?.totalEarned || 0).toLocaleString()} USDC
             </div>
             <p className="text-xs text-muted-foreground">
               From completed cycles
@@ -71,7 +101,7 @@ export default function ProfileOverview({ analytics, profileData }: ProfileOverv
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {analytics.averageContribution} USDC
+              {analytics?.averageContribution || 0} USDC
             </div>
             <p className="text-xs text-muted-foreground">Per cycle</p>
           </CardContent>
@@ -86,17 +116,15 @@ export default function ProfileOverview({ analytics, profileData }: ProfileOverv
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Math.round(
-                (analytics.onTimePayments / analytics.totalPayments) * 100
-              )}
-              %
+              {paymentRate}%
             </div>
             <Progress
-              value={
-                (analytics.onTimePayments / analytics.totalPayments) * 100
-              }
+              value={paymentRate}
               className="mt-2"
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              {analytics?.onTimePayments || 0} of {analytics?.totalPayments || 0} payments on time
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -114,17 +142,17 @@ export default function ProfileOverview({ analytics, profileData }: ProfileOverv
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Advanced (75+)</span>
               <span className="text-sm text-gray-600">
-                {profileData.reputationScore}/90
+                {profileData?.reputationScore || 0}/90
               </span>
             </div>
             <Progress
-              value={
-                ((profileData.reputationScore - 75) / (90 - 75)) * 100
-              }
+              value={reputationProgress}
             />
             <p className="text-sm text-gray-600">
-              {90 - profileData.reputationScore} points needed to reach
-              Expert tier
+              {pointsNeeded > 0 
+                ? `${pointsNeeded} points needed to reach Expert tier`
+                : "Expert tier achieved!"
+              }
             </p>
           </div>
         </CardContent>
