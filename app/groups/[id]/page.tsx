@@ -13,7 +13,7 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useGroupDetails } from "@/hooks/use-group-details"
 import { useAccount } from "@starknet-react/core"
-import EnhancedGroupContribution from "@/components/groups/enhanced-group-contribution"
+import { SimpleUsdcContribution } from "@/components/groups/simple-usdc-contribution"
 import GroupLiquidityLock from "@/components/groups/group-liquidity-lock"
 import GroupHeader from "@/components/groups/group-header"
 import GroupStats from "@/components/groups/group-stats"
@@ -170,9 +170,9 @@ export default function GroupDetailsPage() {
           </TabsContent>
 
           <TabsContent value="contribute" className="space-y-4">
-            <EnhancedGroupContribution 
+            <SimpleUsdcContribution 
               groupDetails={groupDetails}
-              onContributionSuccess={refetch}
+              onSuccess={refetch}
             />
           </TabsContent>
 
