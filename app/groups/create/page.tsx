@@ -6,7 +6,6 @@ import { useAccount } from "@starknet-react/core"
 import { useGroupContract } from "@/hooks/use-group-contract"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
-import CreateGroupHeader from "@/components/groups/create/create-group-header"
 import GroupTypeSelector from "@/components/groups/create/group-type-selector"
 import PublicGroupForm from "@/components/groups/create/public-group-form"
 import PrivateGroupForm from "@/components/groups/create/private-group-form"
@@ -170,7 +169,7 @@ export default function CreateGroupPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <CreateGroupHeader />
+   
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">

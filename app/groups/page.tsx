@@ -86,64 +86,8 @@ export default function GroupsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">SC</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">
-                Save Circle
-              </span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <nav className="hidden md:flex items-center gap-6">
-              <Link
-                href="/dashboard"
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/profile"
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Profile
-              </Link>
-            </nav>
-            {!isConnected ? (
-              <Button
-                variant="outline"
-                onClick={() => setShowWalletModal(true)}
-              >
-                Connect Wallet
-              </Button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant="outline"
-                  className="bg-green-50 text-green-700 border-green-200"
-                >
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                  Connected
-                </Badge>
-                <span className="text-sm text-gray-600 font-mono">
-                  {address?.slice(0, 6)}...{address?.slice(-4)}
-                </span>
-              </div>
-            )}
-            <Button asChild>
-              <Link href="/groups/create">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Group
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+ 
+   
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
@@ -156,8 +100,9 @@ export default function GroupsPage() {
         </div>
 
         <Tabs defaultValue="public" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="public">Public Groups</TabsTrigger>
+          <TabsList className="flex justify-between gap-4">
+           <div>
+           <TabsTrigger value="public">Public Groups</TabsTrigger>
             <TabsTrigger value="invites">
               My Invites
               {userInvites.length > 0 && (
@@ -166,6 +111,16 @@ export default function GroupsPage() {
                 </Badge>
               )}
             </TabsTrigger>
+           </div>
+
+              <div>
+              <Button asChild>
+              <Link href="/groups/create">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Group
+              </Link>
+            </Button>
+              </div>
           </TabsList>
 
           <TabsContent value="public" className="space-y-6">

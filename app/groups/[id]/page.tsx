@@ -44,25 +44,15 @@ export default function GroupDetailsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/groups">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Groups
-                </Link>
-              </Button>
-              <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">SC</span>
-                </div>
-                <span className="text-xl font-bold text-gray-900">Save Circle</span>
-              </Link>
-            </div>
-          </div>
-        </header>
         <div className="container mx-auto px-4 py-8">
+          <div className="mb-6">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/groups">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Groups
+              </Link>
+            </Button>
+          </div>
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
             <span className="ml-2 text-gray-600">Loading group details...</span>
@@ -76,36 +66,33 @@ export default function GroupDetailsPage() {
   if (error || !groupDetails) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/groups">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Groups
-                </Link>
-              </Button>
-              <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">SC</span>
-                </div>
-                <span className="text-xl font-bold text-gray-900">Save Circle</span>
-              </Link>
-            </div>
-          </div>
-        </header>
         <div className="container mx-auto px-4 py-8">
-          <Card>
-            <CardContent className="text-center py-12">
-              <div className="text-red-600 mb-4">
-                <AlertCircle className="w-12 h-12 mx-auto mb-4" />
-                <span className="text-lg font-semibold">Error loading group</span>
-                <p className="text-sm mt-2">{error || "Group not found"}</p>
+          <div className="mb-6">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/groups">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Groups
+              </Link>
+            </Button>
+          </div>
+          <Card className="max-w-md mx-auto">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
+                <h2 className="text-xl font-semibold text-gray-900">Group Not Found</h2>
+                <p className="text-gray-600">
+                  {error || "The group you're looking for doesn't exist or you don't have permission to view it."}
+                </p>
+                <div className="flex gap-2 justify-center">
+                  <Button variant="outline" onClick={() => refetch()}>
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Try Again
+                  </Button>
+                  <Button asChild>
+                    <Link href="/groups">Browse Groups</Link>
+                  </Button>
+                </div>
               </div>
-              <Button onClick={refetch} variant="outline">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Try Again
-              </Button>
             </CardContent>
           </Card>
         </div>
@@ -115,27 +102,15 @@ export default function GroupDetailsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/groups">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Groups
-              </Link>
-            </Button>
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">SC</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">Save Circle</span>
-            </Link>
-          </div>
-        </div>
-      </header>
-
       <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/groups">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Groups
+            </Link>
+          </Button>
+        </div>
         {/* Group Header */}
         <Card className="mb-8">
           <CardContent className="pt-6">

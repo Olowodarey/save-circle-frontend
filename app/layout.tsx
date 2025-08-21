@@ -5,6 +5,7 @@ import "./globals.css"
 import { StarknetProvider } from "@/app/provider/starknet-provider" ;
 import {Toaster} from "sonner";
 import {UserProvider} from "@/contexts/UserContext"
+import { AppNavigation } from "@/components/navigation/app-navigation"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,7 +26,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <StarknetProvider>  
           <UserProvider>
-          {children}
+            <AppNavigation />
+            {children}
           </UserProvider>
           <Toaster position="top-right"/>
         </StarknetProvider>

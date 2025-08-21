@@ -42,9 +42,7 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
                 </Link>
                 
                 <nav className="hidden md:flex items-center gap-6">
-                    <ProtectedLink setShowWalletModal={setShowWalletModal} href="/dashboard" className="text-gray-600 hover:text-gray-900">
-                        Dashboard
-                    </ProtectedLink>
+                  
                     <ProtectedLink setShowWalletModal={setShowWalletModal} href="/groups" className="text-gray-600 hover:text-gray-900">
                         Groups
                     </ProtectedLink>
