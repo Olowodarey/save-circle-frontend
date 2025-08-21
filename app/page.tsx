@@ -9,7 +9,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Shield, Lock, TrendingUp, Coins, Globe } from "lucide-react";
+import {
+  Users,
+  Shield,
+  Lock,
+  TrendingUp,
+  Coins,
+  Globe,
+  PiggyBank,
+  Calendar,
+  ArrowRight,
+  Zap,
+} from "lucide-react";
 import { ProtectedLink } from "@/components/ProtectedLinks";
 import Link from "next/link";
 import WalletConnectModal from "@/components/wallet/wallet-connect-modal";
@@ -54,22 +65,15 @@ export default function HomePage() {
             Built on Starknet
           </Badge>
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Decentralized Savings Circles
+            Save together, get paid sooner
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join the future of community savings with Save Circle. Create or
-            join Esusu groups, build your reputation, and grow your wealth
-            together on Starknet.
+          <p className="text-xl text-gray-700 mb-8 max-w-3xl mx-auto">
+            Lock a little. Save a little. Receive a lump sum early—then pay
+            yourself back over time. Unlike typical DeFi, you get your locked
+            liquidity and your progressive contributions back at the end of the
+            cycle.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8" asChild>
-              <ProtectedLink
-                setShowWalletModal={setShowWalletModal}
-                href="/dashboard"
-              >
-                Start Saving
-              </ProtectedLink>
-            </Button>
             <Button
               size="lg"
               variant="outline"
@@ -83,6 +87,57 @@ export default function HomePage() {
                 Explore Groups
               </ProtectedLink>
             </Button>
+            <Button size="lg" variant="ghost" className="text-lg px-8" asChild>
+              <Link
+                href="#how-it-works"
+                className="inline-flex items-center gap-2"
+              >
+                How it works <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* The SaveCircle Difference */}
+      <section className="container grid mx-auto px-4 py-12">
+        <div className=" grid  gap-10 items-start">
+          <div>
+            <div className="text-center">
+              <h2 className="text-3xl flex items-center justify-center font-bold text-gray-900 mb-4">
+                <span className="mr-2">The SaveCircle difference</span>
+              </h2>
+              <p className="text-gray-700 mb-6 max-w-3xl mx-auto text-center">
+                Most DeFi platforms return exactly what you locked. With SaveCircle, you <strong>lock an initial amount</strong> to join and set your payout priority, then <strong>save small amounts</strong> on a daily or weekly schedule. Through <strong>rotating payouts</strong>, everyone takes a turn receiving lump sums early while others continue saving. At the end of the cycle, you get back your lock amount plus all your contributions. It's a smarter way to save together and access funds sooner.
+              </p>
+              <div className="mt-6 text-blue-700 font-medium text-center">
+                Pay with STRK, ETH, USDT, or USDC. We auto‑swap to USDC.
+              </div>
+            </div>
+          </div>
+          <div>
+            <div>
+              <div className="mt-4 grid sm:grid-cols-3 gap-3">
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <p className="font-medium text-gray-900">Priority by lock</p>
+                  <p className="text-sm text-gray-600">
+                    Higher locks are scheduled earlier.
+                  </p>
+                </div>
+                <div className="bg-green-50 rounded-lg p-4">
+                  <p className="font-medium text-gray-900">Rotating payouts</p>
+                  <p className="text-sm text-gray-600">Everyone gets a turn.</p>
+                </div>
+                <div className="bg-purple-50 rounded-lg p-4">
+                  <p className="font-medium text-gray-900">
+                    You get everything back
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Locked + saved amounts.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -182,14 +237,15 @@ export default function HomePage() {
       </section>
 
       {/* How it Works */}
-      <section className="bg-white py-16">
+      <section id="how-it-works" className="bg-white py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               How Save Circle Works
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Simple steps to start your savings journey
+              Get a lump sum sooner, keep saving steadily, and end with
+              everything that’s yours.
             </p>
           </div>
 
@@ -199,11 +255,11 @@ export default function HomePage() {
                 1
               </div>
               <h3 className="text-xl font-semibold mb-2">
-                Connect & Build Reputation
+                Lock an initial amount
               </h3>
               <p className="text-gray-600">
-                Connect your Starknet wallet and start building your reputation
-                through successful transactions
+                Lock any amount (e.g., $10) to join and set your payout priority
+                in the rotation.
               </p>
             </div>
 
@@ -212,11 +268,11 @@ export default function HomePage() {
                 2
               </div>
               <h3 className="text-xl font-semibold mb-2">
-                Create or Join Groups
+                Save small amounts on schedule
               </h3>
               <p className="text-gray-600">
-                Create your own savings circle or join existing public groups
-                that match your criteria
+                Contribute $1, $1, $1... daily or weekly. Everyone in your
+                circle does the same.
               </p>
             </div>
 
@@ -225,13 +281,138 @@ export default function HomePage() {
                 3
               </div>
               <h3 className="text-xl font-semibold mb-2">
-                Save & Earn Together
+                Receive early, get everything back
               </h3>
               <p className="text-gray-600">
-                Participate in rotating savings, receive payouts, and grow your
-                wealth with the community
+                You may get your payout early and keep contributing. At the end
+                of the cycle, you get back your locked liquidity plus all your
+                progressive contributions.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Liquidity Options */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Liquidity Options
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Join in the way that fits your capital today.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card className="border-0 shadow-lg">
+            <CardHeader>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Lock className="w-6 h-6 text-blue-600" />
+              </div>
+              <CardTitle>Progressive Lock</CardTitle>
+              <CardDescription>
+                Save gradually—your lock amount boosts your payout priority.
+                More trust, earlier turns.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="border-0 shadow-lg">
+            <CardHeader>
+              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-gray-600" />
+              </div>
+              <CardTitle>No Lock</CardTitle>
+              <CardDescription>
+                Join without locking liquidity. You’ll still save progressively;
+                payouts follow after locked members.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </section>
+
+      {/* Why this matters */}
+      <section className="bg-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Why this matters
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Consistency beats size. Start with what you have and build
+              momentum together.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl shadow-md p-6 border">
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                <Zap className="w-6 h-6 text-yellow-600" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Day-to-day traders</h3>
+              <p className="text-gray-600">
+                Build a trading stack—receive a lump sum early, then keep
+                contributing over time.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-md p-6 border">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Calendar className="w-6 h-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Students</h3>
+              <p className="text-gray-600">
+                Practice disciplined saving without needing large capital
+                upfront.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-md p-6 border">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                <PiggyBank className="w-6 h-6 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Everyday savers</h3>
+              <p className="text-gray-600">
+                Join with any budget—consistency matters more than size.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to action */}
+      <section className="container pt-16 mx-auto px-4 pb-16">
+        <div className="bg-blue-600 text-white rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 className="text-2xl font-bold mb-1">Start your first circle</h3>
+            <p className="text-blue-100">
+              Create a group or join existing ones in minutes.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              size="lg"
+              className="px-8 bg-white text-blue-700 hover:bg-white/90"
+              asChild
+            >
+              <ProtectedLink
+                setShowWalletModal={setShowWalletModal}
+                href="/groups/create"
+              >
+                Create a group
+              </ProtectedLink>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-8 bg-transparent border-white text-white hover:bg-white/10"
+              asChild
+            >
+              <ProtectedLink
+                setShowWalletModal={setShowWalletModal}
+                href="/groups"
+              >
+                Explore groups
+              </ProtectedLink>
+            </Button>
           </div>
         </div>
       </section>
