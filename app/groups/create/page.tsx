@@ -26,8 +26,8 @@ export default function CreateGroupPage() {
 
   const [groupType, setGroupType] = useState<"public" | "private">("public")
   const [lockEnabled, setLockEnabled] = useState(false)
-  const [inviteEmails, setInviteEmails] = useState<string[]>([])
-  const [currentEmail, setCurrentEmail] = useState("")
+  const [invitedMembers, setInvitedMembers] = useState<string[]>([])
+  const [currentAddress, setCurrentAddress] = useState("")
   const [selectedToken, setSelectedToken] = useState("usdc")
   const [lockAmount, setLockAmount] = useState("")
 
@@ -50,15 +50,24 @@ export default function CreateGroupPage() {
     { value: "wbtc", label: "WBTC", icon: "₿" },
   ]
 
-  const addEmail = () => {
-    if (currentEmail && !inviteEmails.includes(currentEmail)) {
-      setInviteEmails([...inviteEmails, currentEmail])
-      setCurrentEmail("")
+  const addAddress = () => {
+    if (currentAddress && !invitedMembers.includes(currentAddress)) {
+      // Basic validation for Starknet addresses
+      if (!currentAddress.startsWith('0x') || currentAddress.length < 10) {
+        toast({
+          title: "Invalid Address",
+          description: "Please enter a valid Starknet wallet address starting with 0x",
+          variant: "destructive",
+        })
+        return
+      }
+      setInvitedMembers([...invitedMembers, currentAddress])
+      setCurrentAddress("")
     }
   }
 
-  const removeEmail = (email: string) => {
-    setInviteEmails(inviteEmails.filter((e) => e !== email))
+  const removeAddress = (address: string) => {
+    setInvitedMembers(invitedMembers.filter((a) => a !== address))
   }
 
   const handleInputChange = (field: string, value: string) => {
@@ -98,8 +107,12 @@ export default function CreateGroupPage() {
       return false
     }
     
-    if (groupType === "private" && inviteEmails.length === 0) {
-      toast({ title: "Error", description: "At least one member must be invited for private groups", variant: "destructive" })
+    if (groupType === "private" && invitedMembers.length === 0) {
+      toast({
+        title: "Missing invitations",
+        description: "Please invite at least one member to your private group.",
+        variant: "destructive",
+      })
       return false
     }
     
@@ -142,7 +155,7 @@ export default function CreateGroupPage() {
         result = await createPrivateGroup({
           ...groupParams,
           minReputation: formData.minReputation,
-          inviteEmails,
+          invitedMembers,
         })
       }
 
@@ -209,11 +222,11 @@ export default function CreateGroupPage() {
               onLockEnabledChange={setLockEnabled}
               lockAmount={lockAmount}
               onLockAmountChange={setLockAmount}
-              inviteEmails={inviteEmails}
-              currentEmail={currentEmail}
-              onCurrentEmailChange={setCurrentEmail}
-              onAddEmail={addEmail}
-              onRemoveEmail={removeEmail}
+              invitedMembers={invitedMembers}
+              currentAddress={currentAddress}
+              setCurrentAddress={setCurrentAddress}
+              addAddress={addAddress}
+              removeAddress={removeAddress}
             />
           </TabsContent>
         </Tabs>

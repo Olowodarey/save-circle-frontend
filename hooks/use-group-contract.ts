@@ -200,7 +200,7 @@ export function useGroupContract() {
     contributionAmount: string;
     frequency: string;
     minReputation: string;
-    inviteEmails: string[];
+    invitedMembers: string[]; // Changed from inviteEmails to invitedMembers (wallet addresses)
     lockEnabled: boolean;
     lockAmount?: string;
     selectedToken: string;
@@ -229,15 +229,14 @@ export function useGroupContract() {
           : LockType.None
         : LockType.None;
 
-      // For demo purposes, convert email addresses to mock contract addresses
-      // In production, you'd need a proper address resolution system
-      const invitedAddresses = params.inviteEmails.map(
-        (email) =>
-          `0x${email
-            .replace(/[^a-zA-Z0-9]/g, "")
-            .padStart(64, "0")
-            .slice(0, 64)}`
-      );
+      // Validate and format wallet addresses
+      const invitedAddresses = params.invitedMembers.map((address) => {
+        // Basic validation for Starknet addresses
+        if (!address.startsWith('0x') || address.length < 10) {
+          throw new Error(`Invalid wallet address: ${address}`);
+        }
+        return address;
+      });
 
       const callData = [
         params.groupName, // name: ByteArray
@@ -268,7 +267,7 @@ export function useGroupContract() {
           createdAt: new Date().toISOString(),
           creator: address,
           type: "private",
-          invitedMembers: params.inviteEmails,
+          invitedMembers: params.invitedMembers,
         };
 
         const existingGroups = JSON.parse(

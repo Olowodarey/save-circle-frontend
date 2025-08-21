@@ -28,11 +28,11 @@ interface PrivateGroupFormProps {
   onLockEnabledChange: (enabled: boolean) => void;
   lockAmount: string;
   onLockAmountChange: (amount: string) => void;
-  inviteEmails: string[];
-  currentEmail: string;
-  onCurrentEmailChange: (email: string) => void;
-  onAddEmail: () => void;
-  onRemoveEmail: (email: string) => void;
+  invitedMembers: string[];
+  currentAddress: string;
+  setCurrentAddress: (address: string) => void;
+  addAddress: () => void;
+  removeAddress: (address: string) => void;
 }
 
 export default function PrivateGroupForm({
@@ -45,11 +45,11 @@ export default function PrivateGroupForm({
   onLockEnabledChange,
   lockAmount,
   onLockAmountChange,
-  inviteEmails,
-  currentEmail,
-  onCurrentEmailChange,
-  onAddEmail,
-  onRemoveEmail
+  invitedMembers,
+  currentAddress,
+  setCurrentAddress,
+  addAddress,
+  removeAddress
 }: PrivateGroupFormProps) {
   return (
     <Card>
@@ -155,11 +155,11 @@ export default function PrivateGroupForm({
         />
 
         <InviteMembersSection
-          inviteEmails={inviteEmails}
-          currentEmail={currentEmail}
-          onCurrentEmailChange={onCurrentEmailChange}
-          onAddEmail={onAddEmail}
-          onRemoveEmail={onRemoveEmail}
+          invitedMembers={invitedMembers}
+          currentAddress={currentAddress}
+          setCurrentAddress={setCurrentAddress}
+          addAddress={addAddress}
+          removeAddress={removeAddress}
         />
       </CardContent>
     </Card>

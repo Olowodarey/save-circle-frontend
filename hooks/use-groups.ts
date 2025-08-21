@@ -8,6 +8,8 @@ import { CONTRACT_ADDRESS } from "@/constants";
 // Type definitions based on contract structs
 export interface GroupInfo {
   group_id: bigint | number;
+  group_name: string;
+  description: string;
   creator: string;
   member_limit: number | bigint;
   contribution_amount: bigint | number;
@@ -19,11 +21,16 @@ export interface GroupInfo {
   current_cycle: number | bigint;
   payout_order: number | bigint;
   start_time: bigint | number;
+  last_payout_time: bigint | number;
   total_cycles: number | bigint;
   visibility: any; // CairoCustomEnum or number
   requires_lock: boolean;
   requires_reputation_score: number | bigint;
-  invited_members: number | bigint;
+  completed_cycles: number | bigint;
+  total_pool_amount: bigint | number;
+  remaining_pool_amount: bigint | number;
+  next_payout_recipient: string;
+  is_active: boolean;
 }
 
 export interface FormattedGroup {
@@ -172,8 +179,8 @@ export function useGroups() {
 
     return {
       id: groupId,
-      name: `Savings Group #${groupId}`, // Since contract doesn't store names, we'll generate them
-      description: `A ${
+      name: groupInfo.group_name || `Savings Group #${groupId}`, // Use actual group name from contract
+      description: groupInfo.description || `A ${
         isPublic ? "public" : "private"
       } savings group with ${Number(
         groupInfo.member_limit
