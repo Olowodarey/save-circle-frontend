@@ -1,33 +1,60 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, CheckCircle, AlertCircle, ArrowDownUp, DollarSign } from "lucide-react"
-import { useAccount, useSendTransaction, useReadContract } from "@starknet-react/core"
-import { Call } from "starknet"
-import { useAutoswap } from "@/hooks/use-autoswap"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  ArrowDownUp,
+  DollarSign,
+} from "lucide-react";
+import {
+  useAccount,
+  useSendTransaction,
+  useReadContract,
+} from "@starknet-react/core";
+import { Call } from "starknet";
+import { useAutoswap } from "@/hooks/use-autoswap";
 
 // Token addresses
-const USDC_TOKEN_ADDRESS = "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8"
-const STRK_TOKEN_ADDRESS = "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
-const ETH_TOKEN_ADDRESS = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
-const USDT_TOKEN_ADDRESS = "0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8"
+const USDC_TOKEN_ADDRESS =
+  "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8";
+const STRK_TOKEN_ADDRESS =
+  "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
+const ETH_TOKEN_ADDRESS =
+  "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
+const USDT_TOKEN_ADDRESS =
+  "0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8";
 
 // Liquidity lock contract address
-const LIQUIDITY_LOCK_CONTRACT = "0x037c49f99be664a2d5ede866a619e7ff629adf7a021ad6ba99f9ba94bbcd5923"
+const LIQUIDITY_LOCK_CONTRACT =
+  "0x037c49f99be664a2d5ede866a619e7ff629adf7a021ad6ba99f9ba94bbcd5923";
 
-// Token options for dropdown
+// Token options for dropdown - STRK first as default
 const TOKEN_OPTIONS = [
-  { value: USDC_TOKEN_ADDRESS, label: "USDC", symbol: "USDC" },
   { value: STRK_TOKEN_ADDRESS, label: "STRK", symbol: "STRK" },
   { value: ETH_TOKEN_ADDRESS, label: "ETH", symbol: "ETH" },
   { value: USDT_TOKEN_ADDRESS, label: "USDT", symbol: "USDT" },
-]
+  { value: USDC_TOKEN_ADDRESS, label: "USDC", symbol: "USDC" },
+];
 
 // ERC20 ABI for token interactions
 const ERC20_ABI = [
@@ -36,32 +63,35 @@ const ERC20_ABI = [
     name: "balance_of",
     state_mutability: "view",
     inputs: [
-      { name: "account", type: "core::starknet::contract_address::ContractAddress" },
+      {
+        name: "account",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
     ],
     outputs: [{ type: "core::integer::u256" }],
   },
-] as const
+] as const;
 
 interface EnhancedLiquidityLockProps {
-  groupId: string
-  onSuccess?: () => void
+  groupId: string;
+  onSuccess?: () => void;
 }
 
-export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityLockProps) {
-  const { address, status } = useAccount()
-  const [selectedToken, setSelectedToken] = useState(USDC_TOKEN_ADDRESS)
-  const [amount, setAmount] = useState("")
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [txHash, setTxHash] = useState<string | null>(null)
-  const [isSuccess, setIsSuccess] = useState(false)
+export function EnhancedLiquidityLock({
+  groupId,
+  onSuccess,
+}: EnhancedLiquidityLockProps) {
+  const { address, status } = useAccount();
+  // Changed default to STRK instead of USDC
+  const [selectedToken, setSelectedToken] = useState(STRK_TOKEN_ADDRESS);
+  const [amount, setAmount] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const { sendAsync } = useSendTransaction({})
-  const { 
-    executeSwap, 
-    isSwapping, 
-    swapError 
-  } = useAutoswap()
+  const { sendAsync } = useSendTransaction({});
+  const { executeSwap, isSwapping, swapError } = useAutoswap();
 
   // Check token balance
   const { data: balance } = useReadContract({
@@ -70,100 +100,112 @@ export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityL
     address: selectedToken as `0x${string}`,
     args: address ? [address] : undefined,
     enabled: Boolean(address),
-  })
+  });
 
-  const selectedTokenInfo = TOKEN_OPTIONS.find(token => token.value === selectedToken)
-  const isDirectUSDC = selectedToken === USDC_TOKEN_ADDRESS
+  const selectedTokenInfo = TOKEN_OPTIONS.find(
+    (token) => token.value === selectedToken
+  );
+  const isDirectUSDC = selectedToken === USDC_TOKEN_ADDRESS;
 
   const formatBalance = (balance: any, decimals: number = 6) => {
-    if (!balance) return "0"
-    const balanceNum = Number(balance) / Math.pow(10, decimals)
-    return balanceNum.toFixed(2)
-  }
+    if (!balance) return "0";
+    const balanceNum = Number(balance) / Math.pow(10, decimals);
+    return balanceNum.toFixed(2);
+  };
 
   const getTokenDecimals = (tokenAddress: string) => {
-    if (tokenAddress === ETH_TOKEN_ADDRESS || tokenAddress === STRK_TOKEN_ADDRESS) return 18
-    return 6 // USDC and USDT
-  }
+    if (
+      tokenAddress === ETH_TOKEN_ADDRESS ||
+      tokenAddress === STRK_TOKEN_ADDRESS
+    )
+      return 18;
+    return 6; // USDC and USDT
+  };
 
   const handleSwapAndLock = async () => {
-    if (!address || !amount || !selectedTokenInfo) return
+    if (!address || !amount || !selectedTokenInfo) return;
 
-    setIsProcessing(true)
-    setError(null)
+    setIsProcessing(true);
+    setError(null);
 
     try {
-      const inputAmount = parseFloat(amount)
-      const tokenDecimals = getTokenDecimals(selectedToken)
-      
+      const inputAmount = parseFloat(amount);
+      const tokenDecimals = getTokenDecimals(selectedToken);
+
       if (isDirectUSDC) {
         // Direct USDC lock
-        await handleDirectLock(inputAmount)
+        await handleDirectLock(inputAmount);
       } else {
         // Swap to USDC first, then lock
-        console.log(`Swapping ${inputAmount} ${selectedTokenInfo.symbol} to USDC...`)
-        
+        console.log(
+          `Swapping ${inputAmount} ${selectedTokenInfo.symbol} to USDC...`
+        );
+
         // Execute the swap (simplified - no quote needed)
-        const tokenSymbol = selectedTokenInfo.symbol as "STRK" | "ETH" | "USDT" | "USDC"
-        const swapResult = await executeSwap(tokenSymbol, "USDC", inputAmount)
+        const tokenSymbol = selectedTokenInfo.symbol as
+          | "STRK"
+          | "ETH"
+          | "USDT"
+          | "USDC";
+        const swapResult = await executeSwap(tokenSymbol, "USDC", inputAmount);
 
         if (!swapResult || !swapResult.success) {
-          throw new Error(swapResult ? "Swap failed" : "No swap result")
+          throw new Error(swapResult ? "Swap failed" : "No swap result");
         }
 
-        console.log("Swap successful:", swapResult)
-        
+        console.log("Swap successful:", swapResult);
+
         // Wait a moment for the swap to be confirmed on-chain
-        console.log("Waiting for swap confirmation...")
-        await new Promise(resolve => setTimeout(resolve, 5000))
-        
+        console.log("Waiting for swap confirmation...");
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+
         // For now, use a conservative estimate of the USDC received
         // In a real implementation, you'd query the actual balance or get this from the swap result
-        let estimatedUsdcAmount: number
+        let estimatedUsdcAmount: number;
         if (tokenSymbol === "STRK") {
-          estimatedUsdcAmount = inputAmount * 0.12 // Approximate STRK to USDC rate
+          estimatedUsdcAmount = inputAmount * 0.12; // Approximate STRK to USDC rate
         } else if (tokenSymbol === "ETH") {
-          estimatedUsdcAmount = inputAmount * 2500 // Approximate ETH to USDC rate
+          estimatedUsdcAmount = inputAmount * 2500; // Approximate ETH to USDC rate
         } else if (tokenSymbol === "USDT") {
-          estimatedUsdcAmount = inputAmount * 0.99 // Approximate USDT to USDC rate
+          estimatedUsdcAmount = inputAmount * 0.99; // Approximate USDT to USDC rate
         } else {
-          estimatedUsdcAmount = inputAmount // Fallback
+          estimatedUsdcAmount = inputAmount; // Fallback
         }
-        
-        console.log(`Now locking approximately ${estimatedUsdcAmount} USDC...`)
-        
+
+        console.log(`Now locking approximately ${estimatedUsdcAmount} USDC...`);
+
         // Now lock the estimated USDC amount
-        await handleDirectLock(estimatedUsdcAmount)
+        await handleDirectLock(estimatedUsdcAmount);
       }
 
-      setIsSuccess(true)
-      onSuccess?.()
+      setIsSuccess(true);
+      onSuccess?.();
     } catch (err) {
-      console.error("Error in swap and lock:", err)
-      setError(err instanceof Error ? err.message : "Transaction failed")
+      console.error("Error in swap and lock:", err);
+      setError(err instanceof Error ? err.message : "Transaction failed");
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const handleDirectLock = async (usdcAmount: number) => {
-    if (!address) return
+    if (!address) return;
 
     // Convert amount to proper format (USDC has 6 decimals)
-    const amountInWei = BigInt(Math.floor(usdcAmount * 1e6))
-    const groupIdBigInt = BigInt(groupId)
-    
+    const amountInWei = BigInt(Math.floor(usdcAmount * 1e6));
+    const groupIdBigInt = BigInt(groupId);
+
     // Format U256 values - split into low and high 128-bit parts
     const formatU256 = (value: bigint) => {
-      const MAX_U128 = BigInt("0xffffffffffffffffffffffffffffffff")
+      const MAX_U128 = BigInt("0xffffffffffffffffffffffffffffffff");
       return {
         low: value & MAX_U128,
         high: value >> BigInt(128),
-      }
-    }
-    
-    const amountU256 = formatU256(amountInWei)
-    const groupIdU256 = formatU256(groupIdBigInt)
+      };
+    };
+
+    const amountU256 = formatU256(amountInWei);
+    const groupIdU256 = formatU256(groupIdBigInt);
 
     // Create multicall with both approve and lock operations
     const calls: Call[] = [
@@ -187,19 +229,19 @@ export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityL
           groupIdU256.high.toString(), // group_id high
         ],
       },
-    ]
+    ];
 
-    const result = await sendAsync(calls)
-    setTxHash(result.transaction_hash)
-  }
+    const result = await sendAsync(calls);
+    setTxHash(result.transaction_hash);
+  };
 
   const reset = () => {
-    setAmount("")
-    setError(null)
-    setTxHash(null)
-    setIsSuccess(false)
-    setIsProcessing(false)
-  }
+    setAmount("");
+    setError(null);
+    setTxHash(null);
+    setIsSuccess(false);
+    setIsProcessing(false);
+  };
 
   if (status !== "connected") {
     return (
@@ -222,7 +264,7 @@ export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityL
           </Alert>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (isSuccess) {
@@ -251,7 +293,7 @@ export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityL
           </Button>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -262,7 +304,8 @@ export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityL
           Lock Liquidity with AutoSwap
         </CardTitle>
         <CardDescription>
-          Lock liquidity using any supported token. Non-USDC tokens will be automatically swapped to USDC.
+          Lock liquidity using any supported token. Non-USDC tokens will be
+          automatically swapped to USDC.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -287,13 +330,17 @@ export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityL
         <Alert>
           <DollarSign className="h-4 w-4" />
           <AlertDescription>
-            Your {selectedTokenInfo?.symbol} Balance: {formatBalance(balance, getTokenDecimals(selectedToken))} {selectedTokenInfo?.symbol}
+            Your {selectedTokenInfo?.symbol} Balance:{" "}
+            {formatBalance(balance, getTokenDecimals(selectedToken))}{" "}
+            {selectedTokenInfo?.symbol}
           </AlertDescription>
         </Alert>
 
         {/* Amount Input */}
         <div className="space-y-2">
-          <Label htmlFor="amount">Amount to Lock ({selectedTokenInfo?.symbol})</Label>
+          <Label htmlFor="amount">
+            Amount to Lock ({selectedTokenInfo?.symbol})
+          </Label>
           <Input
             id="amount"
             type="number"
@@ -310,7 +357,8 @@ export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityL
           <Alert>
             <ArrowDownUp className="h-4 w-4" />
             <AlertDescription>
-              This will swap your {selectedTokenInfo?.symbol} to USDC before locking liquidity.
+              This will swap your {selectedTokenInfo?.symbol} to USDC before
+              locking liquidity.
             </AlertDescription>
           </Alert>
         )}
@@ -320,7 +368,8 @@ export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityL
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Two-Step Process: First swap {selectedTokenInfo?.symbol} → USDC, then lock USDC liquidity.
+              Two-Step Process: First swap {selectedTokenInfo?.symbol} → USDC,
+              then lock USDC liquidity.
             </AlertDescription>
           </Alert>
         )}
@@ -329,15 +378,13 @@ export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityL
         {(error || swapError) && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {error || swapError}
-            </AlertDescription>
+            <AlertDescription>{error || swapError}</AlertDescription>
           </Alert>
         )}
 
         {/* Action Button */}
-        <Button 
-          onClick={handleSwapAndLock} 
+        <Button
+          onClick={handleSwapAndLock}
           disabled={!amount || isProcessing || isSwapping}
           className="w-full"
         >
@@ -349,7 +396,9 @@ export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityL
           ) : (
             <>
               <DollarSign className="mr-2 h-4 w-4" />
-              {isDirectUSDC ? `Lock ${amount || "0"} USDC` : `Swap & Lock ${amount || "0"} ${selectedTokenInfo?.symbol}`}
+              {isDirectUSDC
+                ? `Lock ${amount || "0"} USDC`
+                : `Swap & Lock ${amount || "0"} ${selectedTokenInfo?.symbol}`}
             </>
           )}
         </Button>
@@ -357,13 +406,12 @@ export function EnhancedLiquidityLock({ groupId, onSuccess }: EnhancedLiquidityL
         {/* Transaction Info */}
         <Alert>
           <AlertDescription>
-            {isDirectUSDC 
+            {isDirectUSDC
               ? "This will approve and lock your USDC in one transaction."
-              : "This will swap your tokens to USDC and then lock the liquidity."
-            }
+              : "This will swap your tokens to USDC and then lock the liquidity."}
           </AlertDescription>
         </Alert>
       </CardContent>
     </Card>
-  )
+  );
 }

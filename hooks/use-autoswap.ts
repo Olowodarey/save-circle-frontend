@@ -46,7 +46,7 @@ export function useAutoswap() {
         inputToken,
         outputToken,
         inputTokenAddress,
-        outputTokenAddress
+        outputTokenAddress,
       });
 
       // Validate that we have a connected account
@@ -55,39 +55,41 @@ export function useAutoswap() {
       }
 
       console.log("Using AutoSwap SDK with connected wallet");
-      
+
       // Create a custom AutoSwappr instance that uses the connected wallet
       // We'll create our own provider and account setup
-      const provider = new RpcProvider({ 
-        nodeUrl: "https://starknet-mainnet.public.blastapi.io" 
+      const provider = new RpcProvider({
+        nodeUrl: "https://starknet-mainnet.public.blastapi.io",
       });
-      
+
       // Create AutoSwappr with minimal config - we'll override the account
       const autoswappr = new AutoSwappr({
-        contractAddress: "0x05582ad635c43b4c14dbfa53cbde0df32266164a0d1b36e5b510e5b34aeb364b",
+        contractAddress:
+          "0x05582ad635c43b4c14dbfa53cbde0df32266164a0d1b36e5b510e5b34aeb364b",
         rpcUrl: "https://starknet-mainnet.public.blastapi.io",
         accountAddress: address,
         privateKey: "0x1", // Dummy private key, we'll override with connected account
       });
-      
+
       // Override the internal account with the connected wallet account
       (autoswappr as any).account = account;
-      
+
       console.log("AutoSwappr configured with:", {
-        contractAddress: "0x05582ad635c43b4c14dbfa53cbde0df32266164a0d1b36e5b510e5b34aeb364b",
+        contractAddress:
+          "0x05582ad635c43b4c14dbfa53cbde0df32266164a0d1b36e5b510e5b34aeb364b",
         accountAddress: address,
         inputTokenAddress,
         outputTokenAddress,
-        amount
+        amount,
       });
-      
+
       // Use the SDK's executeSwap method with proper options
       const swapOptions = {
         amount: amount.toString(),
       };
-      
+
       console.log("Calling SDK executeSwap with:", swapOptions);
-      
+
       const swapResult = await autoswappr.executeSwap(
         inputTokenAddress,
         outputTokenAddress,
