@@ -301,7 +301,7 @@ export function EnhancedLiquidityLock({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <DollarSign className="h-5 w-5" />
-          Lock Liquidity with AutoSwap
+            swap your token using Autoswap
         </CardTitle>
         <CardDescription>
           Lock liquidity using any supported token. Non-USDC tokens will be
@@ -391,14 +391,12 @@ export function EnhancedLiquidityLock({
           {isProcessing || isSwapping ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {isDirectUSDC ? "Locking USDC..." : "Swapping & Locking..."}
+              {isDirectUSDC ? "Processing..." : "Swapping..."}
             </>
           ) : (
             <>
               <DollarSign className="mr-2 h-4 w-4" />
-              {isDirectUSDC
-                ? `Lock ${amount || "0"} USDC`
-                : `Swap & Lock ${amount || "0"} ${selectedTokenInfo?.symbol}`}
+              {`Swap ${amount || "0"} ${isDirectUSDC ? 'USDC' : selectedTokenInfo?.symbol}`}
             </>
           )}
         </Button>
@@ -407,8 +405,8 @@ export function EnhancedLiquidityLock({
         <Alert>
           <AlertDescription>
             {isDirectUSDC
-              ? "This will approve and lock your USDC in one transaction."
-              : "This will swap your tokens to USDC and then lock the liquidity."}
+              ? "This will swap your tokens to USDC n."
+              : "This will swap your tokens to USDC ."}
           </AlertDescription>
         </Alert>
       </CardContent>

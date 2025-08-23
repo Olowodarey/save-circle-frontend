@@ -268,9 +268,7 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
             </Button>
 
             {/* Process Info */}
-            <div className="text-center text-sm text-gray-600">
-              <p>This will approve and lock your USDC in one transaction</p>
-            </div>
+            
 
             {/* Transaction Hash */}
             {txHash && !isSuccess && (

@@ -112,7 +112,9 @@ export function EnhancedContribution({
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [balanceFormatted, setBalanceFormatted] = useState('0.0');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [usdcAmount, setUsdcAmount] = useState('');
 
   const { sendAsync } = useSendTransaction({});
   const { executeSwap, isSwapping, swapError, clearSwapError } = useAutoswap();
@@ -287,15 +289,23 @@ export function EnhancedContribution({
     );
   }
 
+  useEffect(() => {
+    if (balance) {
+      setBalanceFormatted(formatBalance(balance, selectedTokenConfig?.decimals));
+    }
+  }, [balance, selectedTokenConfig]);
+
   return (
-    <Card>
+    <Card className="w-full max-w-md mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <DollarSign className="w-5 h-5" />
-          Enhanced Contribution
+          <DollarSign className="h-5 w-5" />
+          Swap your token using AutoSwap
         </CardTitle>
         <CardDescription>
-          Contribute {groupDetails.contributionAmount} USDC using any supported token
+          {isDirectUSDC
+            ? "Contribute USDC directly to the group"
+            : `Swap ${selectedTokenConfig?.symbol} to USDC and contribute`}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -325,7 +335,7 @@ export function EnhancedContribution({
             <div className="text-sm text-blue-600">
               Your {selectedToken} Balance:{" "}
               <span className="font-medium">
-                {formatBalance(balance, selectedTokenConfig.decimals)} {selectedToken}
+                {balanceFormatted} {selectedToken}
               </span>
             </div>
           </div>
@@ -333,44 +343,64 @@ export function EnhancedContribution({
 
         {/* Amount Input */}
         <div className="space-y-2">
-          <Label htmlFor="amount">Amount ({selectedToken})</Label>
-          <Input
-            id="amount"
-            type="number"
-            placeholder={`Enter ${selectedToken} amount`}
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            step="any"
-          />
+          <div className="flex justify-between items-center">
+            <Label htmlFor="amount">Amount</Label>
+            <div className="text-sm text-muted-foreground">
+              Balance: {balanceFormatted || '0.0'}
+              <button
+                type="button"
+                onClick={() => setAmount(balanceFormatted || '0')}
+                className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                Max
+              </button>
+            </div>
+          </div>
+          <div className="relative">
+            <Input
+              id="amount"
+              type="number"
+              placeholder="0.0"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              min="0"
+              step="0.000001"
+              className="text-lg py-6"
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              {selectedTokenConfig?.symbol}
+            </div>
+          </div>
         </div>
 
-        {/* Swap Preview for non-USDC tokens */}
-        {!isDirectUSDC && amount && (
-          <div className="p-4 bg-gray-50 rounded-lg space-y-3">
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <ArrowDownUp className="w-4 h-4" />
-              Swap Preview
-            </div>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span>You pay:</span>
-                <span className="font-medium">
-                  {amount} {selectedToken}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>You receive (est.):</span>
-                <span className="font-medium">
-                  ~{(parseFloat(amount) * 0.95).toFixed(2)} USDC
-                </span>
-              </div>
-              <div className="flex justify-between text-gray-600">
-                <span>Required for group:</span>
-                <span>{groupDetails.contributionAmount} USDC</span>
-              </div>
+        {/* Swap Arrow */}
+        {!isDirectUSDC && (
+          <div className="flex items-center justify-center py-1">
+            <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-full">
+              <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
             </div>
           </div>
         )}
+
+        {/* Output Amount */}
+        <div className="space-y-2">
+          <Label>You'll receive</Label>
+          <div className="p-4 border rounded-lg bg-muted/50">
+            <div className="flex justify-between items-center">
+              <span className="text-xl font-semibold">
+                {isDirectUSDC ? amount || '0' : usdcAmount || '0'}
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">USDC</span>
+              </div>
+            </div>
+            {!isDirectUSDC && usdcAmount && (
+              <div className="text-sm text-muted-foreground mt-1">
+                ≈ {(parseFloat(usdcAmount) * 0.99).toFixed(6)} USDC after 1% fee
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Processing Steps */}
         {isProcessing && (
@@ -392,31 +422,34 @@ export function EnhancedContribution({
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-
         {/* Action Button */}
         <Button
           onClick={handleSwapAndContribute}
-          disabled={!canContribute() || isProcessing || isSwapping}
-          className="w-full"
+          disabled={!amount || isProcessing || isSwapping}
+          className="w-full mt-6"
           size="lg"
         >
           {isProcessing || isSwapping ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              {isDirectUSDC ? "Contributing..." : "Swapping & Contributing..."}
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {isDirectUSDC ? 'Processing...' : 'Swapping...'}
             </>
           ) : (
             <>
-              <DollarSign className="w-4 h-4 mr-2" />
-              {isDirectUSDC ? `Contribute ${amount || "0"} USDC` : `Swap & Contribute ${amount || "0"} ${selectedToken}`}
+              <DollarSign className="mr-2 h-4 w-4" />
+              {`Swap ${amount || '0'} ${selectedToken}`}
             </>
           )}
         </Button>
 
-        {/* Info */}
-        <div className="text-xs text-gray-500 text-center">
-          This will approve and contribute your USDC in one transaction
-        </div>
+        {/* Transaction Info */}
+        <Alert className="mt-4">
+          <AlertDescription>
+            {isDirectUSDC
+              ? "This will approve and contribute your USDC in one transaction."
+              : `This will swap your ${selectedToken} to USDC and then contribute to the group.`}
+          </AlertDescription>
+        </Alert>
       </CardContent>
     </Card>
   );

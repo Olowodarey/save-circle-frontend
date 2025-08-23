@@ -21,7 +21,7 @@ export default function GroupProgress({ groupDetails }: GroupProgressProps) {
       </div>
       <div className="flex items-center justify-between text-sm text-gray-600">
         <span>Next payout: {groupDetails.nextPayoutDate}</span>
-        <span>Total pool: {groupDetails.totalPoolAmount}</span>
+        {/* <span>Total pool: {groupDetails.totalPoolAmount}</span> */}
       </div>
     </div>
   );

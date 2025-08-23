@@ -55,9 +55,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 text-center">
         <div className="max-w-4xl mx-auto">
-          <Badge className="mb-4 bg-blue-100 text-blue-800 hover:bg-blue-100">
-            Built on Starknet
-          </Badge>
+         
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             Save together, get paid sooner
           </h1>
