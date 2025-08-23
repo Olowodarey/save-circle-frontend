@@ -8,7 +8,7 @@ import {
 } from "@starknet-react/core";
 import { MY_CONTRACT_ABI } from "@/constants/abi";
 import { CONTRACT_ADDRESS } from "@/constants";
-import { CallData, shortString, CairoCustomEnum } from "starknet";
+import {  CairoCustomEnum } from "starknet";
 
 // Enum mappings for contract calls (matching contract ABI)
 export const GroupVisibility = {
@@ -17,9 +17,11 @@ export const GroupVisibility = {
 };
 
 export const TimeUnit = {
-  Days: 0,
-  Weeks: 1,
-  Months: 2,
+  Minutes: 0,  // Contract: Minutes = 0
+  Hours: 1,    // Contract: Hours = 1
+  Days: 2,     // Contract: Days = 2
+  Weeks: 3,    // Contract: Weeks = 3
+  Months: 4,   // Contract: Months = 4 (assumed)
 };
 
 export const LockType = {
@@ -34,10 +36,12 @@ const getLockTypeVariant = (type: number): string => {
 
 const getTimeUnitVariant = (unit: number): string => {
   switch (unit) {
+    case TimeUnit.Minutes: return "Minutes";
+    case TimeUnit.Hours: return "Hours";
     case TimeUnit.Days: return "Days";
     case TimeUnit.Weeks: return "Weeks";
     case TimeUnit.Months: return "Months";
-    default: return "Days";
+    default: return "Minutes";
   }
 };
 
@@ -82,16 +86,83 @@ export function useGroupContract() {
 
   // Helper function to convert frequency to time unit and duration
   const convertFrequencyToTimeUnit = (frequency: string) => {
-    switch (frequency) {
+    console.log("=== FREQUENCY CONVERSION DEBUG ===");
+    console.log("Input frequency:", frequency);
+    console.log("Lowercase frequency:", frequency.toLowerCase());
+    
+    let result;
+    switch (frequency.toLowerCase()) {
+      // Minutes
+      case "minutely":
+      case "every minute":
+        result = { unit: TimeUnit.Minutes, duration: 1 };
+        break;
+      case "every 5 minutes":
+        result = { unit: TimeUnit.Minutes, duration: 5 };
+        break;
+      case "every 15 minutes":
+        result = { unit: TimeUnit.Minutes, duration: 15 };
+        break;
+      case "every 30 minutes":
+        result = { unit: TimeUnit.Minutes, duration: 30 };
+        break;
+      
+      // Hours
+      case "hourly":
+      case "every hour":
+        result = { unit: TimeUnit.Hours, duration: 1 };
+        break;
+      case "every 6 hours":
+        result = { unit: TimeUnit.Hours, duration: 6 };
+        break;
+      case "every 12 hours":
+        result = { unit: TimeUnit.Hours, duration: 12 };
+        break;
+      
+      // Days
+      case "daily":
+      case "every day":
+        result = { unit: TimeUnit.Days, duration: 1 };
+        break;
+      case "every 3 days":
+        result = { unit: TimeUnit.Days, duration: 3 };
+        break;
+      
+      // Weeks
       case "weekly":
-        return { unit: TimeUnit.Weeks, duration: 1 };
+      case "every week":
+        result = { unit: TimeUnit.Weeks, duration: 1 };
+        break;
       case "biweekly":
-        return { unit: TimeUnit.Weeks, duration: 2 };
+      case "bi-weekly":
+      case "every 2 weeks":
+        result = { unit: TimeUnit.Weeks, duration: 2 };
+        break;
+      
+      // Months
       case "monthly":
-        return { unit: TimeUnit.Months, duration: 1 };
+      case "every month":
+        result = { unit: TimeUnit.Months, duration: 1 };
+        break;
+      case "quarterly":
+      case "every 3 months":
+        result = { unit: TimeUnit.Months, duration: 3 };
+        break;
+      
+      // Default to weekly for unknown frequencies
       default:
-        return { unit: TimeUnit.Months, duration: 1 };
+        console.warn(`Unknown frequency: ${frequency}, defaulting to weekly`);
+        result = { unit: TimeUnit.Weeks, duration: 1 };
+        break;
     }
+    
+    console.log("Conversion result:", result);
+    console.log("Unit enum value:", result.unit);
+    console.log("Unit variant name:", getTimeUnitVariant(result.unit));
+    console.log("Duration:", result.duration);
+    console.log("=== END FREQUENCY CONVERSION DEBUG ===");
+    
+    return result;
   };
 
   // Helper function to convert reputation string to number
@@ -136,10 +207,16 @@ export function useGroupContract() {
       const { unit, duration } = convertFrequencyToTimeUnit(params.frequency);
       const reputationScore = convertReputationToNumber(params.minReputation);
 
-      // Convert contribution amount to wei (assuming 18 decimals for most tokens)
+      // Convert contribution amount to USDC units (6 decimals)
       const contributionAmountWei = BigInt(
-        Math.floor(parseFloat(params.contributionAmount) * Math.pow(10, 18))
+        Math.floor(parseFloat(params.contributionAmount) * Math.pow(10, 6))
       );
+      
+      console.log("=== CONTRIBUTION AMOUNT CONVERSION ===");
+      console.log("Input amount:", params.contributionAmount);
+      console.log("Parsed amount:", parseFloat(params.contributionAmount));
+      console.log("Converted to USDC units:", contributionAmountWei.toString());
+      console.log("=== END CONTRIBUTION CONVERSION ===");
 
       const lockType = params.lockEnabled
         ? params.lockAmount && parseFloat(params.lockAmount) > 0

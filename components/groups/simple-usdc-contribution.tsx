@@ -186,7 +186,20 @@ export function SimpleUsdcContribution({ groupDetails, onSuccess }: SimpleUsdcCo
           Contribute to Group
         </CardTitle>
         <CardDescription>
-          Contribute {groupDetails.contributionAmount} USDC to {groupDetails.name} in a single transaction.
+          Contribute {(() => {
+            // Convert contributionAmount to number, handling both bigint and string types
+            let baseAmount: number;
+            if (typeof groupDetails.contributionAmount === 'bigint') {
+              // If it's a bigint, convert from USDC units (6 decimals) to readable number
+              baseAmount = Number(groupDetails.contributionAmount) / Math.pow(10, 6);
+            } else {
+              // If it's already a string/number, parse it directly
+              baseAmount = parseFloat(String(groupDetails.contributionAmount));
+            }
+            const poolFee = baseAmount * 0.01; // 1% pool fee
+            const totalAmount = baseAmount + poolFee;
+            return totalAmount.toFixed(2);
+          })()} USDC to {groupDetails.name} in a single transaction.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

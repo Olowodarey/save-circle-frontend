@@ -105,10 +105,26 @@ export function useGroupDetails(groupId: string) {
       
       // Case 1: Object with variant property
       if (typeof unit === "object" && unit !== null && unit.variant) {
-        console.log("Case 1: Object with variant", unit.variant);
+        console.log("✅ Case 1: Object with variant", unit.variant);
+        console.log("Variant type:", typeof unit.variant);
+        console.log("Variant keys:", Object.keys(unit.variant));
+        console.log("Variant values:", Object.values(unit.variant));
         if (typeof unit.variant === "object" && unit.variant !== null) {
-          unitKey = Object.keys(unit.variant)[0];
-          console.log("Extracted variant key:", unitKey);
+          // Find the key with a non-undefined value
+          const variantKeys = Object.keys(unit.variant);
+          const variantValues = Object.values(unit.variant);
+          const activeIndex = variantValues.findIndex(value => value !== undefined);
+          
+          if (activeIndex !== -1) {
+            unitKey = variantKeys[activeIndex];
+            console.log("✅ Found active variant key:", unitKey, "at index:", activeIndex);
+          } else {
+            // Fallback to first key if no active variant found
+            unitKey = variantKeys[0];
+            console.log("⚠️ No active variant found, using first key:", unitKey);
+          }
+        } else {
+          console.log("❌ Variant is not an object:", unit.variant);
         }
       }
       // Case 2: Object with direct enum keys
@@ -123,13 +139,19 @@ export function useGroupDetails(groupId: string) {
         console.log("Case 3: Numeric value", unitNum);
         switch (unitNum) {
           case 0:
-            unitKey = "Days";
+            unitKey = "Minutes";  // Contract: 0 = Minutes
             break;
           case 1:
-            unitKey = "Weeks";
+            unitKey = "Hours";    // Contract: 1 = Hours
             break;
           case 2:
-            unitKey = "Months";
+            unitKey = "Days";     // Contract: 2 = Days
+            break;
+          case 3:
+            unitKey = "Weeks";    // Contract: 3 = Weeks
+            break;
+          case 4:
+            unitKey = "Months";   // Contract: 4 = Months
             break;
           default:
             console.log("Unknown numeric unit:", unitNum);
@@ -179,10 +201,11 @@ export function useGroupDetails(groupId: string) {
       return "Unknown";
     };
 
-    // Convert contribution amount from wei to readable format
+    // Convert contribution amount from USDC units to readable format
     const formatContribution = (amount: any) => {
-      const amountInTokens = Number(amount) / Math.pow(10, 18);
-      return `${amountInTokens} USDC`;
+      // USDC uses 6 decimals, not 18
+      const amountInTokens = Number(amount) / Math.pow(10, 6);
+      return amountInTokens.toString(); // Return just the number, not with "USDC" suffix
     };
 
     // Get state string - handle GroupState enum from contract
