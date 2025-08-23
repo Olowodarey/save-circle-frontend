@@ -18,6 +18,9 @@ import GroupContribution from "@/components/groups/group-contribution"
 import GroupLiquidityLock from "@/components/groups/group-liquidity-lock"
 import GroupHeader from "@/components/groups/group-header"
 import GroupStats from "@/components/groups/group-stats"
+import { LockedBalanceDisplay } from "@/components/groups/locked-balance-display"
+import { InsurancePoolDisplay } from "@/components/groups/insurance-pool-display"
+import { NextPayoutDisplay } from "@/components/groups/next-payout-display"
 import GroupProgress from "@/components/groups/group-progress"
 import GroupActionPanel from "@/components/groups/group-action-panel"
 import GroupMembersList from "@/components/groups/group-members-list"
@@ -146,6 +149,14 @@ export default function GroupDetailsPage() {
           </TabsContent>
 
           <TabsContent value="contribute" className="space-y-4">
+            {/* Group Financial Information */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <LockedBalanceDisplay groupId={params.id as string} />
+              <InsurancePoolDisplay groupId={params.id as string} />
+              <NextPayoutDisplay groupId={params.id as string} />
+            </div>
+            
+            {/* Contribution Form */}
             <GroupContribution 
               groupDetails={groupDetails}
               onContributionSuccess={refetch}
