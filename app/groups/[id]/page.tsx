@@ -21,6 +21,9 @@ import GroupStats from "@/components/groups/group-stats"
 import { LockedBalanceDisplay } from "@/components/groups/locked-balance-display"
 import { InsurancePoolDisplay } from "@/components/groups/insurance-pool-display"
 import { NextPayoutDisplay } from "@/components/groups/next-payout-display"
+import { DistributePayoutAction } from "@/components/groups/distribute-payout-action"
+import { WithdrawLockedAction } from "@/components/groups/withdraw-locked-action"
+import { PayoutOrderDisplay } from "@/components/groups/payout-order-display"
 import GroupProgress from "@/components/groups/group-progress"
 import GroupActionPanel from "@/components/groups/group-action-panel"
 import GroupMembersList from "@/components/groups/group-members-list"
@@ -139,6 +142,7 @@ export default function GroupDetailsPage() {
           <TabsList>
             <TabsTrigger value="members">Members ({groupDetails.members})</TabsTrigger>
             <TabsTrigger value="contribute">Contribute</TabsTrigger>
+            <TabsTrigger value="management">Management</TabsTrigger>
             <TabsTrigger value="lock">Lock Liquidity</TabsTrigger>
             <TabsTrigger value="history">Payment History</TabsTrigger>
             <TabsTrigger value="rules">Rules & Terms</TabsTrigger>
@@ -161,6 +165,24 @@ export default function GroupDetailsPage() {
               groupDetails={groupDetails}
               onContributionSuccess={refetch}
             />
+          </TabsContent>
+
+          <TabsContent value="management" className="space-y-4">
+            {/* Payout Order Display */}
+            <PayoutOrderDisplay groupId={params.id as string} />
+            
+            {/* Admin and User Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <DistributePayoutAction 
+                groupId={params.id as string}
+                groupDetails={groupDetails}
+                onSuccess={refetch}
+              />
+              <WithdrawLockedAction 
+                groupId={params.id as string}
+                onSuccess={refetch}
+              />
+            </div>
           </TabsContent>
 
           <TabsContent value="lock" className="space-y-4">
