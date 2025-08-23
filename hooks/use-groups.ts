@@ -68,43 +68,92 @@ export function useGroups() {
   ): FormattedGroup => {
     // Convert cycle unit enum to readable frequency
     const getFrequency = (unit: any, duration: any) => {
-      const unitNum =
-        typeof unit === "object" && unit.variant
-          ? Object.keys(unit.variant)[0]
-          : Number(unit);
-      const durationNum = Number(duration);
+      console.log("=== FREQUENCY DEBUG ===");
+      console.log("Raw unit:", unit);
+      console.log("Raw duration:", duration);
+      console.log("Unit type:", typeof unit);
+      console.log("Duration type:", typeof duration);
 
-      // Handle enum variants
-      if (typeof unit === "object" && unit.variant) {
-        const variantKey = Object.keys(unit.variant)[0];
-        if (variantKey === "Days") {
-          return durationNum === 1 ? "Daily" : `Every ${durationNum} days`;
-        } else if (variantKey === "Weeks") {
-          return durationNum === 1
-            ? "Weekly"
-            : durationNum === 2
-            ? "Bi-weekly"
-            : `Every ${durationNum} weeks`;
-        } else if (variantKey === "Months") {
-          return durationNum === 1 ? "Monthly" : `Every ${durationNum} months`;
+      const durationNum = Number(duration);
+      console.log("Parsed duration:", durationNum);
+
+      // Handle different enum formats from Starknet
+      let unitKey = null;
+
+      // Case 1: Object with variant property
+      if (typeof unit === "object" && unit !== null && unit.variant) {
+        console.log("Case 1: Object with variant", unit.variant);
+        if (typeof unit.variant === "object" && unit.variant !== null) {
+          unitKey = Object.keys(unit.variant)[0];
+          console.log("Extracted variant key:", unitKey);
+        }
+      }
+      // Case 2: Object with direct enum keys
+      else if (typeof unit === "object" && unit !== null && !unit.variant) {
+        console.log("Case 2: Object with direct keys", Object.keys(unit));
+        unitKey = Object.keys(unit)[0];
+        console.log("Extracted direct key:", unitKey);
+      }
+      // Case 3: Numeric value
+      else {
+        const unitNum = Number(unit);
+        console.log("Case 3: Numeric value", unitNum);
+        switch (unitNum) {
+          case 0:
+            unitKey = "Days";
+            break;
+          case 1:
+            unitKey = "Weeks";
+            break;
+          case 2:
+            unitKey = "Months";
+            break;
+          default:
+            console.log("Unknown numeric unit:", unitNum);
+            return "Unknown";
         }
       }
 
-      // Handle numeric values
-      switch (unitNum) {
-        case 0: // Days
-          return durationNum === 1 ? "Daily" : `Every ${durationNum} days`;
-        case 1: // Weeks
-          return durationNum === 1
-            ? "Weekly"
-            : durationNum === 2
-            ? "Bi-weekly"
-            : `Every ${durationNum} weeks`;
-        case 2: // Months
-          return durationNum === 1 ? "Monthly" : `Every ${durationNum} months`;
-        default:
-          return "Unknown";
+      console.log("Final unit key:", unitKey);
+
+      // Convert to readable frequency
+      if (unitKey === "Minutes") {
+        if (durationNum < 60) {
+          return `Every ${durationNum} minutes`;
+        } else if (durationNum === 60) {
+          return "Hourly";
+        } else if (durationNum < 1440) {
+          const hours = Math.floor(durationNum / 60);
+          return hours === 1 ? "Hourly" : `Every ${hours} hours`;
+        } else {
+          const days = Math.floor(durationNum / 1440);
+          return days === 1 ? "Daily" : `Every ${days} days`;
+        }
+      } else if (unitKey === "Hours") {
+        if (durationNum === 1) {
+          return "Hourly";
+        } else if (durationNum === 24) {
+          return "Daily";
+        } else if (durationNum < 24) {
+          return `Every ${durationNum} hours`;
+        } else {
+          const days = Math.floor(durationNum / 24);
+          return days === 1 ? "Daily" : `Every ${days} days`;
+        }
+      } else if (unitKey === "Days") {
+        return durationNum === 1 ? "Daily" : `Every ${durationNum} days`;
+      } else if (unitKey === "Weeks") {
+        return durationNum === 1
+          ? "Weekly"
+          : durationNum === 2
+          ? "Bi-weekly"
+          : `Every ${durationNum} weeks`;
+      } else if (unitKey === "Months") {
+        return durationNum === 1 ? "Monthly" : `Every ${durationNum} months`;
       }
+
+      console.log(`No matching unit key: ${unitKey}, returning Unknown`);
+      return "Unknown";
     };
 
     // Convert contribution amount from wei to readable format
@@ -177,28 +226,100 @@ export function useGroups() {
 
     const isPublic = visibilityValue === 0 || visibilityValue === "Public";
 
+    // Helper function to format creator address
+    const formatCreatorName = (address: string) => {
+      if (!address) return "Unknown Creator";
+      const addr = String(address);
+      return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+    };
+
+    // Helper function to get proper visibility string
+    const getVisibilityString = (visibility: any) => {
+      console.log("=== VISIBILITY DEBUG ===");
+      console.log("Raw visibility:", visibility);
+      console.log("Visibility type:", typeof visibility);
+
+      // Handle different enum formats from Starknet
+      let visibilityKey = null;
+
+      // Case 1: Object with variant property
+      if (
+        typeof visibility === "object" &&
+        visibility !== null &&
+        visibility.variant
+      ) {
+        console.log("Case 1: Object with variant", visibility.variant);
+        if (
+          typeof visibility.variant === "object" &&
+          visibility.variant !== null
+        ) {
+          visibilityKey = Object.keys(visibility.variant)[0];
+          console.log("Extracted variant key:", visibilityKey);
+        }
+      }
+      // Case 2: Object with direct enum keys
+      else if (
+        typeof visibility === "object" &&
+        visibility !== null &&
+        !visibility.variant
+      ) {
+        console.log("Case 2: Object with direct keys", Object.keys(visibility));
+        visibilityKey = Object.keys(visibility)[0];
+        console.log("Extracted direct key:", visibilityKey);
+      }
+      // Case 3: Numeric value
+      else {
+        const visNum = Number(visibility);
+        console.log("Case 3: Numeric value", visNum);
+        switch (visNum) {
+          case 0:
+            visibilityKey = "Public";
+            break;
+          case 1:
+            visibilityKey = "Private";
+            break;
+          default:
+            console.log("Unknown numeric visibility:", visNum);
+            return "public"; // Default to public
+        }
+      }
+
+      console.log("Final visibility key:", visibilityKey);
+
+      // Convert to lowercase for consistency
+      if (visibilityKey) {
+        return visibilityKey.toLowerCase();
+      }
+
+      console.log("No matching visibility key, defaulting to public");
+      return "public"; // Default fallback
+    };
+
+    const visibilityStr = getVisibilityString(groupInfo.visibility);
+    const creatorAddress = String(groupInfo.creator);
+
     return {
       id: groupId,
-      name: groupInfo.group_name || `Savings Group #${groupId}`, // Use actual group name from contract
-      description: groupInfo.description || `A ${
-        isPublic ? "public" : "private"
-      } savings group with ${Number(
-        groupInfo.member_limit
-      )} members contributing ${formatContribution(
-        groupInfo.contribution_amount
-      )} ${getFrequency(
-        groupInfo.cycle_unit,
-        groupInfo.cycle_duration
-      ).toLowerCase()}.`,
+      name: groupInfo.group_name || `Savings Group #${groupId}`,
+      description:
+        groupInfo.description ||
+        `A ${visibilityStr} savings group with ${Number(
+          groupInfo.member_limit
+        )} members contributing ${formatContribution(
+          groupInfo.contribution_amount
+        )} ${getFrequency(
+          groupInfo.cycle_unit,
+          groupInfo.cycle_duration
+        ).toLowerCase()}.`,
       members: Number(groupInfo.members),
       maxMembers: Number(groupInfo.member_limit),
       contribution: formatContribution(groupInfo.contribution_amount),
       frequency: getFrequency(groupInfo.cycle_unit, groupInfo.cycle_duration),
       minReputation: Number(groupInfo.requires_reputation_score),
       locked: groupInfo.requires_lock,
-      creator: groupInfo.creator,
+      creator: formatCreatorName(creatorAddress),
       tags: generateTags(groupInfo),
-      visibility: isPublic ? "public" : "private",
+      visibility: visibilityStr as "public" | "private",
       state: getStateString(groupInfo.state),
       contributionAmount:
         typeof groupInfo.contribution_amount === "bigint"
