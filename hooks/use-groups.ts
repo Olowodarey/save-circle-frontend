@@ -50,11 +50,16 @@ export interface FormattedGroup {
   contributionAmount: bigint;
 }
 
+// Cache for groups to avoid refetching
+const groupsCache = new Map<string, { data: FormattedGroup[], timestamp: number }>();
+const CACHE_DURATION = 30000; // 30 seconds cache
+
 export function useGroups() {
   const { account, address, isConnected } = useAccount();
   const [groups, setGroups] = useState<FormattedGroup[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const { contract } = useContract({
     abi: MY_CONTRACT_ABI,
@@ -322,75 +327,133 @@ export function useGroups() {
     };
   };
 
-  // Fetch groups from contract
-  const fetchGroups = async () => {
+  // Check cache first
+  const getCachedGroups = (cacheKey: string) => {
+    const cached = groupsCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached.data;
+    }
+    return null;
+  };
+
+  // Fetch groups from contract with optimizations
+  const fetchGroups = async (useCache = true) => {
     if (!contract) {
       setError("Contract not available");
       return;
+    }
+
+    const cacheKey = `groups_${CONTRACT_ADDRESS}`;
+    
+    // Check cache first
+    if (useCache) {
+      const cachedGroups = getCachedGroups(cacheKey);
+      if (cachedGroups) {
+        console.log("📦 Using cached groups data");
+        setGroups(cachedGroups);
+        setInitialLoad(false);
+        return;
+      }
     }
 
     setLoading(true);
     setError(null);
 
     try {
-      // Since we don't have a function to get total groups, we'll try to fetch groups
-      // starting from ID 1 until we hit an error or empty group
-      const maxGroupsToCheck = 50; // Reasonable limit to avoid infinite loops
+      console.log("🚀 Fetching groups with parallel requests...");
+      const startTime = Date.now();
+      
+      // Use parallel requests for better performance
+      const maxGroupsToCheck = 20; // Reduced for better performance
+      const batchSize = 5; // Process in smaller batches
       const validGroups: FormattedGroup[] = [];
 
-      for (let i = 1; i <= maxGroupsToCheck; i++) {
-        try {
-          const groupInfo = (await contract.call("get_group_info", [
-            i,
-          ])) as GroupInfo;
+      // Process groups in batches for better performance
+      for (let batch = 0; batch < Math.ceil(maxGroupsToCheck / batchSize); batch++) {
+        const batchStart = batch * batchSize + 1;
+        const batchEnd = Math.min((batch + 1) * batchSize, maxGroupsToCheck);
+        
+        console.log(`📦 Processing batch ${batch + 1}: groups ${batchStart}-${batchEnd}`);
+        
+        // Create parallel promises for this batch
+        const batchPromises = [];
+        for (let i = batchStart; i <= batchEnd; i++) {
+          batchPromises.push(
+            contract.call("get_group_info", [i])
+              .then((groupInfo: any) => ({ id: i, data: groupInfo as GroupInfo }))
+              .catch((error) => ({ id: i, error }))
+          );
+        }
 
-          // Add comprehensive debugging for raw contract data
-          console.log(`\n=== RAW GROUP DATA FOR GROUP ${i} ===`);
-          console.log("Full groupInfo object:", groupInfo);
-          console.log("Group ID:", groupInfo.group_id);
-          console.log("Group Name:", groupInfo.group_name);
-          console.log("Cycle Unit (raw):", groupInfo.cycle_unit);
-          console.log("Cycle Duration (raw):", groupInfo.cycle_duration);
-          console.log("Cycle Unit type:", typeof groupInfo.cycle_unit);
-          console.log("Cycle Duration type:", typeof groupInfo.cycle_duration);
-          
-          // Try to inspect the cycle_unit structure
-          if (typeof groupInfo.cycle_unit === 'object' && groupInfo.cycle_unit !== null) {
-            console.log("Cycle Unit object keys:", Object.keys(groupInfo.cycle_unit));
-            console.log("Cycle Unit object values:", Object.values(groupInfo.cycle_unit));
-            console.log("Cycle Unit JSON:", JSON.stringify(groupInfo.cycle_unit, null, 2));
+        // Wait for this batch to complete
+        const batchResults = await Promise.all(batchPromises);
+        
+        // Process batch results
+        for (const result of batchResults) {
+          if ('error' in result) {
+            console.log(`Group ${result.id} not found or error:`, result.error);
+            continue;
           }
-          console.log("=== END RAW GROUP DATA ===\n");
 
+          const { id, data: groupInfo } = result;
+          
           // If group_id is 0, it means the group doesn't exist
           if (Number(groupInfo.group_id) === 0) {
             continue;
           }
 
-          const formattedGroup = formatGroup(groupInfo, i.toString());
-          validGroups.push(formattedGroup);
-        } catch (error) {
-          // If we get an error, the group probably doesn't exist, so we continue
-          console.log(`Group ${i} not found or error:`, error);
-          continue;
+          try {
+            const formattedGroup = formatGroup(groupInfo, id.toString());
+            validGroups.push(formattedGroup);
+          } catch (formatError) {
+            console.log(`Error formatting group ${id}:`, formatError);
+          }
+        }
+        
+        // Update UI progressively for better UX
+        if (validGroups.length > 0) {
+          setGroups([...validGroups]);
         }
       }
 
+      // Cache the results
+      groupsCache.set(cacheKey, {
+        data: validGroups,
+        timestamp: Date.now()
+      });
+      
+      const endTime = Date.now();
+      console.log(`✅ Fetched ${validGroups.length} groups in ${endTime - startTime}ms`);
+      
       setGroups(validGroups);
     } catch (error: any) {
       console.error("Error fetching groups:", error);
       setError(error.message || "Failed to fetch groups");
     } finally {
       setLoading(false);
+      setInitialLoad(false);
     }
   };
 
-  // Fetch groups on mount and when contract becomes available
+  // Preload groups as soon as contract is available (even without wallet connection)
   useEffect(() => {
-    if (contract && isConnected) {
+    if (contract) {
+      // Start fetching immediately when contract is available
       fetchGroups();
     }
-  }, [contract, isConnected]);
+  }, [contract]);
+
+  // Additional effect for when user connects wallet (for user-specific data)
+  useEffect(() => {
+    if (contract && isConnected && address) {
+      // Refresh groups when user connects (for membership status, etc.)
+      const cacheKey = `groups_${CONTRACT_ADDRESS}`;
+      const cachedGroups = getCachedGroups(cacheKey);
+      if (!cachedGroups) {
+        fetchGroups();
+      }
+    }
+  }, [isConnected, address]);
 
   // Get public groups only
   const publicGroups = groups.filter((group) => group.visibility === "public");
@@ -405,6 +468,9 @@ export function useGroups() {
     loading,
     error,
     refetch: fetchGroups,
+    forceRefresh: () => fetchGroups(false), // Force refresh without cache
     isConnected,
+    initialLoad,
+    isFromCache: !loading && !initialLoad && groups.length > 0,
   };
 }

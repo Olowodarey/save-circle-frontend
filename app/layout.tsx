@@ -6,6 +6,7 @@ import { StarknetProvider } from "@/app/provider/starknet-provider" ;
 import {Toaster} from "sonner";
 import {UserProvider} from "@/contexts/UserContext"
 import { AppNavigation } from "@/components/navigation/app-navigation"
+import { GroupsPreloader } from "@/components/providers/groups-preloader"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <StarknetProvider>  
           <UserProvider>
+            <GroupsPreloader />
             <AppNavigation />
             {children}
           </UserProvider>

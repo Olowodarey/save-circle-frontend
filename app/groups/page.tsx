@@ -45,8 +45,17 @@ export default function GroupsPage() {
   // Use Starknet React hooks for wallet connection
   const { address, isConnected } = useAccount();
   
-  // Use the groups hook to fetch contract data
-  const { publicGroups, userInvites, loading, error, refetch } = useGroups();
+  // Use the groups hook to fetch contract data with optimizations
+  const { 
+    publicGroups, 
+    userInvites, 
+    loading, 
+    error, 
+    refetch, 
+    forceRefresh, 
+    initialLoad, 
+    isFromCache 
+  } = useGroups();
 
   // Remove the old wallet connection effect since we're using Starknet React
 
@@ -149,10 +158,34 @@ export default function GroupsPage() {
             </div>
 
             {/* Loading State */}
-            {loading && (
+            {loading && initialLoad && (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                 <span className="ml-2 text-gray-600">Loading groups...</span>
+              </div>
+            )}
+
+            {/* Cache Status & Refresh */}
+            {!loading && !error && publicGroups.length > 0 && (
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  {isFromCache && (
+                    <>
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                      {/* <span>Loaded from cache</span> */}
+                    </>
+                  )}
+                  <span>{publicGroups.length} groups found</span>
+                </div>
+                <Button 
+                  onClick={() => forceRefresh()} 
+                  variant="outline" 
+                  size="sm"
+                  disabled={loading}
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
               </div>
             )}
 
@@ -164,7 +197,7 @@ export default function GroupsPage() {
                     <span className="text-lg font-semibold">Error loading groups</span>
                     <p className="text-sm mt-2">{error}</p>
                   </div>
-                  <Button onClick={refetch} variant="outline">
+                  <Button onClick={() => refetch()} variant="outline">
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Try Again
                   </Button>

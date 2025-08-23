@@ -71,6 +71,14 @@ export interface FormattedGroupDetails {
   startTime: string;
 }
 
+// Cache for group details to avoid refetching
+const groupDetailsCache = new Map<string, { 
+  groupDetails: FormattedGroupDetails, 
+  members: FormattedMember[], 
+  timestamp: number 
+}>();
+const CACHE_DURATION = 30000; // 30 seconds cache
+
 export function useGroupDetails(groupId: string) {
   const { account, address, isConnected } = useAccount();
   const [groupDetails, setGroupDetails] =
@@ -78,6 +86,7 @@ export function useGroupDetails(groupId: string) {
   const [members, setMembers] = useState<FormattedMember[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const { contract } = useContract({
     abi: MY_CONTRACT_ABI,
@@ -561,11 +570,34 @@ export function useGroupDetails(groupId: string) {
     };
   };
 
-  // Fetch group details and members
-  const fetchGroupDetails = async () => {
+  // Check cache first
+  const getCachedGroupDetails = (cacheKey: string) => {
+    const cached = groupDetailsCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached;
+    }
+    return null;
+  };
+
+  // Fetch group details and members with optimizations
+  const fetchGroupDetails = async (useCache = true) => {
     if (!contract || !groupId) {
       setError("Contract not available or invalid group ID");
       return;
+    }
+
+    const cacheKey = `group_${groupId}_${CONTRACT_ADDRESS}`;
+    
+    // Check cache first
+    if (useCache) {
+      const cachedData = getCachedGroupDetails(cacheKey);
+      if (cachedData) {
+        console.log(`📦 Using cached data for group ${groupId}`);
+        setGroupDetails(cachedData.groupDetails);
+        setMembers(cachedData.members);
+        setInitialLoad(false);
+        return;
+      }
     }
 
     setLoading(true);
@@ -599,6 +631,7 @@ export function useGroupDetails(groupId: string) {
       // Then, fetch all members
       const memberCount = Number(groupInfo.members);
       const memberPromises: Promise<GroupMember>[] = [];
+      let formattedMembers: FormattedMember[] = [];
 
       for (let i = 0; i < memberCount; i++) {
         memberPromises.push(
@@ -618,7 +651,7 @@ export function useGroupDetails(groupId: string) {
 
         const creatorAddr = ensureHexAddress(String(groupInfo.creator)).toLowerCase();
 
-        const formattedMembers = memberInfos.map((member, index) => {
+        formattedMembers = memberInfos.map((member, index) => {
           const memberAddrKey = ensureHexAddress(String(member.user)).toLowerCase();
           const isCreator = memberAddrKey === creatorAddr;
           const profile = profiles[memberAddrKey];
@@ -690,20 +723,42 @@ export function useGroupDetails(groupId: string) {
           setGroupDetails((prev) => (prev ? { ...prev, isUserMember } : null));
         }
       }
+
+      // Cache the results after successful fetch
+      if (groupDetails && members.length >= 0) {
+        groupDetailsCache.set(cacheKey, {
+          groupDetails: formattedGroup,
+          members: formattedMembers || [],
+          timestamp: Date.now()
+        });
+        console.log(`✅ Cached group ${groupId} details`);
+      }
     } catch (error: any) {
       console.error("Error fetching group details:", error);
       setError(error.message || "Failed to fetch group details");
     } finally {
       setLoading(false);
+      setInitialLoad(false);
     }
   };
 
-  // Fetch group details on mount and when dependencies change
+  // Fetch group details immediately when contract and groupId are available
   useEffect(() => {
-    if (contract && groupId && isConnected) {
+    if (contract && groupId) {
       fetchGroupDetails();
     }
-  }, [contract, groupId, isConnected, address]);
+  }, [contract, groupId]);
+
+  // Additional effect for when user connects (for membership status)
+  useEffect(() => {
+    if (contract && groupId && isConnected && address) {
+      const cacheKey = `group_${groupId}_${CONTRACT_ADDRESS}`;
+      const cachedData = getCachedGroupDetails(cacheKey);
+      if (!cachedData) {
+        fetchGroupDetails();
+      }
+    }
+  }, [isConnected, address]);
 
   return {
     groupDetails,
@@ -711,6 +766,9 @@ export function useGroupDetails(groupId: string) {
     loading,
     error,
     refetch: fetchGroupDetails,
+    forceRefresh: () => fetchGroupDetails(false),
     isConnected,
+    initialLoad,
+    isFromCache: !loading && !initialLoad && groupDetails !== null,
   };
 }
