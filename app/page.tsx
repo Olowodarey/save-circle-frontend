@@ -2,12 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Users,
@@ -152,92 +146,72 @@ export default function HomePage() {
             Everything you need to participate in decentralized savings circles
           </p>
         </div>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <Users className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Public & Private groups</h3>
+              <p className="text-sm text-gray-600">Create invitation-only circles or join public ones gated by reputation.</p>
+            </div>
+          </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-              <CardTitle>Public & Private Groups</CardTitle>
-              <CardDescription>
-                Create private invitation-only circles or join public groups
-                based on reputation criteria
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Reputation system</h3>
+              <p className="text-sm text-gray-600">Build onchain trust through consistent saving and payouts.</p>
+            </div>
+          </div>
 
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="w-6 h-6 text-green-600" />
-              </div>
-              <CardTitle>Reputation System</CardTitle>
-              <CardDescription>
-                Build your onchain reputation through successful participation
-                and unlock better opportunities
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+              <Lock className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Trust-based lock</h3>
+              <p className="text-sm text-gray-600">Lock more to move earlier in the payout order.</p>
+            </div>
+          </div>
 
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <Lock className="w-6 h-6 text-purple-600" />
-              </div>
-              <CardTitle>Trust-Based Lock System</CardTitle>
-              <CardDescription>
-                Lock additional tokens to build trust and guarantee early
-                withdrawal rights. Higher lock amounts demonstrate commitment
-                and unlock premium benefits.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+              <Shield className="w-5 h-5 text-orange-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Secure by contract</h3>
+              <p className="text-sm text-gray-600">Audited smart contracts on Starknet; transparent operations.</p>
+            </div>
+          </div>
 
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-orange-600" />
-              </div>
-              <CardTitle>Smart Contract Security</CardTitle>
-              <CardDescription>
-                All savings are secured by audited smart contracts on Starknet
-                with transparent operations
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+              <Globe className="w-5 h-5 text-red-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Global access</h3>
+              <p className="text-sm text-gray-600">Join from anywhere with a Starknet wallet.</p>
+            </div>
+          </div>
 
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
-                <Globe className="w-6 h-6 text-red-600" />
-              </div>
-              <CardTitle>Global Access</CardTitle>
-              <CardDescription>
-                Participate in savings circles from anywhere in the world with
-                just a Starknet wallet
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-                <Coins className="w-6 h-6 text-indigo-600" />
-              </div>
-              <CardTitle>Multi-Token Support</CardTitle>
-              <CardDescription>
-                Accept any Starknet token (ETH, STRK, USDT, etc.) with automatic
-                conversion to USDC through integrated DEX protocols for seamless
-                savings.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+              <Coins className="w-5 h-5 text-indigo-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Use any token</h3>
+              <p className="text-sm text-gray-600">Pay with ETH, STRK, USDT—auto‑swapped to USDC for saving.</p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* How it Works */}
-      <section id="how-it-works" className="bg-white py-16">
+      <section id="how-it-works" className=" py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -303,37 +277,30 @@ export default function HomePage() {
             Join in the way that fits your capital today.
           </p>
         </div>
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Lock className="w-6 h-6 text-blue-600" />
-              </div>
-              <CardTitle>Progressive Lock</CardTitle>
-              <CardDescription>
-                Save gradually—your lock amount boosts your payout priority.
-                More trust, earlier turns.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-gray-600" />
-              </div>
-              <CardTitle>No Lock</CardTitle>
-              <CardDescription>
-                Join without locking liquidity. You’ll still save progressively;
-                payouts follow after locked members.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+        <div className="grid md:grid-cols-2 gap-6 text-left">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <Lock className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Progressive Lock</h3>
+              <p className="text-sm text-gray-600">Save gradually—your lock boosts payout priority. More trust, earlier turns.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+              <Users className="w-5 h-5 text-gray-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">No Lock</h3>
+              <p className="text-sm text-gray-600">Join without locking liquidity. You’ll still save progressively; payouts come after locked members.</p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Why this matters */}
-      <section className="bg-white py-16">
+      <section className=" py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -344,35 +311,33 @@ export default function HomePage() {
               momentum together.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-xl shadow-md p-6 border">
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-yellow-600" />
+          <div className="grid md:grid-cols-3 gap-6 text-left">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                <Zap className="w-5 h-5 text-yellow-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Day-to-day traders</h3>
-              <p className="text-gray-600">
-                Build a trading stack—receive a lump sum early, then keep
-                contributing over time.
-              </p>
+              <div>
+                <h3 className="font-semibold text-gray-900">Day-to-day traders</h3>
+                <p className="text-sm text-gray-600">Build a trading stack—receive a lump sum early, then keep contributing over time.</p>
+              </div>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 border">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Calendar className="w-6 h-6 text-blue-600" />
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-blue-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Students</h3>
-              <p className="text-gray-600">
-                Practice disciplined saving without needing large capital
-                upfront.
-              </p>
+              <div>
+                <h3 className="font-semibold text-gray-900">Students</h3>
+                <p className="text-sm text-gray-600">Practice disciplined saving without needing large capital upfront.</p>
+              </div>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 border">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <PiggyBank className="w-6 h-6 text-green-600" />
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <PiggyBank className="w-5 h-5 text-green-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Everyday savers</h3>
-              <p className="text-gray-600">
-                Join with any budget—consistency matters more than size.
-              </p>
+              <div>
+                <h3 className="font-semibold text-gray-900">Everyday savers</h3>
+                <p className="text-sm text-gray-600">Join with any budget—consistency matters more than size.</p>
+              </div>
             </div>
           </div>
         </div>

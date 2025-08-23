@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -9,7 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star } from "lucide-react";
+import { Star, Clipboard, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   FormattedGroupDetails,
   FormattedMember,
@@ -24,6 +26,23 @@ export default function GroupMembersList({
   groupDetails,
   members,
 }: GroupMembersListProps) {
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const formatAddress = (addr: string) => {
+    if (!addr) return "";
+    const s = String(addr);
+    return `${s.slice(0, 6)}...${s.slice(-4)}`;
+  };
+
+  const handleCopy = async (addr: string) => {
+    try {
+      await navigator.clipboard.writeText(addr);
+      setCopied(addr);
+      setTimeout(() => setCopied(null), 1500);
+    } catch (e) {
+      console.error("Failed to copy address:", e);
+    }
+  };
   return (
     <Card>
       <CardHeader>
@@ -60,9 +79,27 @@ export default function GroupMembersList({
                       </Badge>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 font-mono">
-                    {member.address}
-                  </p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <p
+                      className="text-sm font-mono text-gray-800 truncate"
+                      title={member.address}
+                    >
+                      {formatAddress(member.address)}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => handleCopy(member.address)}
+                      aria-label="Copy address"
+                    >
+                      {copied === member.address ? (
+                        <Check className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <Clipboard className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                   <div className="flex items-center gap-2 mt-1">
                     <Star className="w-3 h-3 text-yellow-500" />
                     <span className="text-xs text-gray-600">

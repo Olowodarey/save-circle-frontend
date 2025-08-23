@@ -486,19 +486,71 @@ export function useGroupDetails(groupId: string) {
       cycleUnit: groupInfo.cycle_unit,
       cycleDuration: groupInfo.cycle_duration,
       lockType: groupInfo.lock_type,
-      requiresLock: groupInfo.requires_lock,
+      requiresLock: groupInfo.requires_lock,  
       startTime: new Date(Number(groupInfo.start_time) * 1000).toISOString(),
     };
+  };
+
+  // Address helpers and on-chain profile resolution
+  const ensureHexAddress = (addr: string): string => {
+    const s = String(addr).trim();
+    if (!s) return s;
+    if (s.startsWith("0x")) return s;
+    if (/^[0-9a-fA-F]+$/.test(s)) return `0x${s}`;
+    try {
+      const hex = BigInt(s).toString(16);
+      return `0x${hex}`;
+    } catch {
+      return s;
+    }
+  };
+
+  const resolveProfiles = async (
+    addrs: string[]
+  ): Promise<Record<string, { name?: string; avatar?: string }>> => {
+    const map: Record<string, { name?: string; avatar?: string }> = {};
+    if (!contract) return map;
+
+    const unique = Array.from(
+      new Set(addrs.map((a) => ensureHexAddress(String(a)).toLowerCase()))
+    );
+
+    await Promise.all(
+      unique.map(async (a) => {
+        try {
+          const res = (await contract.call("get_user_profile", [a])) as any;
+          const nameVal = res?.name;
+          const avatarVal = res?.avatar;
+          const nameStr =
+            typeof nameVal === "string" && nameVal.trim().length > 0
+              ? nameVal
+              : undefined;
+          const avatarStr =
+            typeof avatarVal === "string" && avatarVal.trim().length > 0
+              ? avatarVal
+              : undefined;
+          if (nameStr || avatarStr) {
+            map[a] = { name: nameStr, avatar: avatarStr };
+          }
+        } catch (e) {
+          console.log("Profile resolve error for", a, e);
+        }
+      })
+    );
+
+    return map;
   };
 
   // Helper function to format member data
   const formatMember = (
     member: GroupMember,
     index: number,
-    isCreator: boolean = false
+    isCreator: boolean = false,
+    profile?: { name?: string; avatar?: string }
   ): FormattedMember => {
     const formatAmount = (amount: any) => {
-      const amountInTokens = Number(amount) / Math.pow(10, 18);
+      // USDC uses 6 decimals on Starknet
+      const amountInTokens = Number(amount) / Math.pow(10, 6);
       return `${amountInTokens} USDC`;
     };
 
@@ -506,24 +558,24 @@ export function useGroupDetails(groupId: string) {
     const userAddress = String(member.user);
     
     // Helper function to format member name with better profile display
-    const formatMemberName = (address: string, isCreator: boolean) => {
+    const formatMemberName = (
+      address: string,
+      isCreatorFlag: boolean,
+      pf?: { name?: string }
+    ) => {
+      if (pf && pf.name && String(pf.name).trim().length > 0) {
+        return String(pf.name);
+      }
       if (!address) return "Unknown User";
       const addr = String(address);
       const shortAddr = `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-      
-      if (isCreator) {
-        return `${shortAddr} (Creator)`;
-      }
-      
-      // In a real app, you would fetch the user's profile name from a user registry contract
-      // For now, we'll show a formatted address with position info
-      return shortAddr;
+      return isCreatorFlag ? `${shortAddr} (Creator)` : shortAddr;
     };
 
     return {
       address: userAddress,
-      name: formatMemberName(userAddress, isCreator),
-      avatar: "/placeholder.svg?height=40&width=40",
+      name: formatMemberName(userAddress, isCreator, profile),
+      avatar: profile?.avatar || "/placeholder.svg?height=40&width=40",
       reputation: Math.floor(Math.random() * 30) + 70, // Mock reputation 70-100
       joinedAt: new Date(Number(member.joined_at) * 1000)
         .toISOString()
@@ -589,11 +641,17 @@ export function useGroupDetails(groupId: string) {
       if (memberPromises.length > 0) {
         const memberInfos = await Promise.all(memberPromises);
 
+        // Resolve on-chain profiles for member names/avatars
+        const memberAddresses = memberInfos.map((m) => String(m.user));
+        const profiles = await resolveProfiles(memberAddresses);
+
+        const creatorAddr = ensureHexAddress(String(groupInfo.creator)).toLowerCase();
+
         const formattedMembers = memberInfos.map((member, index) => {
-          const isCreator =
-            String(member.user).toLowerCase() ===
-            String(groupInfo.creator).toLowerCase();
-          return formatMember(member, index, isCreator);
+          const memberAddrKey = ensureHexAddress(String(member.user)).toLowerCase();
+          const isCreator = memberAddrKey === creatorAddr;
+          const profile = profiles[memberAddrKey];
+          return formatMember(member, index, isCreator, profile);
         });
 
         setMembers(formattedMembers);
