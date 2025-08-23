@@ -142,9 +142,10 @@ export default function GroupDetailsPage() {
           <TabsList>
             <TabsTrigger value="members">Members ({groupDetails.members})</TabsTrigger>
             <TabsTrigger value="contribute">Contribute</TabsTrigger>
-            <TabsTrigger value="management">Management</TabsTrigger>
+          
             <TabsTrigger value="lock">Lock Liquidity</TabsTrigger>
-            <TabsTrigger value="history">Payment History</TabsTrigger>
+            <TabsTrigger value="management">Group Actions</TabsTrigger>
+            {/* <TabsTrigger value="history">Payment History</TabsTrigger> */}
             <TabsTrigger value="rules">Rules & Terms</TabsTrigger>
           </TabsList>
 

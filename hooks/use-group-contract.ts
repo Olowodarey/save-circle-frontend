@@ -92,33 +92,6 @@ export function useGroupContract() {
     
     let result;
     switch (frequency.toLowerCase()) {
-      // Minutes
-      case "minutely":
-      case "every minute":
-        result = { unit: TimeUnit.Minutes, duration: 1 };
-        break;
-      case "every 5 minutes":
-        result = { unit: TimeUnit.Minutes, duration: 5 };
-        break;
-      case "every 15 minutes":
-        result = { unit: TimeUnit.Minutes, duration: 15 };
-        break;
-      case "every 30 minutes":
-        result = { unit: TimeUnit.Minutes, duration: 30 };
-        break;
-      
-      // Hours
-      case "hourly":
-      case "every hour":
-        result = { unit: TimeUnit.Hours, duration: 1 };
-        break;
-      case "every 6 hours":
-        result = { unit: TimeUnit.Hours, duration: 6 };
-        break;
-      case "every 12 hours":
-        result = { unit: TimeUnit.Hours, duration: 12 };
-        break;
-      
       // Days
       case "daily":
       case "every day":

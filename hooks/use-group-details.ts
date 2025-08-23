@@ -139,19 +139,13 @@ export function useGroupDetails(groupId: string) {
         console.log("Case 3: Numeric value", unitNum);
         switch (unitNum) {
           case 0:
-            unitKey = "Minutes";  // Contract: 0 = Minutes
+            unitKey = "Days";     // Contract: 0 = Days
             break;
           case 1:
-            unitKey = "Hours";    // Contract: 1 = Hours
+            unitKey = "Weeks";    // Contract: 1 = Weeks
             break;
           case 2:
-            unitKey = "Days";     // Contract: 2 = Days
-            break;
-          case 3:
-            unitKey = "Weeks";    // Contract: 3 = Weeks
-            break;
-          case 4:
-            unitKey = "Months";   // Contract: 4 = Months
+            unitKey = "Months";   // Contract: 2 = Months
             break;
           default:
             console.log("Unknown numeric unit:", unitNum);
@@ -162,30 +156,7 @@ export function useGroupDetails(groupId: string) {
       console.log("Final unit key:", unitKey);
       
       // Convert to readable frequency
-      if (unitKey === "Minutes") {
-        if (durationNum < 60) {
-          return `Every ${durationNum} minutes`;
-        } else if (durationNum === 60) {
-          return "Hourly";
-        } else if (durationNum < 1440) {
-          const hours = Math.floor(durationNum / 60);
-          return hours === 1 ? "Hourly" : `Every ${hours} hours`;
-        } else {
-          const days = Math.floor(durationNum / 1440);
-          return days === 1 ? "Daily" : `Every ${days} days`;
-        }
-      } else if (unitKey === "Hours") {
-        if (durationNum === 1) {
-          return "Hourly";
-        } else if (durationNum === 24) {
-          return "Daily";
-        } else if (durationNum < 24) {
-          return `Every ${durationNum} hours`;
-        } else {
-          const days = Math.floor(durationNum / 24);
-          return days === 1 ? "Daily" : `Every ${days} days`;
-        }
-      } else if (unitKey === "Days") {
+      if (unitKey === "Days") {
         return durationNum === 1 ? "Daily" : `Every ${durationNum} days`;
       } else if (unitKey === "Weeks") {
         return durationNum === 1

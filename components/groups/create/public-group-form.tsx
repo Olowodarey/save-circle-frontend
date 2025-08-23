@@ -126,11 +126,8 @@ export default function PublicGroupForm({
                 <SelectValue placeholder="Select frequency" />
               </SelectTrigger>
               <SelectContent>
-              <SelectItem value="minutely">Minutely</SelectItem>
-              <SelectItem value="hourly">Hourly</SelectItem>
-              <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="daily">Daily</SelectItem>
                 <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="biweekly">Bi-weekly</SelectItem>
                 <SelectItem value="monthly">Monthly</SelectItem>
               </SelectContent>
             </Select>

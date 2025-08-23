@@ -46,7 +46,7 @@ const USDT_TOKEN_ADDRESS =
 
 // Liquidity lock contract address
 const LIQUIDITY_LOCK_CONTRACT =
-  "0x037c49f99be664a2d5ede866a619e7ff629adf7a021ad6ba99f9ba94bbcd5923";
+  "0x02663bc68c5b06956db13604e982cf1e90879ffd0726195300fcf905262d2c96";
 
 // Token options for dropdown - STRK first as default
 const TOKEN_OPTIONS = [
