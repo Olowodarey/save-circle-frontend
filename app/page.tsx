@@ -40,7 +40,7 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Save Together,{" "}
+            Save Together{" "}
             <span className="text-blue-600">Thrive Together</span>
           </h1>
 
@@ -83,7 +83,6 @@ export default function HomePage() {
             </Button>
           </div>
 
-          {/* Stats */}
         </div>
       </section>
 
