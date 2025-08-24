@@ -42,6 +42,10 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
                 </Link>
                 
                 <nav className="hidden md:flex items-center gap-6">
+
+                <Link href="/#" className="text-gray-600 hover:text-gray-900">
+                        Home
+                    </Link>
                   
                     <ProtectedLink setShowWalletModal={setShowWalletModal} href="/groups" className="text-gray-600 hover:text-gray-900">
                         Groups
@@ -52,6 +56,10 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
                     <ProtectedLink setShowWalletModal={setShowWalletModal} href="/reputation" className="text-gray-600 hover:text-gray-900">
                         Reputation
                     </ProtectedLink>
+                    <Link href="/Faq" className="text-gray-600 hover:text-gray-900">
+                        FAQ
+                    </Link>
+
                 </nav>
                 
                 <div className="flex items-center gap-3">
@@ -73,9 +81,7 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
                             </Button>
                         </div>
                     )}
-                    {/* <Button asChild>
-                        <Link href="/dashboard">Launch App</Link>
-                    </Button> */}
+                   
                 </div>
             </div>
         </header>
