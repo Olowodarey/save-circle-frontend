@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useAccount, useReadContract } from "@starknet-react/core";
 import { MY_CONTRACT_ABI } from "@/constants/abi";
 
-const CONTRACT_ADDRESS = "0x02663bc68c5b06956db13604e982cf1e90879ffd0726195300fcf905262d2c96"; 
+const CONTRACT_ADDRESS = "0x038fea4f9ab53f1ae2f10a2c0f68d9efe1ac913c6e6705514b0d07d3409f2642"; 
 
 // Helper function to validate and format Starknet address
 const formatStarknetAddress = (address: string | undefined): `0x${string}` | undefined => {

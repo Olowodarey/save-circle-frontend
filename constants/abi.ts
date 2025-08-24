@@ -1,5 +1,4 @@
-export const MY_CONTRACT_ABI = [
-  
+export const  MY_CONTRACT_ABI = [
     {
       "name": "pause",
       "type": "function",
@@ -1852,4 +1851,5 @@ export const MY_CONTRACT_ABI = [
         }
       ]
     }
-  ] as const;
+  ] as const
+    
