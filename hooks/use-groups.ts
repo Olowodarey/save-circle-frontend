@@ -237,11 +237,12 @@ export function useGroups() {
       console.log("=== VISIBILITY DEBUG ===");
       console.log("Raw visibility:", visibility);
       console.log("Visibility type:", typeof visibility);
+      console.log("Visibility JSON:", JSON.stringify(visibility, null, 2));
 
       // Handle different enum formats from Starknet
       let visibilityKey = null;
 
-      // Case 1: Object with variant property
+      // Case 1: Object with variant property (CairoCustomEnum format)
       if (
         typeof visibility === "object" &&
         visibility !== null &&
@@ -252,7 +253,16 @@ export function useGroups() {
           typeof visibility.variant === "object" &&
           visibility.variant !== null
         ) {
-          visibilityKey = Object.keys(visibility.variant)[0];
+          const variantKeys = Object.keys(visibility.variant);
+          console.log("Variant keys:", variantKeys);
+          
+          // Look for active variant or first key
+          visibilityKey = variantKeys.find(key => 
+            visibility.variant[key] === true || 
+            visibility.variant[key] === 1 ||
+            (typeof visibility.variant[key] === 'object' && visibility.variant[key] !== null)
+          ) || variantKeys[0];
+          
           console.log("Extracted variant key:", visibilityKey);
         }
       }
@@ -263,13 +273,26 @@ export function useGroups() {
         !visibility.variant
       ) {
         console.log("Case 2: Object with direct keys", Object.keys(visibility));
-        visibilityKey = Object.keys(visibility)[0];
+        const directKeys = Object.keys(visibility);
+        
+        // Look for active key or first key
+        visibilityKey = directKeys.find(key => 
+          visibility[key] === true || 
+          visibility[key] === 1 ||
+          (typeof visibility[key] === 'object' && visibility[key] !== null)
+        ) || directKeys[0];
+        
         console.log("Extracted direct key:", visibilityKey);
       }
-      // Case 3: Numeric value
+      // Case 3: String value (direct enum name)
+      else if (typeof visibility === "string") {
+        console.log("Case 3: String value", visibility);
+        visibilityKey = visibility;
+      }
+      // Case 4: Numeric value
       else {
         const visNum = Number(visibility);
-        console.log("Case 3: Numeric value", visNum);
+        console.log("Case 4: Numeric value", visNum);
         switch (visNum) {
           case 0:
             visibilityKey = "Public";
@@ -285,16 +308,20 @@ export function useGroups() {
 
       console.log("Final visibility key:", visibilityKey);
 
-      // Convert to lowercase for consistency
+      // Convert to lowercase for consistency and validate
       if (visibilityKey) {
-        return visibilityKey.toLowerCase();
+        const normalizedKey = visibilityKey.toLowerCase();
+        if (normalizedKey === "public" || normalizedKey === "private") {
+          return normalizedKey;
+        }
       }
 
-      console.log("No matching visibility key, defaulting to public");
+      console.log("No valid visibility key found, defaulting to public");
       return "public"; // Default fallback
     };
 
     const visibilityStr = getVisibilityString(groupInfo.visibility);
+    console.log(`🎯 Final visibilityStr for group ${groupId}:`, visibilityStr);
     const creatorAddress = String(groupInfo.creator);
 
     return {
@@ -403,7 +430,16 @@ export function useGroups() {
           }
 
           try {
+            console.log(`🔍 Raw group data for group ${id}:`, {
+              group_id: groupInfo.group_id,
+              group_name: groupInfo.group_name,
+              visibility: groupInfo.visibility,
+              visibility_type: typeof groupInfo.visibility,
+              all_fields: Object.keys(groupInfo)
+            });
+            
             const formattedGroup = formatGroup(groupInfo, id.toString());
+            console.log(`✅ Formatted group ${id} visibility:`, formattedGroup.visibility);
             validGroups.push(formattedGroup);
           } catch (formatError) {
             console.log(`Error formatting group ${id}:`, formatError);

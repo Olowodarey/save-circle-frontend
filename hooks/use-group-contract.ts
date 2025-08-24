@@ -268,9 +268,9 @@ export function useGroupContract() {
       const { unit, duration } = convertFrequencyToTimeUnit(params.frequency);
       const reputationScore = convertReputationToNumber(params.minReputation);
 
-      // Convert contribution amount to wei
+      // Convert contribution amount to USDC units (6 decimals)
       const contributionAmountWei = BigInt(
-        Math.floor(parseFloat(params.contributionAmount) * Math.pow(10, 18))
+        Math.floor(parseFloat(params.contributionAmount) * Math.pow(10, 6))
       );
 
       const lockType = params.lockEnabled

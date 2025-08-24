@@ -244,13 +244,6 @@ export default function GroupsPage() {
                             {group.name}
                           </CardTitle>
                           <div className="flex items-center gap-2">
-                            <Badge
-                              variant="outline"
-                              className="text-green-600 border-green-200"
-                            >
-                              <Globe className="w-3 h-3 mr-1" />
-                              Public
-                            </Badge>
                             {group.locked && (
                               <Badge
                                 variant="outline"

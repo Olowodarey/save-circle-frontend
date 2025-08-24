@@ -34,11 +34,11 @@ export default function TokenSupportInfo({ supportedTokens }: TokenSupportInfoPr
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start gap-2">
                 <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                <span>Accept contributions in any supported Starknet token</span>
+                <span>Accept contributions in USDC </span>
               </li>
               <li className="flex items-start gap-2">
                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <span>Automatic conversion to USDC via integrated DEX protocols</span>
+                <span>Automatic conversion to USDC via integrated AutoSwapper protocol</span>
               </li>
               <li className="flex items-start gap-2">
                 <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
