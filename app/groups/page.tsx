@@ -28,9 +28,9 @@ import {
   Star,
   Clock,
   Plus,
-  LogOut,
   Loader2,
   RefreshCw,
+  AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
 import WalletConnectModal from "@/components/wallet/wallet-connect-modal";
@@ -48,6 +48,7 @@ export default function GroupsPage() {
   // Use the groups hook to fetch contract data with optimizations
   const { 
     publicGroups, 
+    userGroups, 
     userInvites, 
     loading, 
     error, 
@@ -112,14 +113,11 @@ export default function GroupsPage() {
           <TabsList className="flex justify-between gap-4">
            <div>
            <TabsTrigger value="public">Public Groups</TabsTrigger>
-            <TabsTrigger value="invites">
-              My Invites
-              {userInvites.length > 0 && (
-                <Badge className="ml-2 bg-red-100 text-red-800 hover:bg-red-100">
-                  {userInvites.length}
-                </Badge>
-              )}
+           <TabsTrigger value="mygroups">
+              private groups 
+             
             </TabsTrigger>
+          
            </div>
 
               <div>
@@ -244,6 +242,13 @@ export default function GroupsPage() {
                             {group.name}
                           </CardTitle>
                           <div className="flex items-center gap-2">
+                            <Badge
+                              variant="outline"
+                              className="text-green-600 border-green-200"
+                            >
+                              <Globe className="w-3 h-3 mr-1" />
+                              Public
+                            </Badge>
                             {group.locked && (
                               <Badge
                                 variant="outline"
@@ -318,6 +323,185 @@ export default function GroupsPage() {
                   </CardContent>
                 </Card>
               ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="mygroups" className="space-y-6">
+            {/* Search and Filter for My Groups */}
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Search my groups..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-green-600">● {userGroups.length} groups found</span>
+                <Button onClick={() => refetch()} variant="outline" size="sm">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Refresh
+                </Button>
+              </div>
+            </div>
+
+            {/* Loading State */}
+            {loading && initialLoad && (
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <Card key={i} className="animate-pulse">
+                    <CardHeader>
+                      <div className="h-6 bg-gray-200 rounded w-1/3 mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                        <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Failed to load groups
+                  </h3>
+                  <p className="text-gray-600 mb-4">{error}</p>
+                  <Button onClick={() => refetch()} variant="outline">
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Try Again
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Empty State */}
+            {!loading && !error && userGroups.length === 0 && (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No groups found
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    You haven't created or joined any private groups yet.
+                  </p>
+                  <Button asChild>
+                    <Link href="/groups/create">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Group
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* My Groups Grid */}
+            {!loading && !error && userGroups.length > 0 && (
+              <div className="grid gap-6">
+                {userGroups.filter((group) => {
+                  const matchesSearch =
+                    group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    group.description.toLowerCase().includes(searchTerm.toLowerCase());
+                  return matchesSearch;
+                }).map((group) => (
+                  <Card
+                    key={group.id}
+                    className="hover:shadow-lg transition-shadow"
+                  >
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <CardTitle className="text-xl">
+                              {group.name}
+                            </CardTitle>
+                            <div className="flex items-center gap-2">
+                              <Badge
+                                variant="outline"
+                                className="text-purple-600 border-purple-200"
+                              >
+                                <Lock className="w-3 h-3 mr-1" />
+                                Private
+                              </Badge>
+                              {group.locked && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-orange-600 border-orange-200"
+                                >
+                                  <Lock className="w-3 h-3 mr-1" />
+                                  Locked
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <CardDescription className="text-base mb-3">
+                            {group.description}
+                          </CardDescription>
+                          <div className="flex flex-wrap gap-2">
+                            {group.tags.map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                          <div className="text-sm text-gray-500 mb-1">Members</div>
+                          <div className="font-semibold">
+                            {group.members}/{group.maxMembers}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-500 mb-1">Contribution</div>
+                          <div className="font-semibold">{group.contribution}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-500 mb-1">Frequency</div>
+                          <div className="font-semibold">{group.frequency}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-500 mb-1">Min. Reputation</div>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 text-yellow-500" />
+                            <span className="font-semibold">
+                              {group.minReputation}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-gray-500">
+                          Created by {group.creator}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/groups/${group.id}`}>View Details</Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             )}
           </TabsContent>

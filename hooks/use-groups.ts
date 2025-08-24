@@ -493,6 +493,17 @@ export function useGroups() {
 
   // Get public groups only
   const publicGroups = groups.filter((group) => group.visibility === "public");
+  
+  // Get private groups (for user's own groups or groups they're members of)
+  const privateGroups = groups.filter((group) => group.visibility === "private");
+  
+  // Get user's groups (both public and private groups they created or are members of)
+  const userGroups = groups.filter((group) => {
+    if (!address) return false;
+    // For now, show all private groups to the user
+    // In a full implementation, this would check membership from contract
+    return group.visibility === "private" || group.creator.toLowerCase().includes(address.toLowerCase().slice(-4));
+  });
 
   // Get user's group invitations (this would need additional contract functions)
   const userInvites: any[] = []; // Placeholder for now
@@ -500,6 +511,8 @@ export function useGroups() {
   return {
     groups,
     publicGroups,
+    privateGroups,
+    userGroups,
     userInvites,
     loading,
     error,
