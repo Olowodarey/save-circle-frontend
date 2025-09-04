@@ -179,10 +179,14 @@ export function SimpleUsdcContribution({
   const userBalance = formatBalance(balance);
 
   // Convert contribution amount to the same format as userBalance for proper comparison
-  const requiredAmount =
+  // Include 1% pool fee in the required amount
+  const baseAmount =
     typeof groupDetails.contributionAmount === "bigint"
       ? Number(groupDetails.contributionAmount) / 1e6
       : Number(groupDetails.contributionAmount) / 1e6;
+  
+  const poolFee = baseAmount * 0.01; // 1% fee
+  const requiredAmount = baseAmount + poolFee; // Total amount including fee
 
   const hasInsufficientBalance = requiredAmount > parseFloat(userBalance);
 
@@ -290,18 +294,36 @@ export function SimpleUsdcContribution({
               <div className="flex items-center justify-between">
                 <div>
                   <Label className="text-sm font-medium">
-                    Required Contribution
+                    Total Contribution (includes 1% pool fee)
                   </Label>
                   <p className="text-2xl font-bold text-gray-900">
                     {(() => {
-                      // Convert bigint USDC (6 decimals) to human-readable format
-                      const amount =
+                      // Convert bigint USDC (6 decimals) to human-readable format and add 1% fee
+                      const baseAmount =
                         typeof groupDetails.contributionAmount === "bigint"
                           ? Number(groupDetails.contributionAmount) / 1e6
                           : Number(groupDetails.contributionAmount) / 1e6;
-                      return amount.toFixed(2);
+                      const poolFee = baseAmount * 0.01; // 1% fee
+                      const totalAmount = baseAmount + poolFee;
+                      return totalAmount.toFixed(3); // Show 3 decimals for precision
                     })()}{" "}
                     USDC
+                  </p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Base: {(() => {
+                      const baseAmount =
+                        typeof groupDetails.contributionAmount === "bigint"
+                          ? Number(groupDetails.contributionAmount) / 1e6
+                          : Number(groupDetails.contributionAmount) / 1e6;
+                      return baseAmount.toFixed(2);
+                    })()} USDC + Pool Fee: {(() => {
+                      const baseAmount =
+                        typeof groupDetails.contributionAmount === "bigint"
+                          ? Number(groupDetails.contributionAmount) / 1e6
+                          : Number(groupDetails.contributionAmount) / 1e6;
+                      const poolFee = baseAmount * 0.01;
+                      return poolFee.toFixed(3);
+                    })()} USDC
                   </p>
                 </div>
                 <DollarSign className="h-8 w-8 text-gray-400" />
@@ -367,11 +389,13 @@ export function SimpleUsdcContribution({
                   <DollarSign className="h-4 w-4 mr-2" />
                   Contribute{" "}
                   {(() => {
-                    const amount =
+                    const baseAmount =
                       typeof groupDetails.contributionAmount === "bigint"
                         ? Number(groupDetails.contributionAmount) / 1e6
                         : Number(groupDetails.contributionAmount) / 1e6;
-                    return amount.toFixed(2);
+                    const poolFee = baseAmount * 0.01; // 1% fee
+                    const totalAmount = baseAmount + poolFee;
+                    return totalAmount.toFixed(3); // Show 3 decimals for precision
                   })()}{" "}
                   USDC
                 </>
