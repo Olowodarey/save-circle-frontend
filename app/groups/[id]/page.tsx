@@ -30,6 +30,7 @@ import GroupMembersList from "@/components/groups/group-members-list"
 import GroupPaymentHistory from "@/components/groups/group-payment-history"
 import GroupRulesTerms from "@/components/groups/group-rules-terms"
 import GroupAnalytics from "@/components/groups/group-analytics"
+import PenaltyPayoutManagement from "@/components/groups/penalty-payout-management"
 
 export default function GroupDetailsPage() {
   const params = useParams()
@@ -152,6 +153,7 @@ export default function GroupDetailsPage() {
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="lock">Lock Liquidity</TabsTrigger>
             <TabsTrigger value="management">Group Actions</TabsTrigger>
+            <TabsTrigger value="penalties">Penalties & Payouts</TabsTrigger>
             {/* <TabsTrigger value="history">Payment History</TabsTrigger> */}
             <TabsTrigger value="rules">Rules & Terms</TabsTrigger>
           </TabsList>
@@ -196,6 +198,13 @@ export default function GroupDetailsPage() {
                 onSuccess={refetch}
               />
             </div>
+          </TabsContent>
+
+          <TabsContent value="penalties" className="space-y-4">
+            <PenaltyPayoutManagement 
+              groupId={groupId} 
+              groupDetails={groupDetails} 
+            />
           </TabsContent>
 
           <TabsContent value="lock" className="space-y-4">

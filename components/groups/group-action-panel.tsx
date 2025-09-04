@@ -13,8 +13,6 @@ import { CheckCircle, Loader2, RefreshCw } from "lucide-react";
 import { FormattedGroupDetails } from "@/hooks/use-group-details";
 import GroupActivationButton from "./group-activation-button";
 import JoinGroupButton from "./joingroupbutton";
-import DeadlinePenaltyManager from "./deadline-penalty-manager";
-import PayoutManager from "./payout-manager";
 
 interface GroupActionPanelProps {
   groupDetails: FormattedGroupDetails;
@@ -65,45 +63,38 @@ export default function GroupActionPanel({
         </CardContent>
       </Card>
 
-      {/* Join Group Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Join This Group</CardTitle>
-          <CardDescription>
-            {groupDetails.userCanJoin
-              ? "You meet all requirements to join this group"
-              : "You don't meet the requirements to join this group"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <JoinGroupButton
-            groupDetails={groupDetails}
-            onJoinSuccess={onRefetch}
-          />
+      {/* Join Group Card - Only show if user is not a member */}
+      {!groupDetails.isUserMember && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Join This Group</CardTitle>
+            <CardDescription>
+              {groupDetails.userCanJoin
+                ? "You meet all requirements to join this group"
+                : "You don't meet the requirements to join this group"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <JoinGroupButton
+              groupDetails={groupDetails}
+              onJoinSuccess={onRefetch}
+            />
 
-          <div className="pt-4 border-t space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Created by:</span>
-              <span className="font-medium">{groupDetails.creator.name}</span>
+            <div className="pt-4 border-t space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Created by:</span>
+                <span className="font-medium">{groupDetails.creator.name}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Created:</span>
+                <span className="font-medium">
+                  {new Date(groupDetails.createdAt).toLocaleDateString()}
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Created:</span>
-              <span className="font-medium">
-                {new Date(groupDetails.createdAt).toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Deadline & Penalty Management */}
-      <DeadlinePenaltyManager groupId={groupDetails.id.toString()} />
-
-      {/* Payout Management */}
-      <PayoutManager
-        groupId={groupDetails.id.toString()}
-        groupDetails={groupDetails}
-      />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Group Information Card */}
       <Card>
