@@ -27,6 +27,7 @@ import {
 import { Call } from "starknet";
 import { FormattedGroupDetails } from "@/hooks/use-group-details";
 import { CONTRACT_ADDRESS } from "@/constants";
+import { MY_CONTRACT_ABI } from "@/constants/abi";
 
 // USDC token address on Starknet
 const USDC_TOKEN_ADDRESS =
@@ -74,11 +75,28 @@ export function SimpleUsdcContribution({
     enabled: Boolean(address),
   });
 
+  // Get insurance pool balance for the group
+  const { data: insurancePoolBalance } = useReadContract({
+    abi: MY_CONTRACT_ABI,
+    functionName: "get_insurance_pool_balance",
+    address: CONTRACT_ADDRESS,
+    args: [BigInt(groupDetails.id)],
+    enabled: Boolean(groupDetails.id),
+  });
+
   const formatBalance = (balance: any) => {
     if (!balance) return "0";
     const balanceNum = Number(balance) / 1e6; // USDC has 6 decimals
     return balanceNum.toFixed(2);
   };
+
+  const formatInsurancePoolBalance = (balance: any) => {
+    if (!balance) return "0.00";
+    const balanceNum = Number(balance) / 1e6; // USDC has 6 decimals
+    return balanceNum.toFixed(2);
+  };
+
+  const insurancePoolBalanceFormatted = formatInsurancePoolBalance(insurancePoolBalance);
 
   // Check if user can contribute
   const canContribute = () => {

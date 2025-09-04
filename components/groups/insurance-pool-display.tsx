@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useContract } from "@starknet-react/core";
+import { useState, useMemo } from "react";
+import { useReadContract } from "@starknet-react/core";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,49 +14,49 @@ interface InsurancePoolDisplayProps {
 }
 
 export function InsurancePoolDisplay({ groupId }: InsurancePoolDisplayProps) {
-  const [insuranceBalance, setInsuranceBalance] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const { contract } = useContract({
+  // Convert groupId to proper format for contract calls (same as group analytics)
+  const formattedGroupId = useMemo(() => {
+    if (typeof groupId === 'string') {
+      return BigInt(groupId);
+    }
+    return BigInt(groupId);
+  }, [groupId]);
+
+  // Get insurance pool balance using modern useReadContract hook
+  const { data: insurancePoolBalance, isLoading: loading, error } = useReadContract({
     abi: MY_CONTRACT_ABI,
     address: CONTRACT_ADDRESS,
+    functionName: "get_insurance_pool_balance",
+    args: [formattedGroupId],
+    enabled: !!groupId,
+    // Add refresh key to force refetch when needed
+    refetchInterval: refreshKey > 0 ? 1000 : false,
   });
 
-  const fetchInsuranceBalance = async () => {
-    if (!contract || !groupId) return;
+  // Debug logging
+  console.log("Insurance Pool Debug:", {
+    groupId,
+    formattedGroupId: formattedGroupId.toString(),
+    insurancePoolBalance,
+    insurancePoolBalanceString: insurancePoolBalance?.toString(),
+    loading,
+    error,
+    contractAddress: CONTRACT_ADDRESS,
+    enabled: !!groupId
+  });
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      console.log(`Fetching insurance pool balance for group ${groupId}...`);
-      
-      const result = await contract.call("get_insurance_pool_balance", [parseInt(groupId.toString())]);
-      
-      console.log("Raw insurance pool balance result:", result);
-      
-      // Convert from USDC units (6 decimals) to readable format
-      const balanceInTokens = Number(result) / Math.pow(10, 6);
-      setInsuranceBalance(balanceInTokens.toFixed(2));
-      
-      console.log("Formatted insurance pool balance:", balanceInTokens.toFixed(2));
-    } catch (err) {
-      console.error("Error fetching insurance pool balance:", err);
-      setError("Failed to fetch insurance pool balance");
-    } finally {
-      setLoading(false);
-    }
+  const handleRefresh = () => {
+    setRefreshKey(prev => prev + 1);
+    // Reset refresh after a short time
+    setTimeout(() => setRefreshKey(0), 2000);
   };
-
-  useEffect(() => {
-    fetchInsuranceBalance();
-  }, [contract, groupId]);
 
   const formatBalance = (balance: string) => {
     const num = parseFloat(balance);
-    if (num === 0) return "0.00";
-    return num.toFixed(2);
+    if (num === 0) return "0.0000";
+    return num.toFixed(4); // Show 4 decimal places for small amounts
   };
 
   const getInsuranceStatus = (balance: string) => {
@@ -77,7 +77,7 @@ export function InsurancePoolDisplay({ groupId }: InsurancePoolDisplayProps) {
         <Button
           variant="ghost"
           size="sm"
-          onClick={fetchInsuranceBalance}
+          onClick={handleRefresh}
           disabled={loading}
         >
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -92,27 +92,36 @@ export function InsurancePoolDisplay({ groupId }: InsurancePoolDisplayProps) {
             </div>
           ) : error ? (
             <Badge variant="destructive" className="text-xs">
-              {error}
+              Failed to load insurance pool balance
             </Badge>
-          ) : insuranceBalance !== null ? (
+          ) : insurancePoolBalance !== null && insurancePoolBalance !== undefined ? (
             <div className="space-y-2">
               <div className="text-2xl font-bold">
-                {formatBalance(insuranceBalance)} USDC
+                {(() => {
+                  const balanceNum = Number(insurancePoolBalance) / 1e6; // USDC has 6 decimals
+                  return balanceNum.toFixed(4); // Show 4 decimal places for small amounts
+                })()} USDC
               </div>
               <Badge 
-                variant={getInsuranceStatus(insuranceBalance).variant}
+                variant={(() => {
+                  const balanceNum = Number(insurancePoolBalance) / 1e6;
+                  return getInsuranceStatus(balanceNum.toFixed(2)).variant;
+                })()}
                 className="text-xs"
               >
-                {getInsuranceStatus(insuranceBalance).status}
+                {(() => {
+                  const balanceNum = Number(insurancePoolBalance) / 1e6;
+                  return getInsuranceStatus(balanceNum.toFixed(2)).status;
+                })()}
               </Badge>
               <p className="text-xs text-muted-foreground">
                 Insurance pool protects against defaults
               </p>
             </div>
           ) : (
-            <div className="text-sm text-muted-foreground">
+            <Badge variant="secondary" className="text-xs">
               No data available
-            </div>
+            </Badge>
           )}
         </div>
       </CardContent>

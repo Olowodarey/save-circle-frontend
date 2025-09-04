@@ -1,12 +1,20 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Loader2, RefreshCw } from "lucide-react";
 import { FormattedGroupDetails } from "@/hooks/use-group-details";
 import GroupActivationButton from "./group-activation-button";
 import JoinGroupButton from "./joingroupbutton";
+import DeadlinePenaltyManager from "./deadline-penalty-manager";
+import PayoutManager from "./payout-manager";
 
 interface GroupActionPanelProps {
   groupDetails: FormattedGroupDetails;
@@ -14,10 +22,10 @@ interface GroupActionPanelProps {
   onRefetch: () => void;
 }
 
-export default function GroupActionPanel({ 
-  groupDetails, 
-  loading, 
-  onRefetch 
+export default function GroupActionPanel({
+  groupDetails,
+  loading,
+  onRefetch,
 }: GroupActionPanelProps) {
   return (
     <div className="lg:w-80 space-y-4">
@@ -30,15 +38,15 @@ export default function GroupActionPanel({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <GroupActivationButton 
+          <GroupActivationButton
             groupDetails={groupDetails}
             onActivationSuccess={onRefetch}
           />
-          
+
           {/* Debug Refresh Button */}
-          <Button 
-            variant="outline" 
-            onClick={onRefetch} 
+          <Button
+            variant="outline"
+            onClick={onRefetch}
             disabled={loading}
             className="w-full"
           >
@@ -56,7 +64,7 @@ export default function GroupActionPanel({
           </Button>
         </CardContent>
       </Card>
-      
+
       {/* Join Group Card */}
       <Card>
         <CardHeader>
@@ -68,7 +76,7 @@ export default function GroupActionPanel({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <JoinGroupButton 
+          <JoinGroupButton
             groupDetails={groupDetails}
             onJoinSuccess={onRefetch}
           />
@@ -80,12 +88,23 @@ export default function GroupActionPanel({
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Created:</span>
-              <span className="font-medium">{new Date(groupDetails.createdAt).toLocaleDateString()}</span>
+              <span className="font-medium">
+                {new Date(groupDetails.createdAt).toLocaleDateString()}
+              </span>
             </div>
           </div>
         </CardContent>
       </Card>
-      
+
+      {/* Deadline & Penalty Management */}
+      <DeadlinePenaltyManager groupId={groupDetails.id.toString()} />
+
+      {/* Payout Management */}
+      <PayoutManager
+        groupId={groupDetails.id.toString()}
+        groupDetails={groupDetails}
+      />
+
       {/* Group Information Card */}
       <Card>
         <CardHeader>
@@ -98,26 +117,38 @@ export default function GroupActionPanel({
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Created:</span>
-            <span className="font-medium">{new Date(groupDetails.createdAt).toLocaleDateString()}</span>
+            <span className="font-medium">
+              {new Date(groupDetails.createdAt).toLocaleDateString()}
+            </span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">Status:</span>
             <div className="flex items-center gap-2">
-              <Badge 
-                variant={groupDetails.status === "active" ? "default" : "secondary"}
-                className={groupDetails.status === "active" ? "bg-green-100 text-green-800 border-green-200" : ""}
+              <Badge
+                variant={
+                  groupDetails.status === "active" ? "default" : "secondary"
+                }
+                className={
+                  groupDetails.status === "active"
+                    ? "bg-green-100 text-green-800 border-green-200"
+                    : ""
+                }
               >
-                {groupDetails.status === "active" && <CheckCircle className="w-3 h-3 mr-1" />}
+                {groupDetails.status === "active" && (
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                )}
                 {groupDetails.status}
               </Badge>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={onRefetch}
                 disabled={loading}
                 className="h-6 w-6 p-0"
               >
-                <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`w-3 h-3 ${loading ? "animate-spin" : ""}`}
+                />
               </Button>
             </div>
           </div>
