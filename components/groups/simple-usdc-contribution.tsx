@@ -72,8 +72,10 @@ export function SimpleUsdcContribution({ groupDetails, onSuccess }: SimpleUsdcCo
     setError(null)
 
     try {
-      // Convert contribution amount to proper format (USDC has 6 decimals)
-      const contributionAmountInWei = BigInt(Math.floor(Number(groupDetails.contributionAmount) * 1e6))
+      // Use contribution amount directly as it's already in proper USDC format (6 decimals)
+      const contributionAmountInWei = typeof groupDetails.contributionAmount === 'bigint' 
+        ? groupDetails.contributionAmount 
+        : BigInt(groupDetails.contributionAmount)
       const groupIdBigInt = BigInt(groupDetails.id)
       
       // Format U256 values - split into low and high 128-bit parts
@@ -137,7 +139,13 @@ export function SimpleUsdcContribution({ groupDetails, onSuccess }: SimpleUsdcCo
 
   const isConnected = status === "connected"
   const userBalance = formatBalance(balance)
-  const hasInsufficientBalance = groupDetails.contributionAmount > parseFloat(userBalance)
+  
+  // Convert contribution amount to the same format as userBalance for proper comparison
+  const requiredAmount = typeof groupDetails.contributionAmount === 'bigint' 
+    ? Number(groupDetails.contributionAmount) / 1e6 
+    : Number(groupDetails.contributionAmount) / 1e6
+  
+  const hasInsufficientBalance = requiredAmount > parseFloat(userBalance)
   
   if (isSuccess) {
     return (
@@ -241,7 +249,13 @@ export function SimpleUsdcContribution({ groupDetails, onSuccess }: SimpleUsdcCo
                 <div>
                   <Label className="text-sm font-medium">Required Contribution</Label>
                   <p className="text-2xl font-bold text-gray-900">
-                    {groupDetails.contributionAmount} USDC
+                    {(() => {
+                      // Convert bigint USDC (6 decimals) to human-readable format
+                      const amount = typeof groupDetails.contributionAmount === 'bigint' 
+                        ? Number(groupDetails.contributionAmount) / 1e6 
+                        : Number(groupDetails.contributionAmount) / 1e6;
+                      return amount.toFixed(2);
+                    })()} USDC
                   </p>
                 </div>
                 <DollarSign className="h-8 w-8 text-gray-400" />
@@ -253,7 +267,12 @@ export function SimpleUsdcContribution({ groupDetails, onSuccess }: SimpleUsdcCo
               <Alert className="border-red-200 bg-red-50">
                 <AlertCircle className="h-4 w-4 text-red-600" />
                 <AlertDescription className="text-red-800">
-                  Insufficient balance. You need {groupDetails.contributionAmount} USDC but only have {userBalance} USDC available.
+                  Insufficient balance. You need {(() => {
+                    const amount = typeof groupDetails.contributionAmount === 'bigint' 
+                      ? Number(groupDetails.contributionAmount) / 1e6 
+                      : Number(groupDetails.contributionAmount) / 1e6;
+                    return amount.toFixed(2);
+                  })()} USDC but only have {userBalance} USDC available.
                 </AlertDescription>
               </Alert>
             )}
@@ -294,7 +313,12 @@ export function SimpleUsdcContribution({ groupDetails, onSuccess }: SimpleUsdcCo
               ) : (
                 <>
                   <DollarSign className="h-4 w-4 mr-2" />
-                  Contribute {groupDetails.contributionAmount} USDC
+                  Contribute {(() => {
+                    const amount = typeof groupDetails.contributionAmount === 'bigint' 
+                      ? Number(groupDetails.contributionAmount) / 1e6 
+                      : Number(groupDetails.contributionAmount) / 1e6;
+                    return amount.toFixed(2);
+                  })()} USDC
                 </>
               )}
             </Button>
