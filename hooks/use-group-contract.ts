@@ -17,11 +17,10 @@ export const GroupVisibility = {
 };
 
 export const TimeUnit = {
-  Minutes: 0,  // Contract: Minutes = 0
-  Hours: 1,    // Contract: Hours = 1
-  Days: 2,     // Contract: Days = 2
-  Weeks: 3,    // Contract: Weeks = 3
-  Months: 4,   // Contract: Months = 4 (assumed)
+  Hours: 0,    // Contract: Hours = 0
+  Days: 1,     // Contract: Days = 1
+  Weeks: 2,    // Contract: Weeks = 2
+  Months: 3,   // Contract: Months = 3
 };
 
 export const LockType = {
@@ -36,12 +35,11 @@ const getLockTypeVariant = (type: number): string => {
 
 const getTimeUnitVariant = (unit: number): string => {
   switch (unit) {
-    case TimeUnit.Minutes: return "Minutes";
     case TimeUnit.Hours: return "Hours";
     case TimeUnit.Days: return "Days";
     case TimeUnit.Weeks: return "Weeks";
     case TimeUnit.Months: return "Months";
-    default: return "Minutes";
+    default: return "Hours";
   }
 };
 
@@ -92,6 +90,26 @@ export function useGroupContract() {
     
     let result;
     switch (frequency.toLowerCase()) {
+      // hours
+      case "hours":
+      case "every hour":
+        result = { unit: TimeUnit.Hours, duration: 1 };
+        break;
+      case "every 2 hours":
+        result = { unit: TimeUnit.Hours, duration: 2 };
+        break;
+      case "every 3 hours":
+        result = { unit: TimeUnit.Hours, duration: 3 };
+        break;
+      case "every 6 hours":
+        result = { unit: TimeUnit.Hours, duration: 6 };
+        break;
+      case "every 12 hours":
+        result = { unit: TimeUnit.Hours, duration: 12 };
+        break;
+      case "every 24 hours":
+        result = { unit: TimeUnit.Hours, duration: 24 };
+        break;
       // Days
       case "daily":
       case "every day":

@@ -1,42 +1,30 @@
-export const  MY_CONTRACT_ABI = [
+export const MY_CONTRACT_ABI = [
     {
+      "type": "function",
       "name": "pause",
-      "type": "function",
       "inputs": [],
       "outputs": [],
       "state_mutability": "external"
     },
     {
+      "type": "function",
       "name": "unpause",
-      "type": "function",
       "inputs": [],
       "outputs": [],
       "state_mutability": "external"
     },
     {
-      "name": "add_admin",
-      "type": "function",
-      "inputs": [
-        {
-          "name": "new_admin",
-          "type": "core::starknet::contract_address::ContractAddress"
-        }
-      ],
-      "outputs": [],
-      "state_mutability": "external"
-    },
-    {
-      "name": "UpgradeableImpl",
       "type": "impl",
+      "name": "UpgradeableImpl",
       "interface_name": "openzeppelin_upgrades::interface::IUpgradeable"
     },
     {
-      "name": "openzeppelin_upgrades::interface::IUpgradeable",
       "type": "interface",
+      "name": "openzeppelin_upgrades::interface::IUpgradeable",
       "items": [
         {
-          "name": "upgrade",
           "type": "function",
+          "name": "upgrade",
           "inputs": [
             {
               "name": "new_class_hash",
@@ -49,13 +37,13 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "SavecircleImpl",
       "type": "impl",
+      "name": "SavecircleImpl",
       "interface_name": "save_circle::interfaces::Isavecircle::Isavecircle"
     },
     {
-      "name": "core::byte_array::ByteArray",
       "type": "struct",
+      "name": "core::byte_array::ByteArray",
       "members": [
         {
           "name": "data",
@@ -72,8 +60,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "core::bool",
       "type": "enum",
+      "name": "core::bool",
       "variants": [
         {
           "name": "False",
@@ -86,8 +74,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "core::integer::u256",
       "type": "struct",
+      "name": "core::integer::u256",
       "members": [
         {
           "name": "low",
@@ -100,8 +88,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::structs::Structs::UserProfile",
       "type": "struct",
+      "name": "save_circle::structs::Structs::UserProfile",
       "members": [
         {
           "name": "user_address",
@@ -174,8 +162,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::enums::Enums::ActivityType",
       "type": "enum",
+      "name": "save_circle::enums::Enums::ActivityType",
       "variants": [
         {
           "name": "Contribution",
@@ -228,8 +216,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "core::option::Option::<core::integer::u256>",
       "type": "enum",
+      "name": "core::option::Option::<core::integer::u256>",
       "variants": [
         {
           "name": "Some",
@@ -242,8 +230,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::structs::Structs::UserActivity",
       "type": "struct",
+      "name": "save_circle::structs::Structs::UserActivity",
       "members": [
         {
           "name": "activity_id",
@@ -280,8 +268,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::enums::Enums::LockType",
       "type": "enum",
+      "name": "save_circle::enums::Enums::LockType",
       "variants": [
         {
           "name": "Progressive",
@@ -294,9 +282,13 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::enums::Enums::TimeUnit",
       "type": "enum",
+      "name": "save_circle::enums::Enums::TimeUnit",
       "variants": [
+        {
+          "name": "Hours",
+          "type": "()"
+        },
         {
           "name": "Days",
           "type": "()"
@@ -312,8 +304,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::enums::Enums::GroupState",
       "type": "enum",
+      "name": "save_circle::enums::Enums::GroupState",
       "variants": [
         {
           "name": "Created",
@@ -334,8 +326,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::enums::Enums::GroupVisibility",
       "type": "enum",
+      "name": "save_circle::enums::Enums::GroupVisibility",
       "variants": [
         {
           "name": "Public",
@@ -348,8 +340,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::structs::Structs::GroupInfo",
       "type": "struct",
+      "name": "save_circle::structs::Structs::GroupInfo",
       "members": [
         {
           "name": "group_id",
@@ -450,8 +442,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::structs::Structs::UserStatistics",
       "type": "struct",
+      "name": "save_circle::structs::Structs::UserStatistics",
       "members": [
         {
           "name": "user_address",
@@ -504,8 +496,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::structs::Structs::ProfileViewData",
       "type": "struct",
+      "name": "save_circle::structs::Structs::ProfileViewData",
       "members": [
         {
           "name": "profile",
@@ -526,8 +518,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::structs::Structs::GroupMember",
       "type": "struct",
+      "name": "save_circle::structs::Structs::GroupMember",
       "members": [
         {
           "name": "user",
@@ -584,8 +576,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::structs::Structs::UserGroupDetails",
       "type": "struct",
+      "name": "save_circle::structs::Structs::UserGroupDetails",
       "members": [
         {
           "name": "group_info",
@@ -614,12 +606,12 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "save_circle::interfaces::Isavecircle::Isavecircle",
       "type": "interface",
+      "name": "save_circle::interfaces::Isavecircle::Isavecircle",
       "items": [
         {
-          "name": "register_user",
           "type": "function",
+          "name": "register_user",
           "inputs": [
             {
               "name": "name",
@@ -638,8 +630,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
-          "name": "get_user_profile_view_data",
           "type": "function",
+          "name": "get_user_profile_view_data",
           "inputs": [
             {
               "name": "user_address",
@@ -654,8 +646,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "create_public_group",
           "type": "function",
+          "name": "create_public_group",
           "inputs": [
             {
               "name": "name",
@@ -702,8 +694,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
-          "name": "get_group_info",
           "type": "function",
+          "name": "get_group_info",
           "inputs": [
             {
               "name": "group_id",
@@ -718,8 +710,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "create_private_group",
           "type": "function",
+          "name": "create_private_group",
           "inputs": [
             {
               "name": "name",
@@ -770,8 +762,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
-          "name": "get_user_profile",
           "type": "function",
+          "name": "get_user_profile",
           "inputs": [
             {
               "name": "user_address",
@@ -786,8 +778,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "join_group",
           "type": "function",
+          "name": "join_group",
           "inputs": [
             {
               "name": "group_id",
@@ -802,8 +794,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
-          "name": "get_group_member",
           "type": "function",
+          "name": "get_group_member",
           "inputs": [
             {
               "name": "group_id",
@@ -822,8 +814,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "get_user_member_index",
           "type": "function",
+          "name": "get_user_member_index",
           "inputs": [
             {
               "name": "user",
@@ -842,8 +834,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "get_user_joined_groups",
           "type": "function",
+          "name": "get_user_joined_groups",
           "inputs": [
             {
               "name": "user_address",
@@ -858,8 +850,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "get_user_activities",
           "type": "function",
+          "name": "get_user_activities",
           "inputs": [
             {
               "name": "user_address",
@@ -878,8 +870,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "get_user_statistics",
           "type": "function",
+          "name": "get_user_statistics",
           "inputs": [
             {
               "name": "user_address",
@@ -894,8 +886,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "is_group_member",
           "type": "function",
+          "name": "is_group_member",
           "inputs": [
             {
               "name": "group_id",
@@ -914,8 +906,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "lock_liquidity",
           "type": "function",
+          "name": "lock_liquidity",
           "inputs": [
             {
               "name": "token_address",
@@ -938,8 +930,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
+          "type": "function",
           "name": "get_locked_balance",
-          "type": "function",
           "inputs": [
             {
               "name": "user",
@@ -954,8 +946,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
+          "type": "function",
           "name": "withdraw_locked",
-          "type": "function",
           "inputs": [
             {
               "name": "group_id",
@@ -970,8 +962,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
+          "type": "function",
           "name": "get_penalty_locked",
-          "type": "function",
           "inputs": [
             {
               "name": "user",
@@ -990,8 +982,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
+          "type": "function",
           "name": "has_completed_circle",
-          "type": "function",
           "inputs": [
             {
               "name": "user",
@@ -1010,8 +1002,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "contribute",
           "type": "function",
+          "name": "contribute",
           "inputs": [
             {
               "name": "group_id",
@@ -1026,8 +1018,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
-          "name": "get_insurance_pool_balance",
           "type": "function",
+          "name": "get_insurance_pool_balance",
           "inputs": [
             {
               "name": "group_id",
@@ -1042,8 +1034,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
+          "type": "function",
           "name": "activate_group",
-          "type": "function",
           "inputs": [
             {
               "name": "group_id",
@@ -1058,8 +1050,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
+          "type": "function",
           "name": "distribute_payout",
-          "type": "function",
           "inputs": [
             {
               "name": "group_id",
@@ -1074,8 +1066,24 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
-          "name": "get_next_payout_recipient",
           "type": "function",
+          "name": "claim_payout",
+          "inputs": [
+            {
+              "name": "group_id",
+              "type": "core::integer::u256"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u256"
+            }
+          ],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "get_next_payout_recipient",
           "inputs": [
             {
               "name": "group_id",
@@ -1090,8 +1098,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "get_payout_order",
           "type": "function",
+          "name": "get_payout_order",
           "inputs": [
             {
               "name": "group_id",
@@ -1106,8 +1114,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "admin_withdraw_from_pool",
           "type": "function",
+          "name": "admin_withdraw_from_pool",
           "inputs": [
             {
               "name": "group_id",
@@ -1128,21 +1136,177 @@ export const  MY_CONTRACT_ABI = [
             }
           ],
           "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "get_group_locked_funds",
+          "inputs": [
+            {
+              "name": "group_id",
+              "type": "core::integer::u256"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "(core::integer::u256, core::array::Array::<(core::starknet::contract_address::ContractAddress, core::integer::u256)>)"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "get_contribution_deadline",
+          "inputs": [
+            {
+              "name": "group_id",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "user",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u64"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "get_missed_deadline_penalty",
+          "inputs": [
+            {
+              "name": "group_id",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "user",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u256"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "get_time_until_deadline",
+          "inputs": [
+            {
+              "name": "group_id",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "user",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u64"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "track_missed_deadline_penalty",
+          "inputs": [
+            {
+              "name": "group_id",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "user",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "penalty_amount",
+              "type": "core::integer::u256"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::bool"
+            }
+          ],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "check_and_apply_deadline_penalty",
+          "inputs": [
+            {
+              "name": "group_id",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "user",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u256"
+            }
+          ],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "remove_member_from_group",
+          "inputs": [
+            {
+              "name": "group_id",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "member_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::bool"
+            }
+          ],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "add_admin",
+          "inputs": [
+            {
+              "name": "new_admin",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::bool"
+            }
+          ],
+          "state_mutability": "external"
         }
       ]
     },
     {
-      "name": "PausableImpl",
       "type": "impl",
+      "name": "PausableImpl",
       "interface_name": "openzeppelin_security::interface::IPausable"
     },
     {
-      "name": "openzeppelin_security::interface::IPausable",
       "type": "interface",
+      "name": "openzeppelin_security::interface::IPausable",
       "items": [
         {
-          "name": "is_paused",
           "type": "function",
+          "name": "is_paused",
           "inputs": [],
           "outputs": [
             {
@@ -1154,17 +1318,17 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "AccessControlMixinImpl",
       "type": "impl",
+      "name": "AccessControlMixinImpl",
       "interface_name": "openzeppelin_access::accesscontrol::interface::AccessControlABI"
     },
     {
-      "name": "openzeppelin_access::accesscontrol::interface::AccessControlABI",
       "type": "interface",
+      "name": "openzeppelin_access::accesscontrol::interface::AccessControlABI",
       "items": [
         {
+          "type": "function",
           "name": "has_role",
-          "type": "function",
           "inputs": [
             {
               "name": "role",
@@ -1183,8 +1347,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
+          "type": "function",
           "name": "get_role_admin",
-          "type": "function",
           "inputs": [
             {
               "name": "role",
@@ -1199,8 +1363,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
+          "type": "function",
           "name": "grant_role",
-          "type": "function",
           "inputs": [
             {
               "name": "role",
@@ -1215,8 +1379,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
+          "type": "function",
           "name": "revoke_role",
-          "type": "function",
           "inputs": [
             {
               "name": "role",
@@ -1231,8 +1395,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
+          "type": "function",
           "name": "renounce_role",
-          "type": "function",
           "inputs": [
             {
               "name": "role",
@@ -1247,8 +1411,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
-          "name": "hasRole",
           "type": "function",
+          "name": "hasRole",
           "inputs": [
             {
               "name": "role",
@@ -1267,8 +1431,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
-          "name": "getRoleAdmin",
           "type": "function",
+          "name": "getRoleAdmin",
           "inputs": [
             {
               "name": "role",
@@ -1283,8 +1447,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "view"
         },
         {
+          "type": "function",
           "name": "grantRole",
-          "type": "function",
           "inputs": [
             {
               "name": "role",
@@ -1299,8 +1463,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
+          "type": "function",
           "name": "revokeRole",
-          "type": "function",
           "inputs": [
             {
               "name": "role",
@@ -1315,8 +1479,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
+          "type": "function",
           "name": "renounceRole",
-          "type": "function",
           "inputs": [
             {
               "name": "role",
@@ -1331,8 +1495,8 @@ export const  MY_CONTRACT_ABI = [
           "state_mutability": "external"
         },
         {
-          "name": "supports_interface",
           "type": "function",
+          "name": "supports_interface",
           "inputs": [
             {
               "name": "interface_id",
@@ -1349,8 +1513,8 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "name": "constructor",
       "type": "constructor",
+      "name": "constructor",
       "inputs": [
         {
           "name": "default_admin",
@@ -1363,493 +1527,494 @@ export const  MY_CONTRACT_ABI = [
       ]
     },
     {
-      "kind": "struct",
+      "type": "event",
       "name": "openzeppelin_security::pausable::PausableComponent::Paused",
-      "type": "event",
+      "kind": "struct",
       "members": [
         {
-          "kind": "data",
           "name": "account",
-          "type": "core::starknet::contract_address::ContractAddress"
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
         }
       ]
     },
     {
-      "kind": "struct",
+      "type": "event",
       "name": "openzeppelin_security::pausable::PausableComponent::Unpaused",
-      "type": "event",
+      "kind": "struct",
       "members": [
         {
-          "kind": "data",
           "name": "account",
-          "type": "core::starknet::contract_address::ContractAddress"
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
         }
       ]
     },
     {
-      "kind": "enum",
+      "type": "event",
       "name": "openzeppelin_security::pausable::PausableComponent::Event",
-      "type": "event",
+      "kind": "enum",
       "variants": [
         {
-          "kind": "nested",
           "name": "Paused",
-          "type": "openzeppelin_security::pausable::PausableComponent::Paused"
+          "type": "openzeppelin_security::pausable::PausableComponent::Paused",
+          "kind": "nested"
         },
         {
-          "kind": "nested",
           "name": "Unpaused",
-          "type": "openzeppelin_security::pausable::PausableComponent::Unpaused"
+          "type": "openzeppelin_security::pausable::PausableComponent::Unpaused",
+          "kind": "nested"
         }
       ]
     },
     {
-      "kind": "struct",
+      "type": "event",
       "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleGranted",
-      "type": "event",
+      "kind": "struct",
       "members": [
         {
-          "kind": "data",
           "name": "role",
-          "type": "core::felt252"
+          "type": "core::felt252",
+          "kind": "data"
         },
         {
-          "kind": "data",
           "name": "account",
-          "type": "core::starknet::contract_address::ContractAddress"
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
         },
         {
-          "kind": "data",
           "name": "sender",
-          "type": "core::starknet::contract_address::ContractAddress"
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
         }
       ]
     },
     {
-      "kind": "struct",
+      "type": "event",
       "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleRevoked",
-      "type": "event",
-      "members": [
-        {
-          "kind": "data",
-          "name": "role",
-          "type": "core::felt252"
-        },
-        {
-          "kind": "data",
-          "name": "account",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "data",
-          "name": "sender",
-          "type": "core::starknet::contract_address::ContractAddress"
-        }
-      ]
-    },
-    {
       "kind": "struct",
-      "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged",
-      "type": "event",
       "members": [
         {
-          "kind": "data",
           "name": "role",
-          "type": "core::felt252"
+          "type": "core::felt252",
+          "kind": "data"
         },
         {
-          "kind": "data",
-          "name": "previous_admin_role",
-          "type": "core::felt252"
+          "name": "account",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
         },
         {
-          "kind": "data",
-          "name": "new_admin_role",
-          "type": "core::felt252"
+          "name": "sender",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
         }
       ]
     },
     {
-      "kind": "enum",
-      "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
       "type": "event",
+      "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "role",
+          "type": "core::felt252",
+          "kind": "data"
+        },
+        {
+          "name": "previous_admin_role",
+          "type": "core::felt252",
+          "kind": "data"
+        },
+        {
+          "name": "new_admin_role",
+          "type": "core::felt252",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
+      "kind": "enum",
       "variants": [
         {
-          "kind": "nested",
           "name": "RoleGranted",
-          "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleGranted"
+          "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleGranted",
+          "kind": "nested"
         },
         {
-          "kind": "nested",
           "name": "RoleRevoked",
-          "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleRevoked"
+          "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleRevoked",
+          "kind": "nested"
         },
         {
-          "kind": "nested",
           "name": "RoleAdminChanged",
-          "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged"
+          "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged",
+          "kind": "nested"
         }
       ]
     },
     {
-      "kind": "enum",
-      "name": "openzeppelin_introspection::src5::SRC5Component::Event",
       "type": "event",
+      "name": "openzeppelin_introspection::src5::SRC5Component::Event",
+      "kind": "enum",
       "variants": []
     },
     {
-      "kind": "struct",
+      "type": "event",
       "name": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Upgraded",
-      "type": "event",
+      "kind": "struct",
       "members": [
         {
-          "kind": "data",
           "name": "class_hash",
-          "type": "core::starknet::class_hash::ClassHash"
+          "type": "core::starknet::class_hash::ClassHash",
+          "kind": "data"
         }
       ]
     },
     {
-      "kind": "enum",
+      "type": "event",
       "name": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Event",
-      "type": "event",
-      "variants": [
-        {
-          "kind": "nested",
-          "name": "Upgraded",
-          "type": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Upgraded"
-        }
-      ]
-    },
-    {
-      "kind": "struct",
-      "name": "save_circle::events::Events::UserRegistered",
-      "type": "event",
-      "members": [
-        {
-          "kind": "data",
-          "name": "user",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "data",
-          "name": "name",
-          "type": "core::byte_array::ByteArray"
-        }
-      ]
-    },
-    {
-      "kind": "struct",
-      "name": "save_circle::events::Events::GroupCreated",
-      "type": "event",
-      "members": [
-        {
-          "kind": "data",
-          "name": "group_id",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "creator",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "data",
-          "name": "member_limit",
-          "type": "core::integer::u32"
-        },
-        {
-          "kind": "data",
-          "name": "contribution_amount",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "cycle_duration",
-          "type": "core::integer::u64"
-        },
-        {
-          "kind": "data",
-          "name": "cycle_unit",
-          "type": "save_circle::enums::Enums::TimeUnit"
-        },
-        {
-          "kind": "data",
-          "name": "visibility",
-          "type": "save_circle::enums::Enums::GroupVisibility"
-        },
-        {
-          "kind": "data",
-          "name": "requires_lock",
-          "type": "core::bool"
-        }
-      ]
-    },
-    {
-      "kind": "struct",
-      "name": "save_circle::events::Events::UsersInvited",
-      "type": "event",
-      "members": [
-        {
-          "kind": "data",
-          "name": "group_id",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "inviter",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "data",
-          "name": "invitees",
-          "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
-        }
-      ]
-    },
-    {
-      "kind": "struct",
-      "name": "save_circle::events::Events::UserJoinedGroup",
-      "type": "event",
-      "members": [
-        {
-          "kind": "data",
-          "name": "group_id",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "user",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "data",
-          "name": "member_index",
-          "type": "core::integer::u32"
-        },
-        {
-          "kind": "data",
-          "name": "joined_at",
-          "type": "core::integer::u64"
-        }
-      ]
-    },
-    {
-      "kind": "struct",
-      "name": "save_circle::events::Events::FundsWithdrawn",
-      "type": "event",
-      "members": [
-        {
-          "kind": "data",
-          "name": "group_id",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "user",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "data",
-          "name": "amount",
-          "type": "core::integer::u256"
-        }
-      ]
-    },
-    {
-      "kind": "struct",
-      "name": "save_circle::events::Events::ContributionMade",
-      "type": "event",
-      "members": [
-        {
-          "kind": "data",
-          "name": "group_id",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "user",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "data",
-          "name": "contribution_amount",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "insurance_fee",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "total_paid",
-          "type": "core::integer::u256"
-        }
-      ]
-    },
-    {
-      "kind": "struct",
-      "name": "save_circle::events::Events::PayoutDistributed",
-      "type": "event",
-      "members": [
-        {
-          "kind": "data",
-          "name": "group_id",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "recipient",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "data",
-          "name": "amount",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "cycle",
-          "type": "core::integer::u64"
-        }
-      ]
-    },
-    {
-      "kind": "struct",
-      "name": "save_circle::events::Events::PayoutSent",
-      "type": "event",
-      "members": [
-        {
-          "kind": "data",
-          "name": "group_id",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "recipient",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "data",
-          "name": "amount",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "cycle_number",
-          "type": "core::integer::u64"
-        },
-        {
-          "kind": "data",
-          "name": "timestamp",
-          "type": "core::integer::u64"
-        }
-      ]
-    },
-    {
-      "kind": "struct",
-      "name": "save_circle::events::Events::AdminPoolWithdrawal",
-      "type": "event",
-      "members": [
-        {
-          "kind": "data",
-          "name": "admin",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "data",
-          "name": "group_id",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "amount",
-          "type": "core::integer::u256"
-        },
-        {
-          "kind": "data",
-          "name": "recipient",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "data",
-          "name": "remaining_balance",
-          "type": "core::integer::u256"
-        }
-      ]
-    },
-    {
       "kind": "enum",
-      "name": "save_circle::contracts::Savecircle::SaveCircle::Event",
-      "type": "event",
       "variants": [
         {
-          "kind": "flat",
+          "name": "Upgraded",
+          "type": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Upgraded",
+          "kind": "nested"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "save_circle::events::Events::UserRegistered",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "user",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "name",
+          "type": "core::byte_array::ByteArray",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "save_circle::events::Events::GroupCreated",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "group_id",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "creator",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "member_limit",
+          "type": "core::integer::u32",
+          "kind": "data"
+        },
+        {
+          "name": "contribution_amount",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "cycle_duration",
+          "type": "core::integer::u64",
+          "kind": "data"
+        },
+        {
+          "name": "cycle_unit",
+          "type": "save_circle::enums::Enums::TimeUnit",
+          "kind": "data"
+        },
+        {
+          "name": "visibility",
+          "type": "save_circle::enums::Enums::GroupVisibility",
+          "kind": "data"
+        },
+        {
+          "name": "requires_lock",
+          "type": "core::bool",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "save_circle::events::Events::UsersInvited",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "group_id",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "inviter",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "invitees",
+          "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "save_circle::events::Events::UserJoinedGroup",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "group_id",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "user",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "member_index",
+          "type": "core::integer::u32",
+          "kind": "data"
+        },
+        {
+          "name": "joined_at",
+          "type": "core::integer::u64",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "save_circle::events::Events::FundsWithdrawn",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "group_id",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "user",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "amount",
+          "type": "core::integer::u256",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "save_circle::events::Events::ContributionMade",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "group_id",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "user",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "contribution_amount",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "insurance_fee",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "total_paid",
+          "type": "core::integer::u256",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "save_circle::events::Events::PayoutDistributed",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "group_id",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "recipient",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "amount",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "cycle",
+          "type": "core::integer::u64",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "save_circle::events::Events::PayoutSent",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "group_id",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "recipient",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "amount",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "cycle_number",
+          "type": "core::integer::u64",
+          "kind": "data"
+        },
+        {
+          "name": "timestamp",
+          "type": "core::integer::u64",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "save_circle::events::Events::AdminPoolWithdrawal",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "admin",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "group_id",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "amount",
+          "type": "core::integer::u256",
+          "kind": "data"
+        },
+        {
+          "name": "recipient",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "remaining_balance",
+          "type": "core::integer::u256",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "save_circle::contracts::Savecircle::SaveCircle::Event",
+      "kind": "enum",
+      "variants": [
+        {
           "name": "PausableEvent",
-          "type": "openzeppelin_security::pausable::PausableComponent::Event"
+          "type": "openzeppelin_security::pausable::PausableComponent::Event",
+          "kind": "flat"
         },
         {
-          "kind": "flat",
           "name": "AccessControlEvent",
-          "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event"
+          "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
+          "kind": "flat"
         },
         {
-          "kind": "flat",
           "name": "SRC5Event",
-          "type": "openzeppelin_introspection::src5::SRC5Component::Event"
+          "type": "openzeppelin_introspection::src5::SRC5Component::Event",
+          "kind": "flat"
         },
         {
-          "kind": "flat",
           "name": "UpgradeableEvent",
-          "type": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Event"
+          "type": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Event",
+          "kind": "flat"
         },
         {
-          "kind": "nested",
           "name": "UserRegistered",
-          "type": "save_circle::events::Events::UserRegistered"
+          "type": "save_circle::events::Events::UserRegistered",
+          "kind": "nested"
         },
         {
-          "kind": "nested",
           "name": "GroupCreated",
-          "type": "save_circle::events::Events::GroupCreated"
+          "type": "save_circle::events::Events::GroupCreated",
+          "kind": "nested"
         },
         {
-          "kind": "nested",
           "name": "UsersInvited",
-          "type": "save_circle::events::Events::UsersInvited"
+          "type": "save_circle::events::Events::UsersInvited",
+          "kind": "nested"
         },
         {
-          "kind": "nested",
           "name": "UserJoinedGroup",
-          "type": "save_circle::events::Events::UserJoinedGroup"
+          "type": "save_circle::events::Events::UserJoinedGroup",
+          "kind": "nested"
         },
         {
-          "kind": "nested",
           "name": "FundsWithdrawn",
-          "type": "save_circle::events::Events::FundsWithdrawn"
+          "type": "save_circle::events::Events::FundsWithdrawn",
+          "kind": "nested"
         },
         {
-          "kind": "nested",
           "name": "ContributionMade",
-          "type": "save_circle::events::Events::ContributionMade"
+          "type": "save_circle::events::Events::ContributionMade",
+          "kind": "nested"
         },
         {
-          "kind": "nested",
           "name": "PayoutDistributed",
-          "type": "save_circle::events::Events::PayoutDistributed"
+          "type": "save_circle::events::Events::PayoutDistributed",
+          "kind": "nested"
         },
         {
-          "kind": "nested",
           "name": "PayoutSent",
-          "type": "save_circle::events::Events::PayoutSent"
+          "type": "save_circle::events::Events::PayoutSent",
+          "kind": "nested"
         },
         {
-          "kind": "nested",
           "name": "AdminPoolWithdrawal",
-          "type": "save_circle::events::Events::AdminPoolWithdrawal"
+          "type": "save_circle::events::Events::AdminPoolWithdrawal",
+          "kind": "nested"
         }
       ]
     }
-  ] as const
+  ] as const;
+    
     

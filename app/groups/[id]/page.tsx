@@ -29,6 +29,7 @@ import GroupActionPanel from "@/components/groups/group-action-panel"
 import GroupMembersList from "@/components/groups/group-members-list"
 import GroupPaymentHistory from "@/components/groups/group-payment-history"
 import GroupRulesTerms from "@/components/groups/group-rules-terms"
+import GroupAnalytics from "@/components/groups/group-analytics"
 
 export default function GroupDetailsPage() {
   const params = useParams()
@@ -126,6 +127,12 @@ export default function GroupDetailsPage() {
                 <GroupHeader groupDetails={groupDetails} />
                 <GroupStats groupDetails={groupDetails} />
                 <GroupProgress groupDetails={groupDetails} />
+                
+                {/* New Contract Functions - Quick Analytics */}
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h4 className="font-semibold text-blue-800 mb-2">📊 Group Analytics </h4>
+                  <GroupAnalytics groupId={groupId} className="bg-white" />
+                </div>
               </div>
 
               <GroupActionPanel 
@@ -142,7 +149,7 @@ export default function GroupDetailsPage() {
           <TabsList>
             <TabsTrigger value="members">Members ({groupDetails.members})</TabsTrigger>
             <TabsTrigger value="contribute">Contribute</TabsTrigger>
-          
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="lock">Lock Liquidity</TabsTrigger>
             <TabsTrigger value="management">Group Actions</TabsTrigger>
             {/* <TabsTrigger value="history">Payment History</TabsTrigger> */}
@@ -166,6 +173,11 @@ export default function GroupDetailsPage() {
               groupDetails={groupDetails}
               onContributionSuccess={refetch}
             />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-4">
+            {/* New Contract Functions Analytics */}
+            <GroupAnalytics groupId={groupId} />
           </TabsContent>
 
           <TabsContent value="management" className="space-y-4">

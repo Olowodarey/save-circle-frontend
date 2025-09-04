@@ -148,13 +148,16 @@ export function useGroupDetails(groupId: string) {
         console.log("Case 3: Numeric value", unitNum);
         switch (unitNum) {
           case 0:
-            unitKey = "Days";     // Contract: 0 = Days
+            unitKey = "Hours";    // Contract: 0 = Hours
             break;
           case 1:
-            unitKey = "Weeks";    // Contract: 1 = Weeks
+            unitKey = "Days";     // Contract: 1 = Days
             break;
           case 2:
-            unitKey = "Months";   // Contract: 2 = Months
+            unitKey = "Weeks";    // Contract: 2 = Weeks
+            break;
+          case 3:
+            unitKey = "Months";   // Contract: 3 = Months
             break;
           default:
             console.log("Unknown numeric unit:", unitNum);
@@ -165,7 +168,9 @@ export function useGroupDetails(groupId: string) {
       console.log("Final unit key:", unitKey);
       
       // Convert to readable frequency
-      if (unitKey === "Days") {
+      if (unitKey === "Hours") {
+        return durationNum === 1 ? "Hourly" : `Every ${durationNum} hours`;
+      } else if (unitKey === "Days") {
         return durationNum === 1 ? "Daily" : `Every ${durationNum} days`;
       } else if (unitKey === "Weeks") {
         return durationNum === 1

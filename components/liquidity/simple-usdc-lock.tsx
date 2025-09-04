@@ -14,7 +14,7 @@ import { Call } from "starknet"
 const USDC_TOKEN_ADDRESS = "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8"
 
 // Liquidity lock contract address
-const LIQUIDITY_LOCK_CONTRACT = "0x038fea4f9ab53f1ae2f10a2c0f68d9efe1ac913c6e6705514b0d07d3409f2642"
+const LIQUIDITY_LOCK_CONTRACT = "0x06d90ff3e08a68b4969717d8ca1924c87873a700dae1e30a321e2dd1ebd0e794"
 
 // ERC20 ABI for USDC token interactions
 const ERC20_ABI = [

@@ -9,8 +9,9 @@ import {
 import Link from "next/link";
 import { useAccount, useReadContract } from "@starknet-react/core";
 import { MY_CONTRACT_ABI } from "@/constants/abi";
+import { GroupAnalyticsCompact } from "@/components/groups/group-analytics";
 
-const CONTRACT_ADDRESS = "0x038fea4f9ab53f1ae2f10a2c0f68d9efe1ac913c6e6705514b0d07d3409f2642"; 
+const CONTRACT_ADDRESS = "0x06d90ff3e08a68b4969717d8ca1924c87873a700dae1e30a321e2dd1ebd0e794"; 
 
 // Helper function to validate and format Starknet address
 const formatStarknetAddress = (address: string | undefined): `0x${string}` | undefined => {
@@ -508,6 +509,11 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
                       .replace(/\b\w/g, (l) => l.toUpperCase())}
                   </p>
                 </div>
+              </div>
+
+              {/* Group Analytics - New Contract Functions */}
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg border">
+                <GroupAnalyticsCompact groupId={group.id} className="" />
               </div>
 
               {/* Progress for active groups */}
