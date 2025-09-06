@@ -45,12 +45,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Welcome to SaveCircle, where community meets smart savings. Earn
-            higher returns than traditional banks while maintaining flexibility
-            and control over your funds. Our rotating savings model ensures
-            everyone gets their turn to receive a lump sum, creating a win-win
-            for all members. get started with low liquidity or no liquidity at
-            all grow your savings with SaveCircle
+          Welcome to SaveCircle, a community driven integration where needs and demands meets smart contributive savings. Earn an extension of accumulated returns cancelling the daily interest and charges posed by traditional banking system while maintaining control, flexibility and a feasible planning system over your funds. Our rotating savings model ensures adequate and accurate payout.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -95,15 +90,7 @@ export default function HomePage() {
                 <span className="mr-2">The SaveCircle difference</span>
               </h2>
               <p className="text-gray-700 mb-6 max-w-3xl mx-auto text-center">
-                Most DeFi platforms return exactly what you locked. With
-                SaveCircle, you <strong>lock an initial amount</strong> to join
-                and get a priority payout, then{" "}
-                <strong>save small amounts</strong> on a daily, weekly or
-                monthly schedule. Through <strong>rotating payouts</strong>,
-                everyone takes a turn receiving lump sums early while all
-                members continue saving. At the end of the cycle, you get back
-                your lock amount plus all your contributions. It's a smarter way
-                to save together and access funds sooner.
+              Most DeFi platforms return exactly what you locked. With SaveCircle, you get to choose an initial lock amount to join a group best suited for your contribution plan and get a priority payout based on the total number of people present in the group, the specified amount is saved either on a daily, weekly or monthly schedule based on the group plan subscribed to. Through rotating payouts, everyone takes a turn receiving requested contributions from other members while the rest members continue with the savings. At the end of the cycle, you get back your lock amount plus all your contributions. It's a smarter way to save together and access funds sooner enabling individuals to sort out pressing demands.
               </p>
               <div className="mt-6 text-blue-700 font-medium text-center">
                 Pay with STRK, ETH, USDT, or USDC. We auto‑swap to USDC.
@@ -116,19 +103,19 @@ export default function HomePage() {
                 <div className="bg-blue-50 rounded-lg p-4">
                   <p className="font-medium text-gray-900">Priority by lock</p>
                   <p className="text-sm text-gray-600">
-                    Higher locks are scheduled earlier.
+                  First come, first paid using the reputation level to judge the scheduled payout system.
                   </p>
                 </div>
                 <div className="bg-green-50 rounded-lg p-4">
                   <p className="font-medium text-gray-900">Rotating payouts</p>
-                  <p className="text-sm text-gray-600">Everyone gets a turn.</p>
+                  <p className="text-sm text-gray-600">Everyone gets a turn as long as they keep up in avoiding defaulting and penalties.</p>
                 </div>
                 <div className="bg-purple-50 rounded-lg p-4">
                   <p className="font-medium text-gray-900">
                     You get everything back
                   </p>
                   <p className="text-sm text-gray-600">
-                    Locked + saved amounts.
+                  Locked + contributed amounts are returned to individuals after completing the circle.
                   </p>
                 </div>
               </div>
@@ -174,8 +161,7 @@ export default function HomePage() {
                 Save & Earn Your Turn
               </h3>
               <p className="text-gray-600">
-                Contribute regularly and move up the queue. Higher lock amounts
-                get earlier payouts.
+              Contribute regularly and move up the queue. Higher locked amounts get a good reputation but payout is determined by the first come first paid scheduled payout system.
               </p>
             </div>
 
@@ -187,8 +173,7 @@ export default function HomePage() {
                 Get Paid & Continue
               </h3>
               <p className="text-gray-600">
-                Receive your lump sum when it's your turn, then keep saving
-                until the cycle ends to get everything back.
+              Receive your contribution when it's your turn, then keep saving until the cycle ends to get everything back.
               </p>
             </div>
           </div>
@@ -211,12 +196,10 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h3 className="text-xl font-semibold mb-3 text-gray-900">
-                Better Than Traditional Savings
+              Better Than Traditional Savings and Contributions.
               </h3>
               <p className="text-gray-600 mb-4">
-                Earn higher returns than traditional savings accounts while
-                maintaining access to your funds through our rotating payout
-                system.
+              Earn higher returns than traditional bank savings which are driven by high institutional fees causing reduction in funds to receive at the end of the cycle, while maintaining access to your funds through our rotating payout system.
               </p>
               <ul className="space-y-2">
                 <li className="flex items-start">
@@ -295,7 +278,7 @@ export default function HomePage() {
             <div>
               <h3 className="font-semibold text-gray-900">Reputation system</h3>
               <p className="text-sm text-gray-600">
-                Build onchain trust through consistent saving and payouts.
+              Build onchain trust through consistent saving and payouts which over time can be minted as NFT and used across SaveCircle and the Starknet ecosystem.
               </p>
             </div>
           </div>
@@ -307,7 +290,7 @@ export default function HomePage() {
             <div>
               <h3 className="font-semibold text-gray-900">Trust-based lock</h3>
               <p className="text-sm text-gray-600">
-                Lock more to move earlier in the payout order.
+              Lock collateral for payout order. No locked funds, no contribution payout.
               </p>
             </div>
           </div>
@@ -380,8 +363,7 @@ export default function HomePage() {
                       Make Regular Contributions
                     </h3>
                     <p className="text-gray-600">
-                      Contribute small, manageable amounts on a set schedule
-                      that works for your group's needs.
+                    Contributions are made based on agreed amount on the schedule that works for your group's needs.
                     </p>
                   </div>
                 </div>
@@ -407,19 +389,16 @@ export default function HomePage() {
               <div className="space-y-6">
                 <div className="p-6 bg-gray-50 rounded-lg">
                   <h3 className="text-lg font-semibold mb-2">
-                    Progressive Lock
+                    Public Lock
                   </h3>
                   <p className="text-gray-600">
-                    Lock your funds to move up the payout queue. The longer you
-                    lock, the higher your priority for receiving payouts.
+                  The collateral to be locked is determined by the system/Admin, which is paid by everyone joining the cycle.
                   </p>
                 </div>
                 <div className="p-6 bg-gray-50 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-2">No Lock</h3>
+                  <h3 className="text-lg font-semibold mb-2">Private Lock</h3>
                   <p className="text-gray-600">
-                    Join without locking funds. You'll receive payouts later in
-                    the rotation but can still participate in the savings
-                    circle.
+                  The locked collateral is set by the creator of the group based on the amount to be contributed by each individual, then the system verifies and approves the group creation.
                   </p>
                 </div>
               </div>
