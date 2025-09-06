@@ -161,7 +161,8 @@ export default function HomePage() {
                 Save & Earn Your Turn
               </h3>
               <p className="text-gray-600">
-              Contribute regularly and move up the queue. Higher locked amounts get a good reputation but payout is determined by the first come first paid scheduled payout system.
+              Contribute, save & earn your turn contribute regularly and get a good reputation. Higher locked amounts raises ranks moving eligible users up the queue but payout is determined by the high lock and time stamp scheduled payout system. 
+
               </p>
             </div>
 
