@@ -246,6 +246,12 @@ export function useGroupDetails(groupId: string) {
         const allKeys = Object.keys(state);
         console.log("All state keys:", allKeys);
 
+        // Special case: Empty object {} typically means Active state in Starknet enums
+        if (allKeys.length === 0) {
+          console.log("Empty state object detected, defaulting to 'active'");
+          return "active";
+        }
+
         // Filter out non-enum keys and look for enum variants
         const enumVariants = ["Created", "Active", "Completed", "Defaulted"];
         const foundVariant = allKeys.find((key) => enumVariants.includes(key));
