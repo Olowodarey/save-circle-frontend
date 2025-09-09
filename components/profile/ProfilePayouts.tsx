@@ -14,11 +14,11 @@ import {
   AlertCircle,
   Wallet,
 } from "lucide-react";
-import { useAccount, useReadContract } from "@starknet-react/core";
+import { useAccount, useReadContract, useSendTransaction } from "@starknet-react/core";
 import { MY_CONTRACT_ABI } from "@/constants/abi";
 import { CONTRACT_ADDRESS } from "@/constants";
 import { formatUnits } from "viem";
-import { Contract, RpcProvider } from "starknet";
+import { Contract, RpcProvider, Call } from "starknet";
 
 interface ProfilePayoutsProps {
   userAddress?: string;
@@ -26,6 +26,7 @@ interface ProfilePayoutsProps {
 
 export default function ProfilePayouts({ userAddress }: ProfilePayoutsProps) {
   const { address, isConnected } = useAccount();
+  const { sendAsync } = useSendTransaction({});
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [withdrawalSuccess, setWithdrawalSuccess] = useState(false);
   const [withdrawalError, setWithdrawalError] = useState<string | null>(null);
@@ -73,37 +74,54 @@ export default function ProfilePayouts({ userAddress }: ProfilePayoutsProps) {
 
   // Handle withdrawal
   const handleWithdraw = async () => {
-    if (!currentAddress || !hasPendingPayout) return;
+    if (!currentAddress || !hasPendingPayout || !isConnected) {
+      setWithdrawalError("Please connect your wallet to withdraw payouts");
+      return;
+    }
 
     setIsWithdrawing(true);
     setWithdrawalError(null);
     setWithdrawalSuccess(false);
 
     try {
-      const contract = getContract();
-      if (!contract) {
-        throw new Error("Contract not available");
-      }
+      console.log("Initiating withdrawal for amount:", pendingAmount);
+      
+      // Create the contract call for withdraw_payout
+      const call: Call = {
+        entrypoint: "withdraw_payout",
+        contractAddress: CONTRACT_ADDRESS,
+        calldata: [], // withdraw_payout takes no parameters
+      };
 
-      // For now, show a message that the withdrawal functionality needs wallet integration
-      // This is a placeholder until proper wallet integration is set up
-      console.log("Withdrawal requested for amount:", pendingAmount);
+      // Execute the transaction
+      const result = await sendAsync([call]);
       
-      // Simulate successful withdrawal for UI testing
-      setLastWithdrawnAmount(pendingAmount);
-      setWithdrawalSuccess(true);
-      
-      // Show a message about wallet integration
-      setWithdrawalError("Withdrawal functionality requires wallet integration. Please connect your wallet and try again.");
-      
-      // Refresh the pending payout data
-      setTimeout(() => {
-        refetchPayout();
-      }, 2000);
+      if (result?.transaction_hash) {
+        console.log("Withdrawal transaction hash:", result.transaction_hash);
+        setLastWithdrawnAmount(pendingAmount);
+        setWithdrawalSuccess(true);
+        
+        // Refresh the pending payout data after successful withdrawal
+        setTimeout(() => {
+          refetchPayout();
+        }, 3000); // Wait a bit longer for blockchain confirmation
+      } else {
+        throw new Error("Transaction failed - no transaction hash received");
+      }
 
     } catch (error: any) {
       console.error("Withdrawal error:", error);
-      setWithdrawalError(error.message || "Failed to withdraw payout");
+      let errorMessage = "Failed to withdraw payout";
+      
+      if (error.message?.includes("User abort")) {
+        errorMessage = "Transaction was cancelled by user";
+      } else if (error.message?.includes("insufficient")) {
+        errorMessage = "Insufficient funds for transaction fees";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setWithdrawalError(errorMessage);
     } finally {
       setIsWithdrawing(false);
     }
