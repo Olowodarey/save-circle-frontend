@@ -46,7 +46,7 @@ const USDT_TOKEN_ADDRESS =
 
 // Liquidity lock contract address
 const LIQUIDITY_LOCK_CONTRACT =
-  "0x06c79bd702e4a350654d56eb56f1745cbe232d3a98fea112fcd38f001df16c6a";
+  "0x0081239ae11f403bc90620395f3bed28c35810b6e18a0d55cf809b45ccab5fb7";
 
 // Token options for dropdown - STRK first as default
 const TOKEN_OPTIONS = [
@@ -301,7 +301,7 @@ export function EnhancedLiquidityLock({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <DollarSign className="h-5 w-5" />
-            swap your token using Autoswap
+          swap your token using Autoswap
         </CardTitle>
         <CardDescription>
           Lock liquidity using any supported token. Non-USDC tokens will be
@@ -396,7 +396,9 @@ export function EnhancedLiquidityLock({
           ) : (
             <>
               <DollarSign className="mr-2 h-4 w-4" />
-              {`Swap ${amount || "0"} ${isDirectUSDC ? 'USDC' : selectedTokenInfo?.symbol}`}
+              {`Swap ${amount || "0"} ${
+                isDirectUSDC ? "USDC" : selectedTokenInfo?.symbol
+              }`}
             </>
           )}
         </Button>

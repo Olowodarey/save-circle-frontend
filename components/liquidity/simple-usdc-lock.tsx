@@ -1,20 +1,32 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, CheckCircle, AlertCircle, DollarSign } from "lucide-react"
-import { useAccount, useSendTransaction, useReadContract } from "@starknet-react/core"
-import { Call } from "starknet"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, CheckCircle, AlertCircle, DollarSign } from "lucide-react";
+import {
+  useAccount,
+  useSendTransaction,
+  useReadContract,
+} from "@starknet-react/core";
+import { Call } from "starknet";
 
 // USDC token address on Starknet
-const USDC_TOKEN_ADDRESS = "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8"
+const USDC_TOKEN_ADDRESS =
+  "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8";
 
 // Liquidity lock contract address
-const LIQUIDITY_LOCK_CONTRACT = "0x06c79bd702e4a350654d56eb56f1745cbe232d3a98fea112fcd38f001df16c6a"
+const LIQUIDITY_LOCK_CONTRACT =
+  "0x0081239ae11f403bc90620395f3bed28c35810b6e18a0d55cf809b45ccab5fb7";
 
 // ERC20 ABI for USDC token interactions
 const ERC20_ABI = [
@@ -23,26 +35,29 @@ const ERC20_ABI = [
     name: "balance_of",
     state_mutability: "view",
     inputs: [
-      { name: "account", type: "core::starknet::contract_address::ContractAddress" },
+      {
+        name: "account",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
     ],
     outputs: [{ type: "core::integer::u256" }],
   },
-] as const
+] as const;
 
 interface SimpleUsdcLockProps {
-  groupId: string
-  onSuccess?: () => void
+  groupId: string;
+  onSuccess?: () => void;
 }
 
 export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
-  const { address, status } = useAccount()
-  const [amount, setAmount] = useState("")
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [txHash, setTxHash] = useState<string | null>(null)
-  const [isSuccess, setIsSuccess] = useState(false)
+  const { address, status } = useAccount();
+  const [amount, setAmount] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const { sendAsync } = useSendTransaction({})
+  const { sendAsync } = useSendTransaction({});
 
   // Check USDC balance
   const { data: balance } = useReadContract({
@@ -51,44 +66,50 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
     address: USDC_TOKEN_ADDRESS,
     args: address ? [address] : undefined,
     enabled: Boolean(address),
-  })
+  });
 
   const formatBalance = (balance: any) => {
-    if (!balance) return "0"
-    const balanceNum = Number(balance) / 1e6 // USDC has 6 decimals
-    return balanceNum.toFixed(2)
-  }
+    if (!balance) return "0";
+    const balanceNum = Number(balance) / 1e6; // USDC has 6 decimals
+    return balanceNum.toFixed(2);
+  };
 
   const handleApproveAndLock = async () => {
-    if (!address || !amount) return
+    if (!address || !amount) return;
 
-    setIsProcessing(true)
-    setError(null)
+    setIsProcessing(true);
+    setError(null);
 
     try {
       // Convert amount to proper format (USDC has 6 decimals)
-      const amountInWei = BigInt(Math.floor(parseFloat(amount) * 1e6))
-      const groupIdBigInt = BigInt(groupId)
-      
+      const amountInWei = BigInt(Math.floor(parseFloat(amount) * 1e6));
+      const groupIdBigInt = BigInt(groupId);
+
       // Format U256 values - split into low and high 128-bit parts
       const formatU256 = (value: bigint) => {
-        const MAX_U128 = BigInt("0xffffffffffffffffffffffffffffffff")
+        const MAX_U128 = BigInt("0xffffffffffffffffffffffffffffffff");
         return {
           low: value & MAX_U128,
           high: value >> BigInt(128),
-        }
-      }
-      
-      const amountU256 = formatU256(amountInWei)
-      const groupIdU256 = formatU256(groupIdBigInt)
+        };
+      };
+
+      const amountU256 = formatU256(amountInWei);
+      const groupIdU256 = formatU256(groupIdBigInt);
 
       console.log("Multicall: Approve and Lock USDC:", {
         amount: amount,
         amountInWei: amountInWei.toString(),
         groupId: groupId,
-        amountU256: { low: amountU256.low.toString(), high: amountU256.high.toString() },
-        groupIdU256: { low: groupIdU256.low.toString(), high: groupIdU256.high.toString() },
-      })
+        amountU256: {
+          low: amountU256.low.toString(),
+          high: amountU256.high.toString(),
+        },
+        groupIdU256: {
+          low: groupIdU256.low.toString(),
+          high: groupIdU256.high.toString(),
+        },
+      });
 
       // Create multicall with both approve and lock operations
       const calls: Call[] = [
@@ -112,30 +133,31 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
             groupIdU256.high.toString(), // group_id high
           ],
         },
-      ]
+      ];
 
-      console.log("Multicall details:", calls)
+      console.log("Multicall details:", calls);
 
-      const result = await sendAsync(calls)
-      console.log("Multicall transaction sent:", result)
+      const result = await sendAsync(calls);
+      console.log("Multicall transaction sent:", result);
 
       if (result?.transaction_hash) {
-        setTxHash(result.transaction_hash)
-        setIsSuccess(true)
-        onSuccess?.()
+        setTxHash(result.transaction_hash);
+        setIsSuccess(true);
+        onSuccess?.();
       }
     } catch (error: any) {
-      console.error("Multicall failed:", error)
-      setError(error.message || "Failed to approve and lock USDC")
+      console.error("Multicall failed:", error);
+      setError(error.message || "Failed to approve and lock USDC");
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
-  const isConnected = status === "connected"
-  const userBalance = formatBalance(balance)
-  const hasInsufficientBalance = parseFloat(amount || "0") > parseFloat(userBalance)
-  
+  const isConnected = status === "connected";
+  const userBalance = formatBalance(balance);
+  const hasInsufficientBalance =
+    parseFloat(amount || "0") > parseFloat(userBalance);
+
   if (isSuccess) {
     return (
       <Card>
@@ -160,10 +182,10 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
           <div className="mt-4">
             <Button
               onClick={() => {
-                setIsSuccess(false)
-                setAmount("")
-                setTxHash(null)
-                setError(null)
+                setIsSuccess(false);
+                setAmount("");
+                setTxHash(null);
+                setError(null);
               }}
               variant="outline"
               className="w-full"
@@ -173,7 +195,7 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -184,7 +206,8 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
           Lock USDC Liquidity
         </CardTitle>
         <CardDescription>
-          Lock your USDC tokens for this group in a single transaction. This ensures commitment and builds trust.
+          Lock your USDC tokens for this group in a single transaction. This
+          ensures commitment and builds trust.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -202,7 +225,8 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
             {/* Balance Display */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <p className="text-sm text-blue-700">
-                Your USDC Balance: <span className="font-semibold">{userBalance} USDC</span>
+                Your USDC Balance:{" "}
+                <span className="font-semibold">{userBalance} USDC</span>
               </p>
             </div>
 
@@ -232,7 +256,10 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
                 <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
                 <div className="text-sm text-green-700">
                   <p className="font-medium">One-Step Process</p>
-                  <p>Both approval and locking will happen in a single transaction, saving you time and gas fees.</p>
+                  <p>
+                    Both approval and locking will happen in a single
+                    transaction, saving you time and gas fees.
+                  </p>
                 </div>
               </div>
             </div>
@@ -250,7 +277,12 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
             {/* Action Button */}
             <Button
               onClick={handleApproveAndLock}
-              disabled={!amount || isProcessing || hasInsufficientBalance || parseFloat(amount) <= 0}
+              disabled={
+                !amount ||
+                isProcessing ||
+                hasInsufficientBalance ||
+                parseFloat(amount) <= 0
+              }
               className="w-full"
               size="lg"
             >
@@ -268,7 +300,6 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
             </Button>
 
             {/* Process Info */}
-            
 
             {/* Transaction Hash */}
             {txHash && !isSuccess && (
@@ -285,5 +316,5 @@ export function SimpleUsdcLock({ groupId, onSuccess }: SimpleUsdcLockProps) {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

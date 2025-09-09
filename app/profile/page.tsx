@@ -38,6 +38,7 @@ import ProfileOverview from "@/components/profile/ProfileOverview";
 import ProfileActivity from "@/components/profile/ProfileActivity";
 import ProfileStatistics from "@/components/profile/ProfileStatistics";
 import MyGroupsJoined from "@/components/profile/MyGroupsJoined";
+import ProfilePayouts from "@/components/profile/ProfilePayouts";
 
 // Utility function to convert felt252 (hex) to string
 function felt252ToString(felt: any): string {
@@ -108,8 +109,8 @@ export default function ProfilePage() {
     error: profileError,
     refetch: refetchProfile,
   } = useReadContract({
-    args: [address ? address : ""],
-    abi: MY_CONTRACT_ABI,
+    args: address ? [address] : undefined,
+    abi: MY_CONTRACT_ABI as any,
     address: CONTRACT_ADDRESS,
     enabled: !!address,
     watch: true,
@@ -122,8 +123,8 @@ export default function ProfilePage() {
     isLoading: isLoadingActivities,
     error: activitiesError,
   } = useReadContract({
-    args: [address ? address : "", 20], // Get last 20 activities
-    abi: MY_CONTRACT_ABI,
+    args: address ? [address, 20] : undefined, // Get last 20 activities
+    abi: MY_CONTRACT_ABI as any,
     address: CONTRACT_ADDRESS,
     enabled: !!address,
     watch: true,
@@ -136,8 +137,8 @@ export default function ProfilePage() {
     isLoading: isLoadingStatistics,
     error: statisticsError,
   } = useReadContract({
-    args: [address ? address : ""],
-    abi: MY_CONTRACT_ABI,
+    args: address ? [address] : undefined,
+    abi: MY_CONTRACT_ABI as any,
     address: CONTRACT_ADDRESS,
     enabled: !!address,
     watch: true,
@@ -150,8 +151,8 @@ export default function ProfilePage() {
     isLoading: isLoadingJoinedGroups,
     error: joinedGroupsError,
   } = useReadContract({
-    args: [address ? address : ""],
-    abi: MY_CONTRACT_ABI,
+    args: address ? [address] : undefined,
+    abi: MY_CONTRACT_ABI as any,
     address: CONTRACT_ADDRESS,
     enabled: !!address,
     watch: true,
@@ -164,8 +165,8 @@ export default function ProfilePage() {
     isLoading: isLoadingLockedBalance,
     error: lockedBalanceError,
   } = useReadContract({
-    args: [address ? address : ""],
-    abi: MY_CONTRACT_ABI,
+    args: address ? [address] : undefined,
+    abi: MY_CONTRACT_ABI as any,
     address: CONTRACT_ADDRESS,
     enabled: !!address,
     watch: true,
@@ -463,6 +464,9 @@ export default function ProfilePage() {
               )}
             </TabsTrigger>
             <TabsTrigger value="statistics">Statistics</TabsTrigger>
+            <TabsTrigger value="payouts">
+              Payouts
+            </TabsTrigger>
             <TabsTrigger value="my-groups">
               My Groups
               {analytics.joinedGroups > 0 && (
@@ -495,6 +499,10 @@ export default function ProfilePage() {
                 <span>Loading statistics...</span>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="payouts" className="space-y-6">
+            <ProfilePayouts userAddress={address} />
           </TabsContent>
 
           <TabsContent value="my-groups" className="space-y-6">

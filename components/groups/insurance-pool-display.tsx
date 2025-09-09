@@ -10,7 +10,7 @@ import { MY_CONTRACT_ABI } from "@/constants/abi";
 import { CONTRACT_ADDRESS } from "@/constants";
 
 interface InsurancePoolDisplayProps {
-  groupId: string;
+  groupId: string | number;
 }
 
 export function InsurancePoolDisplay({ groupId }: InsurancePoolDisplayProps) {

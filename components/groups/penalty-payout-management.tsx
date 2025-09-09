@@ -2,7 +2,7 @@
 
 import { FormattedGroupDetails } from "@/hooks/use-group-details";
 import DeadlinePenaltyManager from "./deadline-penalty-manager";
-import PayoutManager from "./payout-manager";
+
 
 interface PenaltyPayoutManagementProps {
   groupId: string;
@@ -21,11 +21,7 @@ export default function PenaltyPayoutManagement({
         <DeadlinePenaltyManager groupId={groupId} />
       </div>
 
-      {/* Payout Management Section */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Payout Management</h2>
-        <PayoutManager groupId={groupId} groupDetails={groupDetails} />
-      </div>
+   
     </div>
   );
 }

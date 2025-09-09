@@ -4,10 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useGroupAnalytics } from "@/hooks/use-group-analytics";
+import { InsurancePoolDisplay } from "@/components/groups/insurance-pool-display"
 import { 
   DollarSign, 
   Clock, 
-  Users, 
   AlertTriangle, 
   CheckCircle, 
   RefreshCw,
@@ -23,6 +23,7 @@ interface GroupAnalyticsProps {
 
 export default function GroupAnalytics({ groupId, className }: GroupAnalyticsProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  
   
   const {
     lockedFunds,
@@ -86,17 +87,7 @@ export default function GroupAnalytics({ groupId, className }: GroupAnalyticsPro
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {hasError && (
-          <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-            <div className="flex items-center gap-2 text-destructive">
-              <AlertTriangle className="w-4 h-4" />
-              <span className="font-medium">Error loading analytics</span>
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {lockedFundsError?.message || deadlineError?.message || "Failed to load group analytics"}
-            </p>
-          </div>
-        )}
+    
 
         {/* Locked Funds Section */}
         <div className="space-y-4">
@@ -121,16 +112,7 @@ export default function GroupAnalytics({ groupId, className }: GroupAnalyticsPro
                 </div>
               </div>
                             <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium text-gray-700">Users with Locked Funds</span>
-                    <p className="text-xs text-gray-500 mt-1">Wallet addresses and amounts locked in this group</p>
-                  </div>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    <Users className="w-3 h-3 mr-1" />
-                    {lockedFunds.userContributions.length} {lockedFunds.userContributions.length === 1 ? 'User' : 'Users'}
-                  </Badge>
-                </div>
+               
                 
                 <div className="max-h-40 overflow-y-auto space-y-2">
                   {lockedFunds.userContributions.map((contribution, index) => (
@@ -248,6 +230,16 @@ export default function GroupAnalytics({ groupId, className }: GroupAnalyticsPro
   );
 }
 
+// Insurance Pool Analytics Component
+export function GroupAnalyticsWithInsurance({ groupId, className }: GroupAnalyticsProps) {
+  return (
+    <div className="space-y-4">
+      <GroupAnalytics groupId={groupId} className={className} />
+      <InsurancePoolDisplay groupId={groupId} />
+    </div>
+  );
+}
+
 // Compact version for smaller spaces
 export function GroupAnalyticsCompact({ groupId, className }: GroupAnalyticsProps) {
   const { lockedFunds, deadline, isLoading } = useGroupAnalytics(groupId);
@@ -283,6 +275,10 @@ export function GroupAnalyticsCompact({ groupId, className }: GroupAnalyticsProp
           </Badge>
         </div>
       )}
+
+      <div className="flex items-center gap-1">
+       <InsurancePoolDisplay groupId={groupId} />
+      </div>
     </div>
   );
 }

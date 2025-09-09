@@ -11,29 +11,32 @@ import { useAccount, useReadContract } from "@starknet-react/core";
 import { MY_CONTRACT_ABI } from "@/constants/abi";
 import { GroupAnalyticsCompact } from "@/components/groups/group-analytics";
 
-const CONTRACT_ADDRESS = "0x06c79bd702e4a350654d56eb56f1745cbe232d3a98fea112fcd38f001df16c6a"; 
+const CONTRACT_ADDRESS =
+  "0x0081239ae11f403bc90620395f3bed28c35810b6e18a0d55cf809b45ccab5fb7";
 
 // Helper function to validate and format Starknet address
-const formatStarknetAddress = (address: string | undefined): `0x${string}` | undefined => {
+const formatStarknetAddress = (
+  address: string | undefined
+): `0x${string}` | undefined => {
   if (!address) return undefined;
-  
+
   // Remove any whitespace
   const cleanAddress = address.trim();
-  
+
   // Check if it's a valid hex string (only contains 0-9, a-f, A-F)
   const hexRegex = /^0x[0-9a-fA-F]+$/;
   if (!hexRegex.test(cleanAddress)) {
-    console.error('Invalid address format:', cleanAddress);
+    console.error("Invalid address format:", cleanAddress);
     return undefined;
   }
-  
+
   // Ensure it's the right length (Starknet addresses should be 64 characters + 0x prefix)
   if (cleanAddress.length !== 66) {
     // Pad with zeros if too short
-    const paddedAddress = cleanAddress.replace('0x', '').padStart(64, '0');
+    const paddedAddress = cleanAddress.replace("0x", "").padStart(64, "0");
     return `0x${paddedAddress}`;
   }
-  
+
   return cleanAddress as `0x${string}`;
 };
 
@@ -88,7 +91,10 @@ const LoadingState = () => (
     {/* Summary stats skeleton */}
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {[...Array(3)].map((_, i) => (
-        <div key={i} className="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div
+          key={i}
+          className="bg-white rounded-lg border border-gray-200 shadow-sm"
+        >
           <div className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
@@ -108,8 +114,12 @@ const LoadingState = () => (
           <div className="absolute inset-0 w-8 h-8 border-2 border-blue-200 rounded-full animate-ping"></div>
         </div>
         <div className="text-center">
-          <p className="text-lg font-medium text-gray-900 mb-1">Loading your groups...</p>
-          <p className="text-sm text-gray-600">Fetching data from the blockchain</p>
+          <p className="text-lg font-medium text-gray-900 mb-1">
+            Loading your groups...
+          </p>
+          <p className="text-sm text-gray-600">
+            Fetching data from the blockchain
+          </p>
         </div>
       </div>
     </div>
@@ -149,7 +159,6 @@ interface JoinedGroup {
 
 interface MyGroupsJoinedProps {
   userAddress?: string;
-  
 }
 
 export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
@@ -168,7 +177,7 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
     error: contractError,
     isLoading,
     isSuccess,
-    isError
+    isError,
   } = useReadContract({
     abi: MY_CONTRACT_ABI,
     functionName: "get_user_joined_groups",
@@ -181,7 +190,7 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
   // Helper function to format U256 values from contract
   const formatU256 = (value: any) => {
     if (!value) return 0;
-    if (typeof value === 'object' && value.low !== undefined) {
+    if (typeof value === "object" && value.low !== undefined) {
       return Number(value.low) / 1e6; // Assuming 6 decimal places for USDC
     }
     return Number(value) / 1e6;
@@ -190,9 +199,13 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
   // Helper function to get time unit string
   const getTimeUnitString = (unit: any) => {
     const timeUnits = ["Minutes", "Hours", "Days", "Weeks", "Months"];
-    const unitIndex = typeof unit === 'object' ? Object.keys(unit)[0] : unit;
+    const unitIndex = typeof unit === "object" ? Object.keys(unit)[0] : unit;
     const unitMap: { [key: string]: number } = {
-      'Minutes': 0, 'Hours': 1, 'Days': 2, 'Weeks': 3, 'Months': 4
+      Minutes: 0,
+      Hours: 1,
+      Days: 2,
+      Weeks: 3,
+      Months: 4,
     };
     return timeUnits[unitMap[unitIndex] || 0] || "Unknown";
   };
@@ -200,9 +213,13 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
   // Helper function to get group state string
   const getGroupStateString = (state: any) => {
     const states = ["created", "active", "completed", "paused"];
-    const stateIndex = typeof state === 'object' ? Object.keys(state)[0] : state;
+    const stateIndex =
+      typeof state === "object" ? Object.keys(state)[0] : state;
     const stateMap: { [key: string]: number } = {
-      'Created': 0, 'Active': 1, 'Completed': 2, 'Defaulted': 3
+      Created: 0,
+      Active: 1,
+      Completed: 2,
+      Defaulted: 3,
     };
     return states[stateMap[stateIndex] || 0] || "created";
   };
@@ -210,103 +227,143 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
   // Helper function to get visibility string
   const getVisibilityString = (visibility: any) => {
     const visibilities = ["public", "private"];
-    const visIndex = typeof visibility === 'object' ? Object.keys(visibility)[0] : visibility;
+    const visIndex =
+      typeof visibility === "object" ? Object.keys(visibility)[0] : visibility;
     const visMap: { [key: string]: number } = {
-      'Public': 0, 'Private': 1
+      Public: 0,
+      Private: 1,
     };
     return visibilities[visMap[visIndex] || 0] || "public";
   };
 
   // Process contract result when it changes
   useEffect(() => {
-    console.log('Contract call state:', { 
-      isLoading, 
-      isSuccess, 
-      isError, 
-      targetAddress, 
+    console.log("Contract call state:", {
+      isLoading,
+      isSuccess,
+      isError,
+      targetAddress,
       formattedContractAddress,
-      hasResult: !!contractResult 
+      hasResult: !!contractResult,
     });
 
     if (isSuccess && contractResult) {
       try {
-        console.log('Contract result:', contractResult);
+        console.log("Contract result:", contractResult);
 
         if (Array.isArray(contractResult) && contractResult.length > 0) {
-          const processedGroups: JoinedGroup[] = contractResult.map((groupDetail: any, index: number) => {
-            console.log(`Processing group ${index}:`, groupDetail);
-            
-            const groupInfo = groupDetail?.group_info || {};
-            const memberData = groupDetail?.member_data || {};
-            
-            // Calculate next payout date
-            const nextPayoutTimestamp = groupDetail?.next_payout_date;
-            const nextPayoutDate = nextPayoutTimestamp 
-              ? new Date(Number(nextPayoutTimestamp) * 1000).toLocaleDateString()
-              : "TBD";
+          const processedGroups: JoinedGroup[] = contractResult.map(
+            (groupDetail: any, index: number) => {
+              console.log(`Processing group ${index}:`, groupDetail);
 
-            // Calculate expected payout
-            const expectedPayout = formatU256(groupDetail?.expected_payout_amount);
-            
-            // Determine payment status based on contribution count and current cycle
-            let paymentStatus: "up-to-date" | "pending" | "late" = "up-to-date";
-            const missedContributions = Number(memberData?.missed_contributions || 0);
-            const contributionCount = Number(memberData?.contribution_count || 0);
-            const currentCycle = Number(groupInfo?.current_cycle || 0);
-            
-            if (missedContributions > 0) {
-              paymentStatus = "late";
-            } else if (contributionCount < currentCycle) {
-              paymentStatus = "pending";
+              const groupInfo = groupDetail?.group_info || {};
+              const memberData = groupDetail?.member_data || {};
+
+              // Calculate next payout date
+              const nextPayoutTimestamp = groupDetail?.next_payout_date;
+              const nextPayoutDate = nextPayoutTimestamp
+                ? new Date(
+                    Number(nextPayoutTimestamp) * 1000
+                  ).toLocaleDateString()
+                : "TBD";
+
+              // Calculate expected payout
+              const expectedPayout = formatU256(
+                groupDetail?.expected_payout_amount
+              );
+
+              // Determine payment status based on contribution count and current cycle
+              let paymentStatus: "up-to-date" | "pending" | "late" =
+                "up-to-date";
+              const missedContributions = Number(
+                memberData?.missed_contributions || 0
+              );
+              const contributionCount = Number(
+                memberData?.contribution_count || 0
+              );
+              const currentCycle = Number(groupInfo?.current_cycle || 0);
+
+              if (missedContributions > 0) {
+                paymentStatus = "late";
+              } else if (contributionCount < currentCycle) {
+                paymentStatus = "pending";
+              }
+
+              const processedGroup: JoinedGroup = {
+                id: (groupInfo?.group_id || index).toString(),
+                name:
+                  groupInfo?.group_name ||
+                  `Group ${groupInfo?.group_id || index}`,
+                type: getVisibilityString(groupInfo?.visibility) as
+                  | "public"
+                  | "private",
+                members: Number(groupInfo?.members || 0),
+                maxMembers: Number(groupInfo?.member_limit || 0),
+                contribution: `${formatU256(
+                  groupInfo?.contribution_amount || 0
+                )} USDC`,
+                frequency: getTimeUnitString(groupInfo?.cycle_unit),
+                status: getGroupStateString(groupInfo?.state) as
+                  | "active"
+                  | "completed"
+                  | "paused"
+                  | "created",
+                joinedAt: memberData?.joined_at
+                  ? new Date(
+                      Number(memberData.joined_at) * 1000
+                    ).toLocaleDateString()
+                  : "Unknown",
+                currentCycle: Number(groupInfo?.current_cycle || 0),
+                totalCycles: Number(groupInfo?.total_cycles || 0),
+                nextPayoutDate,
+                userPosition: Number(groupDetail?.position_in_queue || 0),
+                totalContributed: formatU256(
+                  groupDetail?.total_contributed_so_far || 0
+                ),
+                expectedPayout: `${expectedPayout.toLocaleString()} USDC`,
+                paymentStatus,
+                hasBeenPaid: Boolean(memberData?.has_been_paid),
+                isActive: Boolean(memberData?.is_active),
+                contributionCount,
+                missedContributions,
+                totalReceived: formatU256(
+                  memberData?.total_recieved || memberData?.total_received || 0
+                ),
+              };
+
+              console.log(`Processed group ${index}:`, processedGroup);
+              return processedGroup;
             }
+          );
 
-            const processedGroup: JoinedGroup = {
-              id: (groupInfo?.group_id || index).toString(),
-              name: groupInfo?.group_name || `Group ${groupInfo?.group_id || index}`,
-              type: getVisibilityString(groupInfo?.visibility) as "public" | "private",
-              members: Number(groupInfo?.members || 0),
-              maxMembers: Number(groupInfo?.member_limit || 0),
-              contribution: `${formatU256(groupInfo?.contribution_amount || 0)} USDC`,
-              frequency: getTimeUnitString(groupInfo?.cycle_unit),
-              status: getGroupStateString(groupInfo?.state) as "active" | "completed" | "paused" | "created",
-              joinedAt: memberData?.joined_at ? new Date(Number(memberData.joined_at) * 1000).toLocaleDateString() : "Unknown",
-              currentCycle: Number(groupInfo?.current_cycle || 0),
-              totalCycles: Number(groupInfo?.total_cycles || 0),
-              nextPayoutDate,
-              userPosition: Number(groupDetail?.position_in_queue || 0),
-              totalContributed: formatU256(groupDetail?.total_contributed_so_far || 0),
-              expectedPayout: `${expectedPayout.toLocaleString()} USDC`,
-              paymentStatus,
-              hasBeenPaid: Boolean(memberData?.has_been_paid),
-              isActive: Boolean(memberData?.is_active),
-              contributionCount,
-              missedContributions,
-              totalReceived: formatU256(memberData?.total_recieved || memberData?.total_received || 0),
-            };
-            
-            console.log(`Processed group ${index}:`, processedGroup);
-            return processedGroup;
-          });
-
-          console.log('Final processed groups:', processedGroups);
+          console.log("Final processed groups:", processedGroups);
           setJoinedGroups(processedGroups);
           setProcessedError(null);
         } else {
-          console.log('No groups found or empty result');
+          console.log("No groups found or empty result");
           setJoinedGroups([]);
           setProcessedError(null);
         }
       } catch (err) {
-        console.error('Error processing contract result:', err);
-        setProcessedError('Failed to process group data. Please try again.');
+        console.error("Error processing contract result:", err);
+        setProcessedError("Failed to process group data. Please try again.");
         setJoinedGroups([]);
       }
     } else if (isError) {
-      console.error('Contract call error:', contractError);
-      setProcessedError(contractError?.message || 'Failed to load groups. Please try again.');
+      console.error("Contract call error:", contractError);
+      setProcessedError(
+        contractError?.message || "Failed to load groups. Please try again."
+      );
       setJoinedGroups([]);
     }
-  }, [contractResult, isSuccess, isError, contractError, targetAddress, formattedContractAddress]);
+  }, [
+    contractResult,
+    isSuccess,
+    isError,
+    contractError,
+    targetAddress,
+    formattedContractAddress,
+  ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -343,7 +400,8 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
 
   // Show error state
   if (processedError || isError) {
-    const errorMessage = processedError || contractError?.message || 'An error occurred';
+    const errorMessage =
+      processedError || contractError?.message || "An error occurred";
     return (
       <div className="bg-white rounded-lg border border-red-200 shadow-sm">
         <div className="text-center py-12 px-6">
@@ -353,11 +411,11 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
           </div>
           <p className="text-gray-600 mb-4">{errorMessage}</p>
           <div className="text-xs text-gray-500 mb-4 space-y-1">
-            <div>Target Address: {targetAddress || 'Not available'}</div>
-            <div>Contract Address: {formattedContractAddress || 'Invalid'}</div>
+            <div>Target Address: {targetAddress || "Not available"}</div>
+            <div>Contract Address: {formattedContractAddress || "Invalid"}</div>
           </div>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             Try Again
@@ -374,13 +432,14 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
         <div className="text-center py-12 px-6">
           <Users className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {!targetAddress ? 'Connect Your Wallet' : 'Invalid Contract Address'}
+            {!targetAddress
+              ? "Connect Your Wallet"
+              : "Invalid Contract Address"}
           </h3>
           <p className="text-gray-600 mb-4">
-            {!targetAddress 
-              ? 'Please connect your wallet to view your joined groups.'
-              : 'The contract address is invalid. Please check the configuration.'
-            }
+            {!targetAddress
+              ? "Please connect your wallet to view your joined groups."
+              : "The contract address is invalid. Please check the configuration."}
           </p>
         </div>
       </div>
@@ -453,14 +512,23 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
       {/* Groups List */}
       <div className="space-y-4">
         {joinedGroups.map((group) => (
-          <div key={group.id} className="bg-white rounded-lg border border-gray-200 shadow-sm">
+          <div
+            key={group.id}
+            className="bg-white rounded-lg border border-gray-200 shadow-sm"
+          >
             <div className="p-6">
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-xl font-semibold text-gray-900">{group.name}</h3>
-                    <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${getStatusColor(group.status)}`}>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {group.name}
+                    </h3>
+                    <span
+                      className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                        group.status
+                      )}`}
+                    >
                       {group.status}
                     </span>
                     <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-600 bg-white">
@@ -468,12 +536,11 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
                     </span>
                   </div>
                   <p className="text-gray-600 text-sm">
-                    Position #{group.userPosition} • Joined{" "}
-                    {group.joinedAt}
+                    Position #{group.userPosition} • Joined {group.joinedAt}
                   </p>
                 </div>
                 {/* FIXED: Proper Link structure */}
-                <Link 
+                <Link
                   href={`/groups/${group.id}`}
                   className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                 >
@@ -503,7 +570,11 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
 
                 <div className="space-y-1">
                   <p className="text-sm text-gray-600">Payment Status</p>
-                  <p className={`font-semibold ${getPaymentStatusColor(group.paymentStatus)}`}>
+                  <p
+                    className={`font-semibold ${getPaymentStatusColor(
+                      group.paymentStatus
+                    )}`}
+                  >
                     {group.paymentStatus
                       .replace("-", " ")
                       .replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -526,10 +597,14 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                      style={{ 
-                        width: `${group.totalCycles > 0 ? (group.currentCycle / group.totalCycles) * 100 : 0}%` 
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${
+                          group.totalCycles > 0
+                            ? (group.currentCycle / group.totalCycles) * 100
+                            : 0
+                        }%`,
                       }}
                     ></div>
                   </div>
@@ -549,7 +624,8 @@ export default function MyGroupsJoined({ userAddress }: MyGroupsJoinedProps) {
                   </div>
                   <p className="text-sm text-green-600 mt-1">
                     Total contributed: {group.totalContributed.toLocaleString()}{" "}
-                    USDC • Total received: {group.totalReceived.toLocaleString()} USDC
+                    USDC • Total received:{" "}
+                    {group.totalReceived.toLocaleString()} USDC
                   </p>
                 </div>
               )}

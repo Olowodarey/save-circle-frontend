@@ -1,15 +1,18 @@
 "use client";
 
-import { Users, DollarSign, Calendar, Star } from "lucide-react";
+import { Users, DollarSign, Calendar, Star, Clock } from "lucide-react";
 import { FormattedGroupDetails } from "@/hooks/use-group-details";
+import { useHeldPayouts } from "@/hooks/use-held-payouts";
 
 interface GroupStatsProps {
   groupDetails: FormattedGroupDetails;
 }
 
 export default function GroupStats({ groupDetails }: GroupStatsProps) {
+  const { heldPayoutsCount, isLoading } = useHeldPayouts(groupDetails.id);
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
       <div className="p-4 bg-blue-50 rounded-lg">
         <div className="flex items-center gap-2 mb-1">
           <Users className="w-4 h-4 text-blue-600" />
@@ -22,7 +25,7 @@ export default function GroupStats({ groupDetails }: GroupStatsProps) {
       <div className="p-4 bg-green-50 rounded-lg">
         <div className="flex items-center gap-2 mb-1">
           <DollarSign className="w-4 h-4 text-green-600" />
-          <span className="text-sm font-medium text-green-900">Contribution</span>
+          <span className="text-sm font-medium text-green-900">Contribution amount</span>
         </div>
         <p className="text-xl font-bold text-green-900">{groupDetails.contribution}</p>
       </div>
@@ -39,6 +42,15 @@ export default function GroupStats({ groupDetails }: GroupStatsProps) {
           <span className="text-sm font-medium text-yellow-900">Min. Reputation</span>
         </div>
         <p className="text-xl font-bold text-yellow-900">{groupDetails.minReputation}</p>
+      </div>
+      <div className="p-4 bg-orange-50 rounded-lg">
+        <div className="flex items-center gap-2 mb-1">
+          <Clock className="w-4 h-4 text-orange-600" />
+          <span className="text-sm font-medium text-orange-900">Held Payouts</span>
+        </div>
+        <p className="text-xl font-bold text-orange-900">
+          {isLoading ? "..." : heldPayoutsCount}
+        </p>
       </div>
     </div>
   );

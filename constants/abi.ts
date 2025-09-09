@@ -1,6 +1,4 @@
-export const MY_CONTRACT_ABI = 
-
-    [
+export const MY_CONTRACT_ABI = [
       {
         "type": "function",
         "name": "pause",
@@ -159,6 +157,10 @@ export const MY_CONTRACT_ABI =
           },
           {
             "name": "average_contribution",
+            "type": "core::integer::u256"
+          },
+          {
+            "name": "pending_payouts",
             "type": "core::integer::u256"
           }
         ]
@@ -590,14 +592,6 @@ export const MY_CONTRACT_ABI =
             "type": "save_circle::structs::Structs::GroupMember"
           },
           {
-            "name": "next_payout_date",
-            "type": "core::integer::u64"
-          },
-          {
-            "name": "position_in_queue",
-            "type": "core::integer::u32"
-          },
-          {
             "name": "total_contributed_so_far",
             "type": "core::integer::u256"
           },
@@ -853,26 +847,6 @@ export const MY_CONTRACT_ABI =
           },
           {
             "type": "function",
-            "name": "get_user_activities",
-            "inputs": [
-              {
-                "name": "user_address",
-                "type": "core::starknet::contract_address::ContractAddress"
-              },
-              {
-                "name": "limit",
-                "type": "core::integer::u32"
-              }
-            ],
-            "outputs": [
-              {
-                "type": "core::array::Array::<save_circle::structs::Structs::UserActivity>"
-              }
-            ],
-            "state_mutability": "view"
-          },
-          {
-            "type": "function",
             "name": "get_user_statistics",
             "inputs": [
               {
@@ -965,26 +939,6 @@ export const MY_CONTRACT_ABI =
           },
           {
             "type": "function",
-            "name": "get_penalty_locked",
-            "inputs": [
-              {
-                "name": "user",
-                "type": "core::starknet::contract_address::ContractAddress"
-              },
-              {
-                "name": "group_id",
-                "type": "core::integer::u256"
-              }
-            ],
-            "outputs": [
-              {
-                "type": "core::integer::u256"
-              }
-            ],
-            "state_mutability": "view"
-          },
-          {
-            "type": "function",
             "name": "has_completed_circle",
             "inputs": [
               {
@@ -1069,13 +1023,8 @@ export const MY_CONTRACT_ABI =
           },
           {
             "type": "function",
-            "name": "claim_payout",
-            "inputs": [
-              {
-                "name": "group_id",
-                "type": "core::integer::u256"
-              }
-            ],
+            "name": "withdraw_payout",
+            "inputs": [],
             "outputs": [
               {
                 "type": "core::integer::u256"
@@ -1085,16 +1034,32 @@ export const MY_CONTRACT_ABI =
           },
           {
             "type": "function",
-            "name": "get_next_payout_recipient",
+            "name": "get_pending_payout",
             "inputs": [
               {
-                "name": "group_id",
-                "type": "core::integer::u256"
+                "name": "user_address",
+                "type": "core::starknet::contract_address::ContractAddress"
               }
             ],
             "outputs": [
               {
-                "type": "save_circle::structs::Structs::GroupMember"
+                "type": "core::integer::u256"
+              }
+            ],
+            "state_mutability": "view"
+          },
+          {
+            "type": "function",
+            "name": "get_user_withdrawal_info",
+            "inputs": [
+              {
+                "name": "user_address",
+                "type": "core::starknet::contract_address::ContractAddress"
+              }
+            ],
+            "outputs": [
+              {
+                "type": "(core::integer::u256, core::integer::u256, core::integer::u256)"
               }
             ],
             "state_mutability": "view"
@@ -1157,26 +1122,6 @@ export const MY_CONTRACT_ABI =
           },
           {
             "type": "function",
-            "name": "get_cycle_contributors",
-            "inputs": [
-              {
-                "name": "group_id",
-                "type": "core::integer::u256"
-              },
-              {
-                "name": "cycle",
-                "type": "core::integer::u64"
-              }
-            ],
-            "outputs": [
-              {
-                "type": "(core::integer::u256, core::array::Array::<(core::starknet::contract_address::ContractAddress, core::integer::u256)>)"
-              }
-            ],
-            "state_mutability": "view"
-          },
-          {
-            "type": "function",
             "name": "get_contribution_deadline",
             "inputs": [
               {
@@ -1197,7 +1142,7 @@ export const MY_CONTRACT_ABI =
           },
           {
             "type": "function",
-            "name": "get_missed_deadline_penalty",
+            "name": "get_deadline_info",
             "inputs": [
               {
                 "name": "group_id",
@@ -1210,54 +1155,10 @@ export const MY_CONTRACT_ABI =
             ],
             "outputs": [
               {
-                "type": "core::integer::u256"
+                "type": "(core::integer::u64, core::integer::u64, core::integer::u256, core::bool)"
               }
             ],
             "state_mutability": "view"
-          },
-          {
-            "type": "function",
-            "name": "get_time_until_deadline",
-            "inputs": [
-              {
-                "name": "group_id",
-                "type": "core::integer::u256"
-              },
-              {
-                "name": "user",
-                "type": "core::starknet::contract_address::ContractAddress"
-              }
-            ],
-            "outputs": [
-              {
-                "type": "core::integer::u64"
-              }
-            ],
-            "state_mutability": "view"
-          },
-          {
-            "type": "function",
-            "name": "track_missed_deadline_penalty",
-            "inputs": [
-              {
-                "name": "group_id",
-                "type": "core::integer::u256"
-              },
-              {
-                "name": "user",
-                "type": "core::starknet::contract_address::ContractAddress"
-              },
-              {
-                "name": "penalty_amount",
-                "type": "core::integer::u256"
-              }
-            ],
-            "outputs": [
-              {
-                "type": "core::bool"
-              }
-            ],
-            "state_mutability": "external"
           },
           {
             "type": "function",
@@ -1353,38 +1254,6 @@ export const MY_CONTRACT_ABI =
           },
           {
             "type": "function",
-            "name": "get_current_cycle_contributors",
-            "inputs": [
-              {
-                "name": "group_id",
-                "type": "core::integer::u256"
-              }
-            ],
-            "outputs": [
-              {
-                "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
-              }
-            ],
-            "state_mutability": "view"
-          },
-          {
-            "type": "function",
-            "name": "get_group_total_contributions",
-            "inputs": [
-              {
-                "name": "group_id",
-                "type": "core::integer::u256"
-              }
-            ],
-            "outputs": [
-              {
-                "type": "(core::integer::u256, core::integer::u256, core::array::Array::<(core::starknet::contract_address::ContractAddress, core::integer::u256)>)"
-              }
-            ],
-            "state_mutability": "view"
-          },
-          {
-            "type": "function",
             "name": "get_held_payouts",
             "inputs": [
               {
@@ -1395,6 +1264,54 @@ export const MY_CONTRACT_ABI =
             "outputs": [
               {
                 "type": "core::integer::u32"
+              }
+            ],
+            "state_mutability": "view"
+          },
+          {
+            "type": "function",
+            "name": "distribute_final_pool",
+            "inputs": [
+              {
+                "name": "group_id",
+                "type": "core::integer::u256"
+              }
+            ],
+            "outputs": [
+              {
+                "type": "core::bool"
+              }
+            ],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
+            "name": "mark_group_completed",
+            "inputs": [
+              {
+                "name": "group_id",
+                "type": "core::integer::u256"
+              }
+            ],
+            "outputs": [
+              {
+                "type": "core::bool"
+              }
+            ],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
+            "name": "is_group_admin_completed",
+            "inputs": [
+              {
+                "name": "group_id",
+                "type": "core::integer::u256"
+              }
+            ],
+            "outputs": [
+              {
+                "type": "core::bool"
               }
             ],
             "state_mutability": "view"

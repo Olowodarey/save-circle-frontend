@@ -13,14 +13,11 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useGroupDetails } from "@/hooks/use-group-details"
 import { useAccount } from "@starknet-react/core"
-import { SimpleUsdcContribution } from "@/components/groups/simple-usdc-contribution"
 import GroupContribution from "@/components/groups/group-contribution"
 import GroupLiquidityLock from "@/components/groups/group-liquidity-lock"
 import GroupHeader from "@/components/groups/group-header"
 import GroupStats from "@/components/groups/group-stats"
-import { LockedBalanceDisplay } from "@/components/groups/locked-balance-display"
 import { InsurancePoolDisplay } from "@/components/groups/insurance-pool-display"
-import { NextPayoutDisplay } from "@/components/groups/next-payout-display"
 import { DistributePayoutAction } from "@/components/groups/distribute-payout-action"
 import { WithdrawLockedAction } from "@/components/groups/withdraw-locked-action"
 import { PayoutOrderDisplay } from "@/components/groups/payout-order-display"
@@ -29,7 +26,7 @@ import GroupActionPanel from "@/components/groups/group-action-panel"
 import GroupMembersList from "@/components/groups/group-members-list"
 import GroupPaymentHistory from "@/components/groups/group-payment-history"
 import GroupRulesTerms from "@/components/groups/group-rules-terms"
-import GroupAnalytics from "@/components/groups/group-analytics"
+import GroupAnalytics, { GroupAnalyticsWithInsurance } from "@/components/groups/group-analytics"
 import PenaltyPayoutManagement from "@/components/groups/penalty-payout-management"
 
 export default function GroupDetailsPage() {
@@ -132,7 +129,7 @@ export default function GroupDetailsPage() {
                 {/* New Contract Functions - Quick Analytics */}
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <h4 className="font-semibold text-blue-800 mb-2">📊 Group Analytics </h4>
-                  <GroupAnalytics groupId={groupId} className="bg-white" />
+                  <GroupAnalyticsWithInsurance groupId={groupId} className="bg-white" />
                 </div>
               </div>
 
@@ -150,11 +147,9 @@ export default function GroupDetailsPage() {
           <TabsList>
             <TabsTrigger value="members">Members ({groupDetails.members})</TabsTrigger>
             <TabsTrigger value="contribute">Contribute</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="lock">Lock Liquidity</TabsTrigger>
             <TabsTrigger value="management">Group Actions</TabsTrigger>
             <TabsTrigger value="penalties">Penalties & Payouts</TabsTrigger>
-            {/* <TabsTrigger value="history">Payment History</TabsTrigger> */}
             <TabsTrigger value="rules">Rules & Terms</TabsTrigger>
           </TabsList>
 
@@ -163,24 +158,13 @@ export default function GroupDetailsPage() {
           </TabsContent>
 
           <TabsContent value="contribute" className="space-y-4">
-            {/* Group Financial Information */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <LockedBalanceDisplay groupId={params.id as string} />
-              <InsurancePoolDisplay groupId={params.id as string} />
-              <NextPayoutDisplay groupId={params.id as string} />
-            </div>
-            
-            {/* Contribution Form */}
             <GroupContribution 
               groupDetails={groupDetails}
               onContributionSuccess={refetch}
             />
           </TabsContent>
 
-          <TabsContent value="analytics" className="space-y-4">
-            {/* New Contract Functions Analytics */}
-            <GroupAnalytics groupId={groupId} />
-          </TabsContent>
+        
 
           <TabsContent value="management" className="space-y-4">
             {/* Payout Order Display */}
