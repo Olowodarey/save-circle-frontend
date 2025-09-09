@@ -13,7 +13,8 @@ interface FormData {
   description: string;
   maxMembers: string;
   contributionAmount: string;
-  frequency: string;
+  cycleDuration: string;
+  cycleUnit: string;
   minReputation: string;
 }
 
@@ -119,19 +120,33 @@ export default function PublicGroupForm({
               {selectedToken !== "usdc" && "Will be automatically converted to USDC"}
             </p>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="frequency">Payment Frequency</Label>
-            <Select value={formData.frequency} onValueChange={(value) => onInputChange("frequency", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select frequency" />
-              </SelectTrigger>
-              <SelectContent>
-              <SelectItem value="hours">Hours</SelectItem>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="cycleDuration">Cycle Duration</Label>
+              <Input
+                id="cycleDuration"
+                type="number"
+                min="1"
+                max="100"
+                placeholder="e.g., 1, 2, 3"
+                value={formData.cycleDuration}
+                onChange={(e) => onInputChange("cycleDuration", e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cycleUnit">Cycle Unit</Label>
+              <Select value={formData.cycleUnit} onValueChange={(value) => onInputChange("cycleUnit", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="hours">Hours</SelectItem>
+                  <SelectItem value="days">Days</SelectItem>
+                  <SelectItem value="weeks">Weeks</SelectItem>
+                  <SelectItem value="months">Months</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="minReputation">Minimum Reputation</Label>

@@ -179,7 +179,8 @@ export function useGroupContract() {
     description: string;
     maxMembers: string;
     contributionAmount: string;
-    frequency: string;
+    cycleDuration: string;
+    cycleUnit: string;
     minReputation: string;
     lockEnabled: boolean;
     lockAmount?: string;
@@ -195,7 +196,18 @@ export function useGroupContract() {
     setTransactionHash(null);
 
     try {
-      const { unit, duration } = convertFrequencyToTimeUnit(params.frequency);
+      // Convert cycle unit string to TimeUnit enum value
+      const unit = (() => {
+        switch (params.cycleUnit.toLowerCase()) {
+          case "hours": return TimeUnit.Hours;
+          case "days": return TimeUnit.Days;
+          case "weeks": return TimeUnit.Weeks;
+          case "months": return TimeUnit.Months;
+          default: return TimeUnit.Days;
+        }
+      })();
+      
+      const duration = parseInt(params.cycleDuration) || 1;
       const reputationScore = convertReputationToNumber(params.minReputation);
 
       // Convert contribution amount to USDC units (6 decimals)
@@ -266,7 +278,8 @@ export function useGroupContract() {
     description: string;
     maxMembers: string;
     contributionAmount: string;
-    frequency: string;
+    cycleDuration: string;
+    cycleUnit: string;
     minReputation: string;
     invitedMembers: string[]; // Changed from inviteEmails to invitedMembers (wallet addresses)
     lockEnabled: boolean;
@@ -283,7 +296,18 @@ export function useGroupContract() {
     setTransactionHash(null);
 
     try {
-      const { unit, duration } = convertFrequencyToTimeUnit(params.frequency);
+      // Convert cycle unit string to TimeUnit enum value
+      const unit = (() => {
+        switch (params.cycleUnit.toLowerCase()) {
+          case "hours": return TimeUnit.Hours;
+          case "days": return TimeUnit.Days;
+          case "weeks": return TimeUnit.Weeks;
+          case "months": return TimeUnit.Months;
+          default: return TimeUnit.Days;
+        }
+      })();
+      
+      const duration = parseInt(params.cycleDuration) || 1;
       const reputationScore = convertReputationToNumber(params.minReputation);
 
       // Convert contribution amount to USDC units (6 decimals)

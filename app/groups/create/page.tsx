@@ -37,7 +37,8 @@ export default function CreateGroupPage() {
     description: "",
     maxMembers: "",
     contributionAmount: "",
-    frequency: "",
+    cycleDuration: "1",
+    cycleUnit: "days",
     minReputation: "0",
   })
 
@@ -75,7 +76,7 @@ export default function CreateGroupPage() {
   }
 
   const validateForm = () => {
-    const { groupName, maxMembers, contributionAmount, frequency } = formData
+    const { groupName, maxMembers, contributionAmount, cycleDuration, cycleUnit } = formData
     
     if (!groupName.trim()) {
       toast({ title: "Error", description: "Group name is required", variant: "destructive" })
@@ -102,8 +103,13 @@ export default function CreateGroupPage() {
       return false
     }
     
-    if (!frequency) {
-      toast({ title: "Error", description: "Payment frequency is required", variant: "destructive" })
+    if (!cycleDuration || parseInt(cycleDuration) < 1) {
+      toast({ title: "Error", description: "Cycle duration must be at least 1", variant: "destructive" })
+      return false
+    }
+    
+    if (!cycleUnit) {
+      toast({ title: "Error", description: "Cycle unit is required", variant: "destructive" })
       return false
     }
     
@@ -139,7 +145,8 @@ export default function CreateGroupPage() {
         description: formData.description,
         maxMembers: formData.maxMembers,
         contributionAmount: formData.contributionAmount,
-        frequency: formData.frequency,
+        cycleDuration: formData.cycleDuration,
+        cycleUnit: formData.cycleUnit,
         lockEnabled,
         lockAmount,
         selectedToken,

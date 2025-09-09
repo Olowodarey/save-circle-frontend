@@ -11,7 +11,7 @@ import { useAccount, useReadContract } from "@starknet-react/core";
 import { MY_CONTRACT_ABI } from "@/constants/abi";
 import { GroupAnalyticsCompact } from "@/components/groups/group-analytics";
 
-const CONTRACT_ADDRESS = "0x018b7d8a7de2d9f63d69dc64d82a1dd728c304c29d07f7e14e1b9ca3fa124609"; 
+const CONTRACT_ADDRESS = "0x06c79bd702e4a350654d56eb56f1745cbe232d3a98fea112fcd38f001df16c6a"; 
 
 // Helper function to validate and format Starknet address
 const formatStarknetAddress = (address: string | undefined): `0x${string}` | undefined => {
