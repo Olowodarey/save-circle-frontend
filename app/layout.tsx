@@ -14,7 +14,15 @@ export const metadata: Metadata = {
   title: "Save Circle - Decentralized Savings Platform",
   description:
     "Join the future of community savings with Save Circle. Create or join Esusu groups, build your reputation, and grow your wealth together on Starknet.",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: '/favicon.svg',
+    // Optional: Add multiple sizes for better compatibility
+    // icon: [
+    //   { url: '/favicon.svg', type: 'image/svg+xml' },
+    //   { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' }
+    // ]
+  }
 }
 
 export default function RootLayout({
