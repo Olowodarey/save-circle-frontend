@@ -1,5 +1,6 @@
 import Link from "next/link";
-import {Coins} from "lucide-react";
+import Logo from "@/svg/logo";
+
 
 const Footer = () => {
    return  <footer className="bg-gray-900 text-white py-12">
@@ -7,8 +8,8 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
             <div>
             <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <Coins className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                <Logo/>
                 </div>
                 <span className="text-xl font-bold">Save Circle</span>
             </div>

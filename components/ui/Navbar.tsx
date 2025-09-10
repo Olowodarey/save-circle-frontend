@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 import {ProtectedLink} from "@/components/ProtectedLinks"
+import Logo from "@/svg/logo";
 
 interface HeaderProps {
     setShowWalletModal: (show: boolean) => void;
@@ -35,8 +36,8 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
         <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                        <Coins className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 flex items-center justify-center">
+                       <Logo/>
                     </div>
                     <span className="text-xl font-bold text-gray-900">Save Circle</span>
                 </Link>
