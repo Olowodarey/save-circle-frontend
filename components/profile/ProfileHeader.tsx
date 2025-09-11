@@ -95,7 +95,7 @@ export default function ProfileHeader({
             )}
           </div>
 
-          <div className="flex-1 space-y-4">
+          <div className="flex-1 w-full min-w-0 space-y-4">
             {isEditing ? (
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -124,75 +124,82 @@ export default function ProfileHeader({
               </div>
             ) : (
               <>
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">
+                <div className="w-full">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">
                     {profileData.name}
                   </h1>
-                  <p className="text-gray-600 font-mono text-sm mt-1">
+                  <p className="text-gray-600 font-mono text-xs sm:text-sm mt-1 overflow-hidden text-ellipsis">
                     {profileData.walletAddress}
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4">
-                  {profileData.isRegistered ? (
-                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                      <User className="w-3 h-3 mr-1" />
-                      Registered Member
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
-                      <User className="w-3 h-3 mr-1" />
-                      Not Registered
-                    </Badge>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    <span className="font-semibold">
+                <div className="flex flex-wrap items-start gap-2 sm:gap-4">
+                  <div className="flex-shrink-0">
+                    {profileData.isRegistered ? (
+                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100 whitespace-nowrap text-xs sm:text-sm">
+                        <User className="w-3 h-3 mr-1 flex-shrink-0" />
+                        Registered Member
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-red-100 text-red-800 hover:bg-red-100 whitespace-nowrap text-xs sm:text-sm">
+                        <User className="w-3 h-3 mr-1 flex-shrink-0" />
+                        Not Registered
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 bg-yellow-50 px-2 py-1 rounded-md">
+                    <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 flex-shrink-0" />
+                    <span className="font-semibold text-xs sm:text-sm whitespace-nowrap">
                       {profileData.reputationScore} Reputation
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">
-                      Member since{" "}
-                      {new Date(profileData.profileCreatedAt).toLocaleDateString()}
+                  <div className="flex items-center gap-1 sm:gap-2 bg-gray-50 px-2 py-1 rounded-md w-full sm:w-auto">
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis">
+                      Member since {new Date(profileData.profileCreatedAt).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
                     </span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <Wallet className="w-5 h-5 text-blue-600" />
-                      <span className="font-medium text-blue-900">
-                        Total Locked
-                      </span>
+                <div className="w-full overflow-hidden">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 w-full">
+                    <div className="p-2 sm:p-3 bg-blue-50 rounded-lg min-w-0 w-full">
+                      <div className="flex items-center gap-2">
+                        <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
+                        <span className="font-medium text-blue-900 text-sm sm:text-base truncate">
+                          Total Locked
+                        </span>
+                      </div>
+                      <p className="text-xl sm:text-2xl font-bold text-blue-900 mt-1 truncate">
+                        {profileData.totalLockAmount.toLocaleString()} USDC
+                      </p>
                     </div>
-                    <p className="text-2xl font-bold text-blue-900 mt-1">
-                      {profileData.totalLockAmount.toLocaleString()} USDC
-                    </p>
-                  </div>
-                  <div className="p-4 bg-green-50 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-green-600" />
-                      <span className="font-medium text-green-900">
-                        Total Saved
-                      </span>
+                    <div className="p-2 sm:p-3 bg-green-50 rounded-lg min-w-0 w-full">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
+                        <span className="font-medium text-green-900 text-sm sm:text-base truncate">
+                          Total Saved
+                        </span>
+                      </div>
+                      <p className="text-xl sm:text-2xl font-bold text-green-900 mt-1 truncate">
+                        {analytics.totalSaved.toLocaleString()} USDC
+                      </p>
                     </div>
-                    <p className="text-2xl font-bold text-green-900 mt-1">
-                      {analytics.totalSaved.toLocaleString()} USDC
-                    </p>
-                  </div>
-                  <div className="p-4 bg-purple-50 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-5 h-5 text-purple-600" />
-                      <span className="font-medium text-purple-900">
-                        Active Groups
-                      </span>
+                    <div className="p-2 sm:p-3 bg-purple-50 rounded-lg min-w-0 w-full">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+                        <span className="font-medium text-purple-900 text-sm sm:text-base truncate">
+                          Active Groups
+                        </span>
+                      </div>
+                      <p className="text-xl sm:text-2xl font-bold text-purple-900 mt-1">
+                        {analytics.activeGroups}
+                      </p>
                     </div>
-                    <p className="text-2xl font-bold text-purple-900 mt-1">
-                      {analytics.activeGroups}
-                    </p>
                   </div>
                 </div>
               </>

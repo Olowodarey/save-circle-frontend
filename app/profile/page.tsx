@@ -212,34 +212,62 @@ export default function ProfilePage() {
   // Update profile data when contract data changes
   useEffect(() => {
     if (contractProfileData && address) {
+      console.log('Raw contract profile data:', contractProfileData);
+      
       const formatU256 = (value: any) => {
-        if (!value) return 0;
-        return Number(value) / 1e6; // Assuming 6 decimal places for USDC
+        if (!value || value === '0x0' || value === '0') return 0;
+        try {
+          // Handle both object format (low/high) and direct string/number
+          if (typeof value === 'object' && value !== null) {
+            // Handle Uint256 with low/high fields
+            const low = BigInt(value.low || 0);
+            const high = BigInt(value.high || 0);
+            const bigValue = (high << BigInt(128)) + low;
+            return Number(bigValue) / 1e6; // Convert to USDC (6 decimals)
+          } else {
+            // Handle direct number/string
+            const numValue = typeof value === 'string' ? 
+              (value.startsWith('0x') ? parseInt(value, 16) : parseFloat(value)) : 
+              Number(value);
+            return numValue / 1e6; // Convert to USDC (6 decimals)
+          }
+        } catch (e) {
+          console.error('Error formatting U256 value:', e, value);
+          return 0;
+        }
       };
 
+      // Extract data from contract response
+      const rawData = Array.isArray(contractProfileData) ? 
+        contractProfileData[0] : contractProfileData;
+      
+      // Debug log the raw data structure
+      console.log('Processed contract data:', rawData);
+
+      // Create profile data object with proper fallbacks
       const contractData = {
-        // Convert felt252 name to string
-        name: felt252ToString(contractProfileData.name) || `User ${address.slice(0, 6)}`,
-        avatar: contractProfileData.avatar || "/placeholder.svg?height=120&width=120",
+        name: felt252ToString(rawData.name) || `User ${address.slice(0, 6)}`,
+        avatar: rawData.avatar || "/placeholder.svg?height=120&width=120",
         walletAddress: address,
-        isRegistered: contractProfileData.is_registered || false,
-        totalLockAmount: formatU256(contractProfileData.total_lock_amount),
-        profileCreatedAt: contractProfileData.profile_created_at
-          ? new Date(Number(contractProfileData.profile_created_at) * 1000).toLocaleDateString()
-          : "",
-        reputationScore: Number(contractProfileData.reputation_score) || 0,
-        totalContribution: formatU256(contractProfileData.total_contribution),
-        totalJoinedGroups: Number(contractProfileData.total_joined_groups) || 0,
-        totalCreatedGroups: Number(contractProfileData.total_created_groups) || 0,
-        totalEarned: formatU256(contractProfileData.total_earned),
-        completedCycles: Number(contractProfileData.completed_cycles) || 0,
-        activeGroups: Number(contractProfileData.active_groups) || 0,
-        onTimePayments: Number(contractProfileData.on_time_payments) || 0,
-        totalPayments: Number(contractProfileData.total_payments) || 0,
-        paymentRate: formatU256(contractProfileData.payment_rate),
-        averageContribution: formatU256(contractProfileData.average_contribution),
+        isRegistered: rawData.is_registered || false,
+        totalLockAmount: formatU256(rawData.total_lock_amount || 0),
+        profileCreatedAt: rawData.profile_created_at
+          ? new Date(Number(rawData.profile_created_at) * 1000).toLocaleDateString()
+          : new Date().toLocaleDateString(),
+        reputationScore: Number(rawData.reputation_score || 0),
+        totalContribution: formatU256(rawData.total_contribution || 0),
+        totalJoinedGroups: Number(rawData.total_joined_groups || 0),
+        totalCreatedGroups: Number(rawData.total_created_groups || 0),
+        totalEarned: formatU256(rawData.total_earned || 0),
+        completedCycles: Number(rawData.completed_cycles || 0),
+        activeGroups: Number(rawData.active_groups || 0),
+        onTimePayments: Number(rawData.on_time_payments || 0),
+        totalPayments: Number(rawData.total_payments || 1), // Prevent division by zero
+        paymentRate: Number(rawData.payment_rate || 0),
+        averageContribution: formatU256(rawData.average_contribution || 0),
       };
 
+      console.log('Processed profile data:', contractData);
       setProfileData(contractData);
     }
   }, [contractProfileData, address]);
@@ -247,24 +275,60 @@ export default function ProfilePage() {
   // Update analytics data from user statistics
   useEffect(() => {
     if (userStatistics) {
+      console.log('Raw user statistics:', userStatistics);
+      
       const formatU256 = (value: any) => {
-        if (!value) return 0;
-        return Number(value) / 1e6; // Assuming 6 decimal places for USDC
+        if (!value || value === '0x0' || value === '0') return 0;
+        try {
+          // Handle both object format (low/high) and direct string/number
+          if (typeof value === 'object' && value !== null) {
+            // Handle Uint256 with low/high fields
+            const low = BigInt(value.low || 0);
+            const high = BigInt(value.high || 0);
+            const bigValue = (high << BigInt(128)) + low;
+            return Number(bigValue) / 1e6; // Convert to USDC (6 decimals)
+          } else {
+            // Handle direct number/string
+            const numValue = typeof value === 'string' ? 
+              (value.startsWith('0x') ? parseInt(value, 16) : parseFloat(value)) : 
+              Number(value);
+            return numValue / 1e6; // Convert to USDC (6 decimals)
+          }
+        } catch (e) {
+          console.error('Error formatting U256 value in analytics:', e, value);
+          return 0;
+        }
       };
 
+      // Extract data from statistics response
+      const stats = Array.isArray(userStatistics) ? userStatistics[0] : userStatistics;
       const locked = lockedBalance ? formatU256(lockedBalance) : 0;
 
+      console.log('Processed statistics:', {
+        totalSaved: formatU256(stats.total_saved || 0),
+        activeGroups: stats.active_groups || profileData.activeGroups || 0,
+        completedCycles: stats.completed_cycles || profileData.completedCycles || 0,
+        totalEarned: formatU256(stats.total_earned || 0),
+        averageContribution: formatU256(stats.average_contribution) || profileData.averageContribution || 0,
+        onTimePayments: stats.on_time_payments || profileData.onTimePayments || 0,
+        totalPayments: stats.total_payments || profileData.totalPayments || 1, // Prevent division by zero
+        joinedGroups: stats.joined_groups || profileData.totalJoinedGroups || 0,
+        createdGroups: stats.created_groups || profileData.totalCreatedGroups || 0,
+        successRate: Number(stats.success_rate || 0),
+        lockedAmount: locked,
+      });
+
       setAnalytics({
-        totalSaved: formatU256(userStatistics.total_saved),
-        activeGroups: profileData.activeGroups,
-        completedCycles: profileData.completedCycles,
-        totalEarned: formatU256(userStatistics.total_earned),
-        averageContribution: profileData.averageContribution,
-        onTimePayments: profileData.onTimePayments,
-        totalPayments: profileData.totalPayments,
-        joinedGroups: profileData.totalJoinedGroups,
-        createdGroups: profileData.totalCreatedGroups,
-        successRate: Number(userStatistics.success_rate) || 0,
+        totalSaved: formatU256(stats.total_saved || 0),
+        activeGroups: stats.active_groups || profileData.activeGroups || 0,
+        completedCycles: stats.completed_cycles || profileData.completedCycles || 0,
+        totalEarned: formatU256(stats.total_earned || 0),
+        averageContribution: formatU256(stats.average_contribution) || profileData.averageContribution || 0,
+        onTimePayments: stats.on_time_payments || profileData.onTimePayments || 0,
+        totalPayments: stats.total_payments || profileData.totalPayments || 1, // Prevent division by zero
+        joinedGroups: stats.joined_groups || profileData.totalJoinedGroups || 0,
+        createdGroups: stats.created_groups || profileData.totalCreatedGroups || 0,
+        successRate: Number(stats.success_rate || 0),
         lockedAmount: locked,
       });
     }
@@ -414,31 +478,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      {/* <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Link>
-            </Button>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">Profile</span>
-            </div>
-          </div>
-          {!isEditing && (
-            <Button onClick={() => setIsEditing(true)}>
-              <Edit className="w-4 h-4 mr-2" />
-              Edit Profile
-            </Button>
-          )}
-        </div>
-      </header> */}
+  
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Profile Header Component */}

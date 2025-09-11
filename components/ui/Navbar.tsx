@@ -3,8 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Coins, LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
-import {ProtectedLink} from "@/components/ProtectedLinks"
+import { ProtectedLink } from "@/components/ProtectedLinks";
 import Logo from "@/svg/logo";
 
 interface HeaderProps {
@@ -16,8 +17,31 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
     const { address, isConnected, connector: activeConnector } = useAccount();
     const { disconnect } = useDisconnect();
 
+    const pathname = usePathname();
     // Get wallet type from the active connector
     const walletType = activeConnector?.name || "Wallet";
+
+    // Helper function to check if a link is active
+    const isActive = (path: string) => {
+        // Special case for home page
+        if (path === '/' && pathname === '/') return true;
+        // For other paths, check if the current path starts with the link path
+        return path !== '/' && pathname.startsWith(path);
+    };
+
+    // Navigation items with their paths and labels
+    const navItems = [
+        { path: '/', label: 'Home' },
+        { path: '/groups', label: 'Groups', protected: true },
+        { path: '/profile', label: 'Profile', protected: true },
+        { path: '/reputation', label: 'Reputation', protected: true },
+        { path: '/Faq', label: 'FAQ' },
+    ];
+
+    // Close mobile menu when route changes
+    useEffect(() => {
+        setIsMobileMenuOpen(false);
+    }, [pathname]);
 
     useEffect(() => {
         // StarkNet React handles connection persistence automatically
@@ -53,21 +77,33 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
                     
                     {/* Desktop Navigation */}
                     <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
-                        <Link href="/#" className="text-gray-600 hover:text-gray-900 transition-colors">
-                            Home
-                        </Link>
-                        <ProtectedLink setShowWalletModal={setShowWalletModal} href="/groups" className="text-gray-600 hover:text-gray-900 transition-colors">
-                            Groups
-                        </ProtectedLink>
-                        <ProtectedLink setShowWalletModal={setShowWalletModal} href="/profile" className="text-gray-600 hover:text-gray-900 transition-colors">
-                            Profile
-                        </ProtectedLink>
-                        <ProtectedLink setShowWalletModal={setShowWalletModal} href="/reputation" className="text-gray-600 hover:text-gray-900 transition-colors">
-                            Reputation
-                        </ProtectedLink>
-                        <Link href="/Faq" className="text-gray-600 hover:text-gray-900 transition-colors">
-                            FAQ
-                        </Link>
+                        {navItems.map((item) => {
+                            const isItemActive = isActive(item.path);
+                            const className = `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                isItemActive 
+                                    ? 'bg-blue-50 text-blue-700' 
+                                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                            }`;
+                            
+                            return item.protected ? (
+                                <ProtectedLink 
+                                    key={item.path}
+                                    setShowWalletModal={setShowWalletModal} 
+                                    href={item.path} 
+                                    className={className}
+                                >
+                                    {item.label}
+                                </ProtectedLink>
+                            ) : (
+                                <Link 
+                                    key={item.path}
+                                    href={item.path} 
+                                    className={className}
+                                >
+                                    {item.label}
+                                </Link>
+                            );
+                        })}
                     </nav>
                     
                     {/* Desktop Wallet Section */}
@@ -124,45 +160,44 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
                     <div className="md:hidden mt-4 pb-4 border-t border-gray-200">
-                        <nav className="flex flex-col gap-3 pt-4">
-                            <Link 
-                                href="/#" 
-                                className="text-gray-600 hover:text-gray-900 transition-colors py-2 px-2 rounded hover:bg-gray-50"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                Home
-                            </Link>
-                            <ProtectedLink 
-                                setShowWalletModal={setShowWalletModal} 
-                                href="/groups" 
-                                className="text-gray-600 hover:text-gray-900 transition-colors py-2 px-2 rounded hover:bg-gray-50"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                Groups
-                            </ProtectedLink>
-                            <ProtectedLink 
-                                setShowWalletModal={setShowWalletModal} 
-                                href="/profile" 
-                                className="text-gray-600 hover:text-gray-900 transition-colors py-2 px-2 rounded hover:bg-gray-50"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                Profile
-                            </ProtectedLink>
-                            <ProtectedLink 
-                                setShowWalletModal={setShowWalletModal} 
-                                href="/reputation" 
-                                className="text-gray-600 hover:text-gray-900 transition-colors py-2 px-2 rounded hover:bg-gray-50"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                Reputation
-                            </ProtectedLink>
-                            <Link 
-                                href="/Faq" 
-                                className="text-gray-600 hover:text-gray-900 transition-colors py-2 px-2 rounded hover:bg-gray-50"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                FAQ
-                            </Link>
+                        <nav className="flex flex-col gap-1 pt-2">
+                            {navItems.map((item) => {
+                                const isItemActive = isActive(item.path);
+                                const className = `px-4 py-3 rounded-md text-base font-medium transition-colors flex items-center ${
+                                    isItemActive 
+                                        ? 'bg-blue-50 text-blue-700 font-medium' 
+                                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                                }`;
+                                
+                                const linkProps = {
+                                    key: item.path,
+                                    className: className,
+                                    onClick: () => setIsMobileMenuOpen(false)
+                                };
+
+                                return item.protected ? (
+                                    <ProtectedLink 
+                                        {...linkProps}
+                                        setShowWalletModal={setShowWalletModal} 
+                                        href={item.path}
+                                    >
+                                        {item.label}
+                                        {isItemActive && (
+                                            <span className="ml-2 w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                                        )}
+                                    </ProtectedLink>
+                                ) : (
+                                    <Link 
+                                        {...linkProps}
+                                        href={item.path}
+                                    >
+                                        {item.label}
+                                        {isItemActive && (
+                                            <span className="ml-2 w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                                        )}
+                                    </Link>
+                                );
+                            })}
                             
                             {/* Mobile Wallet Section */}
                             <div className="mt-4 pt-4 border-t border-gray-200">
