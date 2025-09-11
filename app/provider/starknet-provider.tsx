@@ -10,16 +10,17 @@ import {
   braavos,
   useInjectedConnectors,
   voyager,
+  argent,
 } from "@starknet-react/core";
  
 export function StarknetProvider({ children }: { children: React.ReactNode }) {
   const { connectors } = useInjectedConnectors({
     // Show these connectors if the user has no connector installed.
-    recommended: [ready(), braavos()],
-    // Hide recommended connectors if the user has any connector installed.
-    includeRecommended: "onlyIfNoConnectors",
-    // Randomize the order of the connectors.
-    order: "random",
+    recommended: [argent(), braavos()],
+    // Always show recommended connectors for better mobile support
+    includeRecommended: "always",
+    // Order connectors with most popular first
+    order: "alphabetical",
   });
 
 
@@ -34,11 +35,13 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
     },
   });
  
+  // Fallback provider for better mobile compatibility
+  const fallbackProvider = publicProvider();
  
   return (
     <StarknetConfig
       chains={[mainnet]}
-      provider={publicProvider()}
+      provider={provider}
       connectors={connectors}
       explorer={voyager}
       autoConnect={true}

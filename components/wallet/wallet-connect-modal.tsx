@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { X, Wallet, AlertCircle, CheckCircle } from "lucide-react";
-import { ready, braavos, useInjectedConnectors, useAccount, useConnect, useDisconnect } from "@starknet-react/core";
+import { ready, braavos, argent, useInjectedConnectors, useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 
 
 interface WalletConnectModalProps {
@@ -21,11 +21,11 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect }: Walle
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
 
   const { connectors } = useInjectedConnectors({
-    recommended: [ready(), braavos()],
-    // Hide recommended connectors if the user has any connector installed.
+    recommended: [argent(), braavos()],
+    // Always show recommended connectors for better mobile support
     includeRecommended: "always",
-    // Randomize the order of the connectors.
-    order: "random",
+    // Order connectors with most popular first
+    order: "alphabetical",
   });
 
   // Close modal when connection is successful
@@ -47,10 +47,23 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect }: Walle
   const handleConnect = async (connector: any) => {
     try {
       setConnectingWallet(connector.id);
+      console.log('Attempting to connect to:', connector.name, connector.id);
+      
+      // For mobile wallets, we might need to handle deep linking
+      if (connector.name?.toLowerCase().includes('argent') && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        // Mobile ArgentX connection
+        console.log('Mobile ArgentX detected, attempting connection...');
+      }
+      
       await connect({ connector });
     } catch (err) {
       console.error("Failed to connect wallet:", err);
       setConnectingWallet(null);
+      
+      // Show more helpful error message for mobile users
+      if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        console.log('Mobile connection failed. User may need to open wallet app first.');
+      }
     }
   };
 
@@ -133,12 +146,28 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect }: Walle
             </div>
           )}
 
+          {/* Mobile Instructions */}
+          {/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && !isConnected && (
+            <div className="p-3 bg-amber-50 rounded-lg border border-amber-200 mb-4">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="font-medium text-amber-900">Mobile Connection Tips:</p>
+                  <p className="text-amber-700 mt-1">
+                    Make sure your wallet app is installed and try opening it before connecting.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Wallet List */}
           {connectors.length > 0 ? (
             <>
               {connectors.map((connector: any) => {
                 const status = getWalletStatus(connector);
                 const isCurrentlyConnected = status === "connected";
+                const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 
                 return (
                   <div
@@ -181,6 +210,11 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect }: Walle
                           {isCurrentlyConnected && (
                             <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
                               Connected
+                            </Badge>
+                          )}
+                          {isMobile && connector.name?.toLowerCase().includes('argent') && (
+                            <Badge variant="outline" className="text-xs">
+                              Mobile
                             </Badge>
                           )}
                         </div>
