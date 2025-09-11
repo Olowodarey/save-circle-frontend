@@ -9,7 +9,7 @@ const Footer = () => {
             <div>
             <div className="flex items-center gap-2 mb-4">
                 <div className="w-10 h-10 flex items-center justify-center">
-                <Logo/>
+                {/* <Logo/> */}
                 </div>
                 <span className="text-xl font-bold">Save Circle</span>
             </div>

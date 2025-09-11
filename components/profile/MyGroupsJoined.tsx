@@ -12,7 +12,7 @@ import { MY_CONTRACT_ABI } from "@/constants/abi";
 import { GroupAnalyticsCompact } from "@/components/groups/group-analytics";
 
 const CONTRACT_ADDRESS =
-  "0x0081239ae11f403bc90620395f3bed28c35810b6e18a0d55cf809b45ccab5fb7";
+  "0x0468015a536a6dd8cc31266436c264fbeaa52c7cd85cf52bb8e6c6ff4e4ff795";
 
 // Helper function to validate and format Starknet address
 const formatStarknetAddress = (

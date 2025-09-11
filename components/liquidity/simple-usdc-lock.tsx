@@ -26,7 +26,7 @@ const USDC_TOKEN_ADDRESS =
 
 // Liquidity lock contract address
 const LIQUIDITY_LOCK_CONTRACT =
-  "0x0081239ae11f403bc90620395f3bed28c35810b6e18a0d55cf809b45ccab5fb7";
+  "0x0468015a536a6dd8cc31266436c264fbeaa52c7cd85cf52bb8e6c6ff4e4ff795";
 
 // ERC20 ABI for USDC token interactions
 const ERC20_ABI = [

@@ -1218,26 +1218,6 @@ export const MY_CONTRACT_ABI = [
           },
           {
             "type": "function",
-            "name": "admin_contribute_from_lock",
-            "inputs": [
-              {
-                "name": "group_id",
-                "type": "core::integer::u256"
-              },
-              {
-                "name": "user",
-                "type": "core::starknet::contract_address::ContractAddress"
-              }
-            ],
-            "outputs": [
-              {
-                "type": "core::bool"
-              }
-            ],
-            "state_mutability": "external"
-          },
-          {
-            "type": "function",
             "name": "get_current_cycle",
             "inputs": [
               {
@@ -1823,6 +1803,38 @@ export const MY_CONTRACT_ABI = [
       },
       {
         "type": "event",
+        "name": "save_circle::events::Events::LiquidityLocked",
+        "kind": "struct",
+        "members": [
+          {
+            "name": "group_id",
+            "type": "core::integer::u256",
+            "kind": "data"
+          },
+          {
+            "name": "user",
+            "type": "core::starknet::contract_address::ContractAddress",
+            "kind": "data"
+          },
+          {
+            "name": "amount",
+            "type": "core::integer::u256",
+            "kind": "data"
+          },
+          {
+            "name": "token_address",
+            "type": "core::starknet::contract_address::ContractAddress",
+            "kind": "data"
+          },
+          {
+            "name": "total_locked",
+            "type": "core::integer::u256",
+            "kind": "data"
+          }
+        ]
+      },
+      {
+        "type": "event",
         "name": "save_circle::events::Events::FundsWithdrawn",
         "kind": "struct",
         "members": [
@@ -2009,6 +2021,11 @@ export const MY_CONTRACT_ABI = [
           {
             "name": "UserJoinedGroup",
             "type": "save_circle::events::Events::UserJoinedGroup",
+            "kind": "nested"
+          },
+          {
+            "name": "LiquidityLocked",
+            "type": "save_circle::events::Events::LiquidityLocked",
             "kind": "nested"
           },
           {

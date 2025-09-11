@@ -32,7 +32,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200">
+    <div className=" bg-gradient-to-br from-blue-100 to-indigo-200">
       {/* Header */}
       <Navbar setShowWalletModal={setShowWalletModal} />
 
@@ -40,12 +40,16 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Save Together{" "}
-            <span className="text-blue-600">Thrive Together</span>
+            Save Together <span className="text-blue-600">Thrive Together</span>
           </h1>
 
           <p className="text-xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">
-          Welcome to SaveCircle, a community driven integration where needs and demands meets smart contributive savings. Earn an extension of accumulated returns cancelling the daily interest and charges posed by traditional banking system while maintaining control, flexibility and a feasible planning system over your funds. Our rotating savings model ensures adequate and accurate payout.
+            Welcome to SaveCircle, a community driven integration where needs
+            and demands meets smart contributive savings. Earn an extension of
+            accumulated returns cancelling the daily interest and charges posed
+            by traditional banking system while maintaining control, flexibility
+            and a feasible planning system over your funds. Our rotating savings
+            model ensures adequate and accurate payout.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -77,7 +81,6 @@ export default function HomePage() {
               </Link>
             </Button>
           </div>
-
         </div>
       </section>
 
@@ -90,7 +93,18 @@ export default function HomePage() {
                 <span className="mr-2">The SaveCircle difference</span>
               </h2>
               <p className="text-gray-700 mb-6 max-w-3xl mx-auto text-center">
-              Most DeFi platforms return exactly what you locked. With SaveCircle, you get to choose an initial lock amount to join a group best suited for your contribution plan and get a priority payout based on the total number of people present in the group, the specified amount is saved either on a daily, weekly or monthly schedule based on the group plan subscribed to. Through rotating payouts, everyone takes a turn receiving requested contributions from other members while the rest members continue with the savings. At the end of the cycle, you get back your lock amount plus all your contributions. It's a smarter way to save together and access funds sooner enabling individuals to sort out pressing demands.
+                Most DeFi platforms return exactly what you locked. With
+                SaveCircle, you get to choose an initial lock amount to join a
+                group best suited for your contribution plan and get a priority
+                payout based on the total number of people present in the group,
+                the specified amount is saved either on a daily, weekly or
+                monthly schedule based on the group plan subscribed to. Through
+                rotating payouts, everyone takes a turn receiving requested
+                contributions from other members while the rest members continue
+                with the savings. At the end of the cycle, you get back your
+                lock amount plus all your contributions. It's a smarter way to
+                save together and access funds sooner enabling individuals to
+                sort out pressing demands.
               </p>
               <div className="mt-6 text-blue-700 font-medium text-center">
                 Pay with STRK, ETH, USDT, or USDC. We auto‑swap to USDC.
@@ -103,19 +117,24 @@ export default function HomePage() {
                 <div className="bg-blue-50 rounded-lg p-4">
                   <p className="font-medium text-gray-900">Priority by lock</p>
                   <p className="text-sm text-gray-600">
-                  First come, first paid using the reputation level to judge the scheduled payout system.
+                    First come, first paid using the reputation level to judge
+                    the scheduled payout system.
                   </p>
                 </div>
                 <div className="bg-green-50 rounded-lg p-4">
                   <p className="font-medium text-gray-900">Rotating payouts</p>
-                  <p className="text-sm text-gray-600">Everyone gets a turn as long as they keep up in avoiding defaulting and penalties.</p>
+                  <p className="text-sm text-gray-600">
+                    Everyone gets a turn as long as they keep up in avoiding
+                    defaulting and penalties.
+                  </p>
                 </div>
                 <div className="bg-purple-50 rounded-lg p-4">
                   <p className="font-medium text-gray-900">
                     You get everything back
                   </p>
                   <p className="text-sm text-gray-600">
-                  Locked + contributed amounts are returned to individuals after completing the circle.
+                    Locked + contributed amounts are returned to individuals
+                    after completing the circle.
                   </p>
                 </div>
               </div>
@@ -161,8 +180,10 @@ export default function HomePage() {
                 Save & Earn Your Turn
               </h3>
               <p className="text-gray-600">
-              Contribute, save & earn your turn contribute regularly and get a good reputation. Higher locked amounts raises ranks moving eligible users up the queue but payout is determined by the high lock and time stamp scheduled payout system. 
-
+                Contribute, save & earn your turn contribute regularly and get a
+                good reputation. Higher locked amounts raises ranks moving
+                eligible users up the queue but payout is determined by the high
+                lock and time stamp scheduled payout system.
               </p>
             </div>
 
@@ -174,7 +195,8 @@ export default function HomePage() {
                 Get Paid & Continue
               </h3>
               <p className="text-gray-600">
-              Receive your contribution when it's your turn, then keep saving until the cycle ends to get everything back.
+                Receive your contribution when it's your turn, then keep saving
+                until the cycle ends to get everything back.
               </p>
             </div>
           </div>
@@ -197,10 +219,13 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h3 className="text-xl font-semibold mb-3 text-gray-900">
-              Better Than Traditional Savings and Contributions.
+                Better Than Traditional Savings and Contributions.
               </h3>
               <p className="text-gray-600 mb-4">
-              Earn higher returns than traditional bank savings which are driven by high institutional fees causing reduction in funds to receive at the end of the cycle, while maintaining access to your funds through our rotating payout system.
+                Earn higher returns than traditional bank savings which are
+                driven by high institutional fees causing reduction in funds to
+                receive at the end of the cycle, while maintaining access to
+                your funds through our rotating payout system.
               </p>
               <ul className="space-y-2">
                 <li className="flex items-start">
@@ -279,7 +304,9 @@ export default function HomePage() {
             <div>
               <h3 className="font-semibold text-gray-900">Reputation system</h3>
               <p className="text-sm text-gray-600">
-              Build onchain trust through consistent saving and payouts which over time can be minted as NFT and used across SaveCircle and the Starknet ecosystem.
+                Build onchain trust through consistent saving and payouts which
+                over time can be minted as NFT and used across SaveCircle and
+                the Starknet ecosystem.
               </p>
             </div>
           </div>
@@ -291,7 +318,8 @@ export default function HomePage() {
             <div>
               <h3 className="font-semibold text-gray-900">Trust-based lock</h3>
               <p className="text-sm text-gray-600">
-              Lock collateral for payout order. No locked funds, no contribution payout.
+                Lock collateral for payout order. No locked funds, no
+                contribution payout.
               </p>
             </div>
           </div>
@@ -364,7 +392,8 @@ export default function HomePage() {
                       Make Regular Contributions
                     </h3>
                     <p className="text-gray-600">
-                    Contributions are made based on agreed amount on the schedule that works for your group's needs.
+                      Contributions are made based on agreed amount on the
+                      schedule that works for your group's needs.
                     </p>
                   </div>
                 </div>
@@ -389,17 +418,18 @@ export default function HomePage() {
               <h2 className="text-3xl font-bold mb-8">Liquidity Options</h2>
               <div className="space-y-6">
                 <div className="p-6 bg-gray-50 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-2">
-                    Public Lock
-                  </h3>
+                  <h3 className="text-lg font-semibold mb-2">Public Lock</h3>
                   <p className="text-gray-600">
-                  The collateral to be locked is determined by the system/Admin, which is paid by everyone joining the cycle.
+                    The collateral to be locked is determined by the
+                    system/Admin, which is paid by everyone joining the cycle.
                   </p>
                 </div>
                 <div className="p-6 bg-gray-50 rounded-lg">
                   <h3 className="text-lg font-semibold mb-2">Private Lock</h3>
                   <p className="text-gray-600">
-                  The locked collateral is set by the creator of the group based on the amount to be contributed by each individual, then the system verifies and approves the group creation.
+                    The locked collateral is set by the creator of the group
+                    based on the amount to be contributed by each individual,
+                    then the system verifies and approves the group creation.
                   </p>
                 </div>
               </div>
@@ -483,6 +513,8 @@ export default function HomePage() {
       {/* Testimonials */}
 
       {/* Final CTA */}
+
+      <div>
       <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzIiIGhlaWdodD0iNTgiIHZpZXdCb3g9IjAgMCA3MiA1OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTM2IDU4QzU1Ljg4MjcgNTggNzIgNDUuNjczMSA3MiAzMEM3MiAxNC4zMjY5IDU1Ljg4MjcgMiAzNiAyQzE2LjExNzMgMiAwIDE0LjMyNjkgMCAzMEMwIDQ1LjY3MzEgMTYuMTE3MyA1OCAzNiA1OFoiIGZpbGw9IiNGRkZGRkYiLz4KPC9zdmc+Cg==')]" />
@@ -513,9 +545,14 @@ export default function HomePage() {
             No credit check. No hidden fees. Just better savings.
           </div>
         </div>
+       
       </section>
-
       <Footer />
+      </div>
+   
+
+
+
       <WalletConnectModal
         isOpen={showWalletModal}
         onClose={() => setShowWalletModal(false)}

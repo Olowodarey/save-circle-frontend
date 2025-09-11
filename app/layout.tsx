@@ -31,8 +31,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" >
+      <body className={`${inter.className} h-full m-0 p-0 min-h-screen`}>
         <StarknetProvider>  
           <UserProvider>
             <GroupsPreloader />
