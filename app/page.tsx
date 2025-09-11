@@ -439,71 +439,65 @@ export default function HomePage() {
       </section>
 
       {/* Who Can Join */}
-      <section id="who-can-join" className="py-16 ">
+      <section id="who-can-join" className="py-16">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className="text-3xl font-bold text-center mb-12">Who Can Join</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Who can join SaveCircle?</h2>
 
           <div className="space-y-8">
             <div className="p-6 bg-white rounded-lg shadow-sm">
               <h3 className="text-xl font-semibold mb-3 text-blue-600">
-                Traders & Crypto Enthusiasts
+                Traders and Crypto Enthusiasts
               </h3>
-              <p className="text-gray-700 mb-3">
-                Perfect for those who want to systematically save a portion of
-                their trading profits or DCA into their usdc assets. Our
-                platform helps you maintain discipline in your investment
-                strategy and you get a priority payout to boost your trading
-                power while your lock funds will be returned to you.
-              </p>
-              <p className="text-gray-600">
-                Benefit from dollar-cost averaging while participating in a
-                community of like-minded investors.
+              <p className="text-gray-700">
+                Dedication and maintaining of initial capital as well as gathering of funds to actually fund trading accounts or keep a backup capital is always a stretch in the trading world.
+                We are dedicated to helping you accumulate your profits over a period of time and for as long as you wish, so as to be able to bounce bank into the system when it becomes necessary to add more...
+                Every traders dream is to monitor and be able to replenish (fund) his/her trading accounts when need arises, we at SaveCircle is dedicated into holding you accountable for Taking charts to new heights.
               </p>
             </div>
 
             <div className="p-6 bg-white rounded-lg shadow-sm">
               <h3 className="text-xl font-semibold mb-3 text-blue-600">
-                Students & Young Professionals
+                Students and Young Professionals
               </h3>
-              <p className="text-gray-700 mb-3">
-                Start building your financial future with small, manageable
-                contributions. Our platform is designed to help you develop
-                consistent saving habits while being part of a supportive
-                community.
-              </p>
-              <p className="text-gray-600">
-                Perfect for those who want to save for tuition, a first car, or
-                build an emergency fund with the accountability of a group.
+              <p className="text-gray-700">
+                This schooling and working system prove tedious and harsher daily as requirements to pay bills and meet up with certain demands such as monthly transportation, feeding, rents, and even departmental and school activities. Our SaveCircle system helps in securing such harsh realities and turning them into a Support system where by each individual can join a pool anticipating the time of their payment in the offline sectors and end up meeting up with all the demands at ease and at the right pace. SaveCircle turns imagination into hand stretched reality.
               </p>
             </div>
 
             <div className="p-6 bg-white rounded-lg shadow-sm">
               <h3 className="text-xl font-semibold mb-3 text-blue-600">
-                Savers & Long-term Planners
+                Business persons and Long term planners
               </h3>
-              <p className="text-gray-700 mb-3">
-                Whether you're saving for a down payment, a dream vacation, or
-                long-term financial goals, our platform helps you stay committed
-                to your savings targets with the support of your savings circle.
-              </p>
-              <p className="text-gray-600">
-                The progressive lock feature allows you to earn higher returns
-                on your savings while maintaining liquidity when you need it.
+              <p className="text-gray-700">
+                What separates the rich from the poor isn't opportunities, it's pure capital and liquidity. In SaveCircle we turn lost of opportunities and imagination into serendipity, a combination of events which have come together by chance to make a surprisingly good or wonderful outcome.
+                We'd build up those committed activities and contributive acts into a strong support system where you can finally meet up with your goals.
               </p>
             </div>
 
             <div className="p-6 bg-white rounded-lg shadow-sm">
               <h3 className="text-xl font-semibold mb-3 text-blue-600">
-                Community Groups & Friends
+                Community
               </h3>
-              <p className="text-gray-700 mb-3">
-                Create private savings circles with friends, family, or
-                community members. Set your own rules, contribution amounts, and
-                schedules that work for your group.
+              <p className="text-gray-700">
+                Communities and close associate could decide to raise funds by coming together to achieve a result over an environmental assessment or fundraising to sort out certain issues. With SaveCircle, that can be easily achieved by setting up a limit and a time frame to help in spreading out and accumulating the required funds to cover up the process. Just out here touching grass nd recharging the community vaults.
               </p>
-              <p className="text-gray-600">
-                Perfect for social savings, community funds, or group financial
-                goals with built-in accountability and trust mechanisms.
+            </div>
+
+            <div className="p-6 bg-white rounded-lg shadow-sm">
+              <h3 className="text-xl font-semibold mb-3 text-blue-600">
+                Family and Friends
+              </h3>
+              <p className="text-gray-700">
+                Illuminating ideas, bond and inspiration. In this regards close associates and families can set-up a pool and pitch in funds to plan an event, marriage, trip etc. with no fear of how payments can be made cause the accumulated funds can be used to setup any of those process and pay off any credit during those process. It unifies family and Friends ties while making payments easier and reliable coming as peace after the storm.
+              </p>
+            </div>
+
+            <div className="p-6 bg-white rounded-lg shadow-sm">
+              <h3 className="text-xl font-semibold mb-3 text-blue-600">
+                Others
+              </h3>
+              <p className="text-gray-700">
+                SaveCircle isn't limited to anyone to be honest was supposed to place this line at the top but placing it here still seems perfect. No age limitation or any other restrictions cause at SaveCircle we are a DAO and our community has the right in voting and implementing actions under the ecosystem. Our goal is to see everybody rise above ranks and win at every single step of the way.
               </p>
             </div>
           </div>
