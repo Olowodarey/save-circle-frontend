@@ -124,7 +124,7 @@ export default function GroupDetailsPage() {
               <div className="flex-1">
                 <GroupHeader groupDetails={groupDetails} />
                 <GroupStats groupDetails={groupDetails} />
-                <GroupProgress groupDetails={groupDetails} />
+                {/* <GroupProgress groupDetails={groupDetails} /> */}
                 
                 {/* New Contract Functions - Quick Analytics */}
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">

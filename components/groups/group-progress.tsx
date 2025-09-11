@@ -17,7 +17,9 @@ export default function GroupProgress({ groupDetails }: GroupProgressProps) {
             Cycle {groupDetails.currentCycle} of {groupDetails.totalCycles}
           </span>
         </div>
-        <Progress value={(groupDetails.currentCycle / groupDetails.totalCycles) * 100} />
+        <Progress
+          value={(groupDetails.currentCycle / groupDetails.totalCycles) * 100}
+        />
       </div>
       <div className="flex items-center justify-between text-sm text-gray-600">
         <span>Next payout: {groupDetails.nextPayoutDate}</span>
