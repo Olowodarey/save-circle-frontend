@@ -144,14 +144,31 @@ export default function GroupDetailsPage() {
 
         {/* Detailed Information */}
         <Tabs defaultValue="members" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="members">Members ({groupDetails.members})</TabsTrigger>
-            <TabsTrigger value="contribute">Contribute</TabsTrigger>
-            <TabsTrigger value="lock">Lock Liquidity</TabsTrigger>
-            <TabsTrigger value="management">Group Actions</TabsTrigger>
-            <TabsTrigger value="penalties">Penalties & Payouts</TabsTrigger>
-            <TabsTrigger value="rules">Rules & Terms</TabsTrigger>
-          </TabsList>
+          <div className="relative">
+            <TabsList className="w-full flex overflow-x-auto pb-1 scrollbar-hide">
+              <div className="flex space-x-1">
+                <TabsTrigger value="members" className="whitespace-nowrap px-3 py-2 text-sm">
+                  Members ({groupDetails.members})
+                </TabsTrigger>
+                <TabsTrigger value="contribute" className="whitespace-nowrap px-3 py-2 text-sm">
+                  Contribute
+                </TabsTrigger>
+                <TabsTrigger value="lock" className="whitespace-nowrap px-3 py-2 text-sm">
+                  Lock
+                </TabsTrigger>
+                <TabsTrigger value="management" className="whitespace-nowrap px-3 py-2 text-sm">
+                  Actions
+                </TabsTrigger>
+                <TabsTrigger value="penalties" className="whitespace-nowrap px-3 py-2 text-sm">
+                  Penalties
+                </TabsTrigger>
+                <TabsTrigger value="rules" className="whitespace-nowrap px-3 py-2 text-sm">
+                  Rules
+                </TabsTrigger>
+              </div>
+            </TabsList>
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none" />
+          </div>
 
           <TabsContent value="members" className="space-y-4">
             <GroupMembersList groupDetails={groupDetails} members={members} />

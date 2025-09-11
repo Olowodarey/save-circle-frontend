@@ -440,7 +440,7 @@ export default function ProfilePage() {
         </div>
       </header> */}
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Profile Header Component */}
         <ProfileHeader
           profileData={profileData}
@@ -452,60 +452,65 @@ export default function ProfilePage() {
         />
 
         {/* Analytics Tabs */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="activity">
-              Recent Activity
+        <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto p-1">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
+              <span className="hidden sm:inline">Recent </span>Activity
               {recentActivity.length > 0 && (
-                <span className="ml-1 bg-blue-500 text-white text-xs rounded-full px-2 py-0.5">
+                <span className="ml-1 bg-blue-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden sm:inline">
                   {recentActivity.length}
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="statistics">Statistics</TabsTrigger>
-            <TabsTrigger value="payouts">
+            <TabsTrigger value="statistics" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
+              <span className="hidden sm:inline">Statistics</span>
+              <span className="sm:hidden">Stats</span>
+            </TabsTrigger>
+            <TabsTrigger value="payouts" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
               Payouts
             </TabsTrigger>
-            <TabsTrigger value="my-groups">
-              My Groups
+            <TabsTrigger value="my-groups" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
+              <span className="hidden sm:inline">My </span>Groups
               {analytics.joinedGroups > 0 && (
-                <span className="ml-1 bg-green-500 text-white text-xs rounded-full px-2 py-0.5">
+                <span className="ml-1 bg-green-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden sm:inline">
                   {analytics.joinedGroups}
                 </span>
               )}
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-6">
+          <TabsContent value="overview" className="space-y-4 sm:space-y-6">
             <ProfileOverview analytics={analytics} profileData={profileData} />
           </TabsContent>
 
-          <TabsContent value="activity" className="space-y-4">
+          <TabsContent value="activity" className="space-y-3 sm:space-y-4">
             <ProfileActivity recentActivity={recentActivity} />
             {isLoadingActivities && (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin mr-2" />
-                <span>Loading activities...</span>
+              <div className="flex items-center justify-center py-6 sm:py-8">
+                <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin mr-2" />
+                <span className="text-sm sm:text-base">Loading activities...</span>
               </div>
             )}
           </TabsContent>
 
-          <TabsContent value="statistics" className="space-y-6">
+          <TabsContent value="statistics" className="space-y-4 sm:space-y-6">
             <ProfileStatistics analytics={analytics} />
             {isLoadingStatistics && (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin mr-2" />
-                <span>Loading statistics...</span>
+              <div className="flex items-center justify-center py-6 sm:py-8">
+                <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin mr-2" />
+                <span className="text-sm sm:text-base">Loading statistics...</span>
               </div>
             )}
           </TabsContent>
 
-          <TabsContent value="payouts" className="space-y-6">
+          <TabsContent value="payouts" className="space-y-4 sm:space-y-6">
             <ProfilePayouts userAddress={address} />
           </TabsContent>
 
-          <TabsContent value="my-groups" className="space-y-6">
+          <TabsContent value="my-groups" className="space-y-4 sm:space-y-6">
             <MyGroupsJoined 
               userAddress={address} 
               // groupsData={userJoinedGroups} 

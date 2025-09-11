@@ -41,21 +41,21 @@ export default function GroupsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [showWalletModal, setShowWalletModal] = useState(false);
-  
+
   // Use Starknet React hooks for wallet connection
   const { address, isConnected } = useAccount();
-  
+
   // Use the groups hook to fetch contract data with optimizations
-  const { 
-    publicGroups, 
-    userGroups, 
-    userInvites, 
-    loading, 
-    error, 
-    refetch, 
-    forceRefresh, 
-    initialLoad, 
-    isFromCache 
+  const {
+    publicGroups,
+    userGroups,
+    userInvites,
+    loading,
+    error,
+    refetch,
+    forceRefresh,
+    initialLoad,
+    isFromCache,
   } = useGroups();
 
   // Remove the old wallet connection effect since we're using Starknet React
@@ -96,54 +96,49 @@ export default function GroupsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
- 
-   
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Savings Groups
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             Discover and join savings circles that match your goals
           </p>
         </div>
 
-        <Tabs defaultValue="public" className="space-y-6">
-          <TabsList className="flex justify-between gap-4">
-           <div>
-           <TabsTrigger value="public">Public Groups</TabsTrigger>
-           <TabsTrigger value="mygroups">
-              private groups 
-             
-            </TabsTrigger>
-          
-           </div>
+        <Tabs defaultValue="public" className="space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <TabsList className="grid w-full sm:w-auto grid-cols-2 h-auto p-1">
+              <TabsTrigger value="public" className="text-sm px-3 py-2">
+                Public Groups
+              </TabsTrigger>
+              <TabsTrigger value="mygroups" className="text-sm px-3 py-2">
+                <span className="hidden sm:inline">Private </span>Groups
+              </TabsTrigger>
+            </TabsList>
 
-              <div>
-              <Button asChild>
+            <Button asChild className="w-full sm:w-auto">
               <Link href="/groups/create">
                 <Plus className="w-4 h-4 mr-2" />
-                Create Group
+                <span className="hidden sm:inline">Create </span>Group
               </Link>
             </Button>
-              </div>
-          </TabsList>
+          </div>
 
-          <TabsContent value="public" className="space-y-6">
+          <TabsContent value="public" className="space-y-4 sm:space-y-6">
             {/* Search and Filters */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   placeholder="Search groups..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-sm sm:text-base"
                 />
               </div>
               <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="w-full sm:w-48">
+                <SelectTrigger className="w-full sm:w-48 text-sm sm:text-base">
                   <Filter className="w-4 h-4 mr-2" />
                   <SelectValue placeholder="Filter by type" />
                 </SelectTrigger>
@@ -165,8 +160,8 @@ export default function GroupsPage() {
 
             {/* Cache Status & Refresh */}
             {!loading && !error && publicGroups.length > 0 && (
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
                   {isFromCache && (
                     <>
                       <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -175,13 +170,18 @@ export default function GroupsPage() {
                   )}
                   <span>{publicGroups.length} groups found</span>
                 </div>
-                <Button 
-                  onClick={() => forceRefresh()} 
-                  variant="outline" 
+                <Button
+                  onClick={() => forceRefresh()}
+                  variant="outline"
                   size="sm"
                   disabled={loading}
+                  className="w-full sm:w-auto text-xs sm:text-sm"
                 >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                  <RefreshCw
+                    className={`w-3 h-3 sm:w-4 sm:h-4 mr-2 ${
+                      loading ? "animate-spin" : ""
+                    }`}
+                  />
                   Refresh
                 </Button>
               </div>
@@ -190,12 +190,20 @@ export default function GroupsPage() {
             {/* Error State */}
             {error && (
               <Card>
-                <CardContent className="text-center py-12">
+                <CardContent className="text-center py-8 sm:py-12 px-4">
                   <div className="text-red-600 mb-4">
-                    <span className="text-lg font-semibold">Error loading groups</span>
-                    <p className="text-sm mt-2">{error}</p>
+                    <span className="text-base sm:text-lg font-semibold">
+                      Error loading groups
+                    </span>
+                    <p className="text-xs sm:text-sm mt-2 break-words">
+                      {error}
+                    </p>
                   </div>
-                  <Button onClick={() => refetch()} variant="outline">
+                  <Button
+                    onClick={() => refetch()}
+                    variant="outline"
+                    className="w-full sm:w-auto text-sm"
+                  >
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Try Again
                   </Button>
@@ -206,17 +214,17 @@ export default function GroupsPage() {
             {/* Empty State */}
             {!loading && !error && filteredGroups.length === 0 && (
               <Card>
-                <CardContent className="text-center py-12">
-                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <CardContent className="text-center py-8 sm:py-12 px-4">
+                  <Users className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                     No groups found
                   </h3>
-                  <p className="text-gray-600 mb-4">
-                    {searchTerm || filterType !== "all" 
-                      ? "No groups match your current filters." 
+                  <p className="text-sm sm:text-base text-gray-600 mb-4 max-w-md mx-auto">
+                    {searchTerm || filterType !== "all"
+                      ? "No groups match your current filters."
                       : "No groups have been created yet. Be the first to create one!"}
                   </p>
-                  <Button asChild>
+                  <Button asChild className="w-full sm:w-auto">
                     <Link href="/groups/create">
                       <Plus className="w-4 h-4 mr-2" />
                       Create Group
@@ -228,101 +236,129 @@ export default function GroupsPage() {
 
             {/* Groups Grid */}
             {!loading && !error && filteredGroups.length > 0 && (
-              <div className="grid gap-6">
+              <div className="grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {filteredGroups.map((group) => (
-                <Card
-                  key={group.id}
-                  className="hover:shadow-lg transition-shadow"
-                >
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <CardTitle className="text-xl">
-                            {group.name}
-                          </CardTitle>
-                          <div className="flex items-center gap-2">
-                            <Badge
-                              variant="outline"
-                              className="text-green-600 border-green-200"
-                            >
-                              <Globe className="w-3 h-3 mr-1" />
-                              Public
-                            </Badge>
-                            {group.locked && (
+                  <Card
+                    key={group.id}
+                    className="hover:shadow-lg transition-shadow"
+                  >
+                    <CardHeader className="pb-3 sm:pb-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                            <CardTitle className="text-lg sm:text-xl">
+                              {group.name}
+                            </CardTitle>
+                            <div className="flex items-center gap-1 sm:gap-2">
                               <Badge
                                 variant="outline"
-                                className="text-orange-600 border-orange-200"
+                                className="text-green-600 border-green-200 text-xs"
                               >
-                                <Lock className="w-3 h-3 mr-1" />
-                                Locked
+                                <Globe className="w-3 h-3 mr-1" />
+                                <span className="hidden sm:inline">Public</span>
+                                <span className="sm:hidden">Pub</span>
                               </Badge>
-                            )}
+                              {group.locked && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-orange-600 border-orange-200 text-xs"
+                                >
+                                  <Lock className="w-3 h-3 mr-1" />
+                                  <span className="hidden sm:inline">
+                                    Locked
+                                  </span>
+                                  <span className="sm:hidden">Lock</span>
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <CardDescription className="text-sm sm:text-base mb-3 line-clamp-2">
+                            {group.description}
+                          </CardDescription>
+                          <div className="flex flex-wrap gap-1 sm:gap-2">
+                            {group.tags.map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
                           </div>
                         </div>
-                        <CardDescription className="text-base mb-3">
-                          {group.description}
-                        </CardDescription>
-                        <div className="flex flex-wrap gap-2">
-                          {group.tags.map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="secondary"
-                              className="text-xs"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
+                        <div>
+                          <p className="text-xs sm:text-sm text-gray-500">
+                            Members
+                          </p>
+                          <p className="font-semibold text-sm sm:text-base">
+                            {group.members}/{group.maxMembers}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs sm:text-sm text-gray-500">
+                            Contribution
+                          </p>
+                          <p className="font-semibold text-sm sm:text-base">
+                            {group.contribution}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs sm:text-sm text-gray-500">
+                            Frequency
+                          </p>
+                          <p className="font-semibold text-sm sm:text-base">
+                            {group.frequency}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs sm:text-sm text-gray-500">
+                            Min. Reputation
+                          </p>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
+                            <span className="font-semibold text-sm sm:text-base">
+                              {group.minReputation}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                      <div>
-                        <p className="text-sm text-gray-500">Members</p>
-                        <p className="font-semibold">
-                          {group.members}/{group.maxMembers}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Contribution</p>
-                        <p className="font-semibold">{group.contribution}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Frequency</p>
-                        <p className="font-semibold">{group.frequency}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Min. Reputation</p>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-4 h-4 text-yellow-500" />
-                          <span className="font-semibold">
-                            {group.minReputation}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-gray-500">
-                        Created by {group.creator}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="text-xs sm:text-sm text-gray-500 truncate">
+                          Created by {group.creator}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                            className="flex-1 sm:flex-none text-xs sm:text-sm"
+                          >
+                            <Link href={`/groups/${group.id}`}>
+                              <span className="hidden sm:inline">
+                                View Details
+                              </span>
+                              <span className="sm:hidden">Details</span>
+                            </Link>
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleJoinGroup(group.id)}
+                            className="flex-1 sm:flex-none text-xs sm:text-sm"
+                          >
+                            <span className="hidden sm:inline">Join Group</span>
+                            <span className="sm:hidden">Join</span>
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/groups/${group.id}`}>View Details</Link>
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handleJoinGroup(group.id)}
-                        >
-                          Join Group
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             )}
           </TabsContent>
@@ -340,7 +376,9 @@ export default function GroupsPage() {
                 />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-green-600">● {userGroups.length} groups found</span>
+                <span className="text-sm text-green-600">
+                  ● {userGroups.length} groups found
+                </span>
                 <Button onClick={() => refetch()} variant="outline" size="sm">
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Refresh
@@ -409,99 +447,119 @@ export default function GroupsPage() {
             {/* My Groups Grid */}
             {!loading && !error && userGroups.length > 0 && (
               <div className="grid gap-6">
-                {userGroups.filter((group) => {
-                  const matchesSearch =
-                    group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    group.description.toLowerCase().includes(searchTerm.toLowerCase());
-                  return matchesSearch;
-                }).map((group) => (
-                  <Card
-                    key={group.id}
-                    className="hover:shadow-lg transition-shadow"
-                  >
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <CardTitle className="text-xl">
-                              {group.name}
-                            </CardTitle>
-                            <div className="flex items-center gap-2">
-                              <Badge
-                                variant="outline"
-                                className="text-purple-600 border-purple-200"
-                              >
-                                <Lock className="w-3 h-3 mr-1" />
-                                Private
-                              </Badge>
-                              {group.locked && (
+                {userGroups
+                  .filter((group) => {
+                    const matchesSearch =
+                      group.name
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase()) ||
+                      group.description
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase());
+                    return matchesSearch;
+                  })
+                  .map((group) => (
+                    <Card
+                      key={group.id}
+                      className="hover:shadow-lg transition-shadow"
+                    >
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <CardTitle className="text-xl">
+                                {group.name}
+                              </CardTitle>
+                              <div className="flex items-center gap-2">
                                 <Badge
                                   variant="outline"
-                                  className="text-orange-600 border-orange-200"
+                                  className="text-purple-600 border-purple-200"
                                 >
                                   <Lock className="w-3 h-3 mr-1" />
-                                  Locked
+                                  Private
                                 </Badge>
-                              )}
+                                {group.locked && (
+                                  <Badge
+                                    variant="outline"
+                                    className="text-orange-600 border-orange-200"
+                                  >
+                                    <Lock className="w-3 h-3 mr-1" />
+                                    Locked
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            <CardDescription className="text-base mb-3">
+                              {group.description}
+                            </CardDescription>
+                            <div className="flex flex-wrap gap-2">
+                              {group.tags.map((tag) => (
+                                <Badge
+                                  key={tag}
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
                             </div>
                           </div>
-                          <CardDescription className="text-base mb-3">
-                            {group.description}
-                          </CardDescription>
-                          <div className="flex flex-wrap gap-2">
-                            {group.tags.map((tag) => (
-                              <Badge
-                                key={tag}
-                                variant="secondary"
-                                className="text-xs"
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                          <div>
+                            <div className="text-sm text-gray-500 mb-1">
+                              Members
+                            </div>
+                            <div className="font-semibold">
+                              {group.members}/{group.maxMembers}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-gray-500 mb-1">
+                              Contribution
+                            </div>
+                            <div className="font-semibold">
+                              {group.contribution}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-gray-500 mb-1">
+                              Frequency
+                            </div>
+                            <div className="font-semibold">
+                              {group.frequency}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-gray-500 mb-1">
+                              Min. Reputation
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Star className="w-4 h-4 text-yellow-500" />
+                              <span className="font-semibold">
+                                {group.minReputation}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div>
-                          <div className="text-sm text-gray-500 mb-1">Members</div>
-                          <div className="font-semibold">
-                            {group.members}/{group.maxMembers}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-gray-500 mb-1">Contribution</div>
-                          <div className="font-semibold">{group.contribution}</div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-gray-500 mb-1">Frequency</div>
-                          <div className="font-semibold">{group.frequency}</div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-gray-500 mb-1">Min. Reputation</div>
-                          <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 text-yellow-500" />
-                            <span className="font-semibold">
-                              {group.minReputation}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
 
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm text-gray-500">
-                          Created by {group.creator}
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm text-gray-500">
+                            Created by {group.creator}
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={`/groups/${group.id}`}>
+                                View Details
+                              </Link>
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm" asChild>
-                            <Link href={`/groups/${group.id}`}>View Details</Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
               </div>
             )}
           </TabsContent>
