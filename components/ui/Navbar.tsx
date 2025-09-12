@@ -32,9 +32,9 @@ const Navbar = ({ setShowWalletModal }: HeaderProps) => {
     // Navigation items with their paths and labels
     const navItems = [
         { path: '/', label: 'Home' },
-        { path: '/groups', label: 'Groups', protected: true },
         { path: '/profile', label: 'Profile', protected: true },
-        { path: '/reputation', label: 'Reputation', protected: true },
+        { path: '/groups', label: 'Groups', protected: true },
+        // { path: '/reputation', label: 'Reputation', protected: true },
         { path: '/Faq', label: 'FAQ' },
     ];
 

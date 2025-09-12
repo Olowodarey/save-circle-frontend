@@ -364,76 +364,52 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works & Liquidity Options */}
-      <section className="py-16 ">
+      {/* Liquidity Options Section */}
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4 max-w-6xl">
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* How it Works */}
-            <div className="md:w-1/2">
-              <h2 className="text-3xl font-bold mb-8">How It Works</h2>
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="text-2xl text-blue-600 font-bold">1</div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">
-                      Lock an Initial Amount
-                    </h3>
-                    <p className="text-gray-600">
-                      Start by locking a small amount to join a savings circle
-                      and secure your spot in the rotation.
-                    </p>
-                  </div>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Liquidity Options</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Choose the locking mechanism that best suits your savings needs
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="p-8 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mr-4">
+                  <Globe className="w-6 h-6 text-blue-600" />
                 </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="text-2xl text-blue-600 font-bold">2</div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">
-                      Make Regular Contributions
-                    </h3>
-                    <p className="text-gray-600">
-                      Contributions are made based on agreed amount on the
-                      schedule that works for your group's needs.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="text-2xl text-blue-600 font-bold">3</div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">
-                      Receive Your Payout
-                    </h3>
-                    <p className="text-gray-600">
-                      Get your lump sum when it's your turn in the rotation,
-                      with the amount growing as more members join.
-                    </p>
-                  </div>
-                </div>
+                <h3 className="text-xl font-semibold text-gray-900">Public Lock</h3>
               </div>
+              <p className="text-gray-600 leading-relaxed">
+                The collateral to be locked is determined by the system/Admin, which is paid by everyone joining the cycle.
+              </p>
             </div>
-
-            {/* Liquidity Options */}
-            <div className="md:w-1/2">
-              <h2 className="text-3xl font-bold mb-8">Liquidity Options</h2>
-              <div className="space-y-6">
-                <div className="p-6 bg-gray-50 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-2">Public Lock</h3>
-                  <p className="text-gray-600">
-                    The collateral to be locked is determined by the
-                    system/Admin, which is paid by everyone joining the cycle.
-                  </p>
+            
+            <div className="p-8 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center mr-4">
+                  <Lock className="w-6 h-6 text-purple-600" />
                 </div>
-                <div className="p-6 bg-gray-50 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-2">Private Lock</h3>
-                  <p className="text-gray-600">
-                    The locked collateral is set by the creator of the group
-                    based on the amount to be contributed by each individual,
-                    then the system verifies and approves the group creation.
-                  </p>
-                </div>
+                <h3 className="text-xl font-semibold text-gray-900">Private Lock</h3>
               </div>
+              <p className="text-gray-600 leading-relaxed">
+                The locked collateral is set by the creator of the group based on the amount to be contributed by each individual, then the system verifies and approves the group creation.
+              </p>
             </div>
+          </div>
+          
+          <div className="mt-12 text-center">
+            <Button
+              asChild
+              variant="outline"
+              className="px-8 py-6 border-2 border-gray-200 hover:border-blue-500 transition-colors"
+            >
+              <Link href="/groups" className="text-lg">
+                Explore All Options <ArrowRight className="ml-2 w-5 h-5 inline" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -441,7 +417,9 @@ export default function HomePage() {
       {/* Who Can Join */}
       <section id="who-can-join" className="py-16">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className="text-3xl font-bold text-center mb-12">Who can join SaveCircle?</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Who can join SaveCircle?
+          </h2>
 
           <div className="space-y-8">
             <div className="p-6 bg-white rounded-lg shadow-sm">
@@ -449,9 +427,16 @@ export default function HomePage() {
                 Traders and Crypto Enthusiasts
               </h3>
               <p className="text-gray-700">
-                Dedication and maintaining of initial capital as well as gathering of funds to actually fund trading accounts or keep a backup capital is always a stretch in the trading world.
-                We are dedicated to helping you accumulate your profits over a period of time and for as long as you wish, so as to be able to bounce bank into the system when it becomes necessary to add more...
-                Every traders dream is to monitor and be able to replenish (fund) his/her trading accounts when need arises, we at SaveCircle is dedicated into holding you accountable for Taking charts to new heights.
+                Dedication and maintaining of initial capital as well as
+                gathering of funds to actually fund trading accounts or keep a
+                backup capital is always a stretch in the trading world. We are
+                dedicated to helping you accumulate your profits over a period
+                of time and for as long as you wish, so as to be able to bounce
+                bank into the system when it becomes necessary to add more...
+                Every traders dream is to monitor and be able to replenish
+                (fund) his/her trading accounts when need arises, we at
+                SaveCircle is dedicated into holding you accountable for Taking
+                charts to new heights.
               </p>
             </div>
 
@@ -460,7 +445,15 @@ export default function HomePage() {
                 Students and Young Professionals
               </h3>
               <p className="text-gray-700">
-                This schooling and working system prove tedious and harsher daily as requirements to pay bills and meet up with certain demands such as monthly transportation, feeding, rents, and even departmental and school activities. Our SaveCircle system helps in securing such harsh realities and turning them into a Support system where by each individual can join a pool anticipating the time of their payment in the offline sectors and end up meeting up with all the demands at ease and at the right pace. SaveCircle turns imagination into hand stretched reality.
+                This schooling and working system prove tedious and harsher
+                daily as requirements to pay bills and meet up with certain
+                demands such as monthly transportation, feeding, rents, and even
+                departmental and school activities. Our SaveCircle system helps
+                in securing such harsh realities and turning them into a Support
+                system where by each individual can join a pool anticipating the
+                time of their payment in the offline sectors and end up meeting
+                up with all the demands at ease and at the right pace.
+                SaveCircle turns imagination into hand stretched reality.
               </p>
             </div>
 
@@ -469,8 +462,13 @@ export default function HomePage() {
                 Business persons and Long term planners
               </h3>
               <p className="text-gray-700">
-                What separates the rich from the poor isn't opportunities, it's pure capital and liquidity. In SaveCircle we turn lost of opportunities and imagination into serendipity, a combination of events which have come together by chance to make a surprisingly good or wonderful outcome.
-                We'd build up those committed activities and contributive acts into a strong support system where you can finally meet up with your goals.
+                What separates the rich from the poor isn't opportunities, it's
+                pure capital and liquidity. In SaveCircle we turn lost of
+                opportunities and imagination into serendipity, a combination of
+                events which have come together by chance to make a surprisingly
+                good or wonderful outcome. We'd build up those committed
+                activities and contributive acts into a strong support system
+                where you can finally meet up with your goals.
               </p>
             </div>
 
@@ -479,7 +477,13 @@ export default function HomePage() {
                 Community
               </h3>
               <p className="text-gray-700">
-                Communities and close associate could decide to raise funds by coming together to achieve a result over an environmental assessment or fundraising to sort out certain issues. With SaveCircle, that can be easily achieved by setting up a limit and a time frame to help in spreading out and accumulating the required funds to cover up the process. Just out here touching grass nd recharging the community vaults.
+                Communities and close associate could decide to raise funds by
+                coming together to achieve a result over an environmental
+                assessment or fundraising to sort out certain issues. With
+                SaveCircle, that can be easily achieved by setting up a limit
+                and a time frame to help in spreading out and accumulating the
+                required funds to cover up the process. Just out here touching
+                grass nd recharging the community vaults.
               </p>
             </div>
 
@@ -488,7 +492,13 @@ export default function HomePage() {
                 Family and Friends
               </h3>
               <p className="text-gray-700">
-                Illuminating ideas, bond and inspiration. In this regards close associates and families can set-up a pool and pitch in funds to plan an event, marriage, trip etc. with no fear of how payments can be made cause the accumulated funds can be used to setup any of those process and pay off any credit during those process. It unifies family and Friends ties while making payments easier and reliable coming as peace after the storm.
+                Illuminating ideas, bond and inspiration. In this regards close
+                associates and families can set-up a pool and pitch in funds to
+                plan an event, marriage, trip etc. with no fear of how payments
+                can be made cause the accumulated funds can be used to setup any
+                of those process and pay off any credit during those process. It
+                unifies family and Friends ties while making payments easier and
+                reliable coming as peace after the storm.
               </p>
             </div>
 
@@ -497,7 +507,13 @@ export default function HomePage() {
                 Others
               </h3>
               <p className="text-gray-700">
-                SaveCircle isn't limited to anyone to be honest was supposed to place this line at the top but placing it here still seems perfect. No age limitation or any other restrictions cause at SaveCircle we are a DAO and our community has the right in voting and implementing actions under the ecosystem. Our goal is to see everybody rise above ranks and win at every single step of the way.
+                SaveCircle isn't limited to anyone to be honest was supposed to
+                place this line at the top but placing it here still seems
+                perfect. No age limitation or any other restrictions cause at
+                SaveCircle we are a DAO and our community has the right in
+                voting and implementing actions under the ecosystem. Our goal is
+                to see everybody rise above ranks and win at every single step
+                of the way.
               </p>
             </div>
           </div>
@@ -509,43 +525,39 @@ export default function HomePage() {
       {/* Final CTA */}
 
       <div>
-      <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzIiIGhlaWdodD0iNTgiIHZpZXdCb3g9IjAgMCA3MiA1OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTM2IDU4QzU1Ljg4MjcgNTggNzIgNDUuNjczMSA3MiAzMEM3MiAxNC4zMjY5IDU1Ljg4MjcgMiAzNiAyQzE2LjExNzMgMiAwIDE0LjMyNjkgMCAzMEMwIDQ1LjY3MzEgMTYuMTE3MyA1OCAzNiA1OFoiIGZpbGw9IiNGRkZGRkYiLz4KPC9zdmc+Cg==')]" />
-        </div>
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Transform Your Savings?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of users already growing their wealth with
-            SaveCircle's innovative savings platform
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              className="bg-white text-blue-700 hover:bg-blue-50 px-8 text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-              asChild
-            >
-              <ProtectedLink
-                setShowWalletModal={setShowWalletModal}
-                href="/groups"
+        <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzIiIGhlaWdodD0iNTgiIHZpZXdCb3g9IjAgMCA3MiA1OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTM2IDU4QzU1Ljg4MjcgNTggNzIgNDUuNjczMSA3MiAzMEM3MiAxNC4zMjY5IDU1Ljg4MjcgMiAzNiAyQzE2LjExNzMgMiAwIDE0LjMyNjkgMCAzMEMwIDQ1LjY3MzEgMTYuMTE3MyA1OCAzNiA1OFoiIGZpbGw9IiNGRkZGRkYiLz4KPC9zdmc+Cg==')]" />
+          </div>
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Ready to Transform Your Savings?
+            </h2>
+            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+              Join thousands of users already growing their wealth with
+              SaveCircle's innovative savings platform
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                size="lg"
+                className="bg-white text-blue-700 hover:bg-blue-50 px-8 text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                asChild
               >
-                Get Started Now
-              </ProtectedLink>
-            </Button>
+                <ProtectedLink
+                  setShowWalletModal={setShowWalletModal}
+                  href="/groups"
+                >
+                  Get Started Now
+                </ProtectedLink>
+              </Button>
+            </div>
+            <div className="mt-6 text-sm text-blue-200">
+              No credit check. No hidden fees. Just better savings.
+            </div>
           </div>
-          <div className="mt-6 text-sm text-blue-200">
-            No credit check. No hidden fees. Just better savings.
-          </div>
-        </div>
-       
-      </section>
-      <Footer />
+        </section>
+        <Footer />
       </div>
-   
-
-
 
       <WalletConnectModal
         isOpen={showWalletModal}
